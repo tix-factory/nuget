@@ -1,5 +1,8 @@
 #!/bin/bash
+
+# https://stackoverflow.com/a/821419/1663648
 set -e
+
 echo "START build.sh"
 echo "BUILD_NUMBER: $BUILD_NUMBER"
 
