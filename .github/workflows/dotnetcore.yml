@@ -25,4 +25,4 @@ jobs:
       shell: bash
       working-directory: ./build
     - name: Publish NuGet packages
-      run: dotnet nuget push ./LocalNuGetRepo/*.nupkg -k ${{ secrets.nuget_apikey }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./LocalNuGetRepo/**/*.nupkg -k ${{ secrets.nuget_apikey }} -s https://api.nuget.org/v3/index.json
