@@ -28,5 +28,5 @@ jobs:
       run: dotnet nuget push ./LocalNuGetRepo/**/*.nupkg --api-key ${{ secrets.nuget_apikey }} --source https://api.nuget.org/v3/index.json --no-symbols true
     - name: Publish NuGet packages to github
       run: |
-           dotnet nuget sources Add -Name "GPR" -Source https://nuget.pkg.github.com/tix-factory/index.json -UserName tix-factory -Password ${{ secrets.github_token }}
+           nuget sources Add -Name "GPR" -Source https://nuget.pkg.github.com/tix-factory/index.json -UserName tix-factory -Password ${{ secrets.github_token }}
            dotnet nuget push ./LocalNuGetRepo/**/*.nupkg --source "GPR" --no-symbols true
