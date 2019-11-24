@@ -14,5 +14,6 @@ jobs:
       with:
         dotnet-version: 2.2.108
     - name: Build with dotnet
-      run: sh build/build.sh
+      run: sh build.sh
       shell: bash
+      working-directory: ./build
