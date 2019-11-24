@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<RepositoryUrl>https://github.com/tix-factory/nuget</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>http</PackageTags>
+		<RootPath>../../</RootPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\TixFactory.Http\TixFactory.Http.csproj" />
+		<PackageReference Include="TixFactory.CookieJar" Version="$(PackageVersion)"/>
+	</ItemGroup>
+
+	<Import Project="$(RootPath)build/build.targets"/>
+</Project>
