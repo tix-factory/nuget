@@ -1,3 +1,21 @@
-printenv
-dotnet build ./../TixFactory.CookieJar/TixFactory.CookieJar.sln -p:Version=2.0.$GITHUB_ACTION --configuration Release
-dotnet build ./../TixFactory.Http/TixFactory.Http.sln -p:Version=2.0.$GITHUB_ACTION --configuration Release
+echo "START build.sh"
+echo "BUILD_NUMBER: $BUILD_NUMBER"
+
+# https://stackoverflow.com/a/25119904/1663648
+if [ "$GITHUB_ACTIONS" = "true" ]; then configuration="Release"; else configuration="Debug"; fi
+
+slns=(
+	"TixFactory.CookieJar/TixFactory.CookieJar.sln"
+	"TixFactory.Http/TixFactory.Http.sln"
+)
+
+echo "Building ${#slns[@]} solutions (configuration: $configuration)..."
+
+# https://stackoverflow.com/a/18898718/1663648
+for sln in "${slns[@]}"
+do
+    echo "Building $sln..."
+	dotnet build ./../$sln -p:Version=2.0.$BUILD_NUMBER --configuration $configuration
+done
+
+echo "END build.sh"

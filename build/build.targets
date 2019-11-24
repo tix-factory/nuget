@@ -1,0 +1,17 @@
+<Project>
+	<PropertyGroup>
+		<LocalNuGetRepository Condition="'$(LocalNuGetRepository)' == ''">E:/LocalNuGetRepo</LocalNuGetRepository>
+		<PackageVersion Condition="'$(PackageVersion)' == ''">2.0.$(BUILD_NUMBER)</PackageVersion>
+	</PropertyGroup>
+	<Target Name="CopyToLocalRepo"
+	        AfterTargets="Pack"
+	        Condition="Exists('$(LocalNuGetRepository)') And '$(Configuration)|$(GeneratePackageOnBuild)' == 'Debug|true'">
+		<PropertyGroup>
+			<LocalCacheFolder>"$(UserProfile)\.nuget\packages\$(PackageId)\$(PackageVersion)"</LocalCacheFolder>
+			<NuGetFile>$(PackageOutputPath)$(PackageId).$(PackageVersion).nupkg</NuGetFile>
+		</PropertyGroup>
+		<Message Text="Copying $(NuGetFile) to $(LocalNuGetRepository)..." Importance="high"/>
+		<Copy SourceFiles="$(NuGetFile)" DestinationFolder="$(LocalNuGetRepository)" SkipUnchangedFiles="false" />
+		<Exec Command="rd /s /q $(LocalCacheFolder)"/>
+	</Target>
+</Project>
