@@ -1,9 +1,19 @@
 <Project>
 	<!-- NuGet properties -->
 	<PropertyGroup>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<RepositoryUrl>https://github.com/tix-factory/nuget</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
 		<PackageVersion Condition="'$(PackageVersion)' == ''">2.0.$(BUILD_NUMBER)</PackageVersion>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<SERVER_BUILD>false</SERVER_BUILD>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="$(RootPath)$(PackageLicenseFile)" Pack="true" PackagePath="$(PackageLicenseFile)">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 	<!-- Build Agent Properties -->
 	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
