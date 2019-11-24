@@ -13,8 +13,6 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 2.2.108
-    - name: Debug Part 1
-      run: dir
     - name: Build with dotnet
-      run: build/build.sh
+      run: sh build/build.sh
       shell: bash
