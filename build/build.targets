@@ -19,7 +19,6 @@
 	<PropertyGroup>
 		<RestoreSources>
 			$(LocalNuGetRepository);
-			https://api.nuget.org/v3/index.json;
 		</RestoreSources>
 	</PropertyGroup>
 
