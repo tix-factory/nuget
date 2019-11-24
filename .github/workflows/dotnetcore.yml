@@ -24,5 +24,7 @@ jobs:
       run: bash build.sh
       shell: bash
       working-directory: ./build
-    - name: Publish NuGet packages
+    - name: Publish NuGet packages to nuget.org
       run: dotnet nuget push ./LocalNuGetRepo/**/*.nupkg --api-key ${{ secrets.nuget_apikey }} --source https://api.nuget.org/v3/index.json --no-symbols true
+    - name: Publish NuGet packages to github
+      run: dotnet nuget push ./LocalNuGetRepo/**/*.nupkg --api-key ${{ secrets.github_token }} --source https://nuget.pkg.github.com/tix-factory/index.json --no-symbols true
