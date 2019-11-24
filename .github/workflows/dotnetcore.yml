@@ -8,7 +8,7 @@ on:
 jobs:
   build:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v1
@@ -16,8 +16,6 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 2.2.108
-    - name: Setup Nuget.exe
-      uses: warrenbuckley/Setup-Nuget@v1 
     - name: Build Number Generator
       uses: einaregilsson/build-number@v2
       with:
@@ -29,6 +27,4 @@ jobs:
     - name: Publish NuGet packages to nuget.org
       run: dotnet nuget push ./LocalNuGetRepo/**/*.nupkg --api-key ${{ secrets.nuget_apikey }} --source https://api.nuget.org/v3/index.json --no-symbols true
     - name: Publish NuGet packages to github
-      run: |
-           nuget sources Add -Name "GPR" -Source https://nuget.pkg.github.com/tix-factory/index.json -UserName tix-factory -Password ${{ secrets.github_token }}
-           dotnet nuget push ./LocalNuGetRepo/**/*.nupkg --source "GPR" --no-symbols true
+      run: dotnet nuget push ./LocalNuGetRepo/**/*.nupkg --api-key ${{ secrets.github_packages_pat }} --source https://nuget.pkg.github.com/tix-factory/index.json --no-symbols true
