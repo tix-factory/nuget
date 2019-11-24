@@ -1,11 +1,37 @@
 <Project>
+	<!-- NuGet properties -->
 	<PropertyGroup>
-		<LocalNuGetRepository Condition="'$(LocalNuGetRepository)' == ''">E:/LocalNuGetRepo</LocalNuGetRepository>
 		<PackageVersion Condition="'$(PackageVersion)' == ''">2.0.$(BUILD_NUMBER)</PackageVersion>
+		<SERVER_BUILD>false</SERVER_BUILD>
 	</PropertyGroup>
+
+	<!-- Build Agent Properties -->
+	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+		<SERVER_BUILD>true</SERVER_BUILD>
+		<CHECKOUT_DIRECTORY>$(GITHUB_WORKSPACE)</CHECKOUT_DIRECTORY>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(SERVER_BUILD)' != 'true'">
+		<LocalNuGetRepository Condition="'$(LocalNuGetRepository)' == ''">E:/LocalNuGetRepo</LocalNuGetRepository>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(SERVER_BUILD)' == 'true'">
+		<LocalNuGetRepository>$(CHECKOUT_DIRECTORY)/LocalNuGetRepo</LocalNuGetRepository>
+	</PropertyGroup>
+	<PropertyGroup>
+		<RestoreSources>
+			$(LocalNuGetRepository);
+		</RestoreSources>
+	</PropertyGroup>
+
+	<!-- Copy NuGet package to local repository -->
+	<Target Name="CreateLocalNuGetRpository"
+		BeforeTargets="Restore;CollectPackageReferences">
+		<MakeDir Directories="$(LocalNuGetRepository)" Condition="!Exists('$(LocalNuGetRepository)')" />
+	</Target>
+
+	<!-- Development -->
 	<Target Name="CopyToLocalRepo"
 	        AfterTargets="Pack"
-	        Condition="Exists('$(LocalNuGetRepository)') And '$(Configuration)|$(GeneratePackageOnBuild)' == 'Debug|true'">
+			Condition="'$(SERVER_BUILD)|$(GeneratePackageOnBuild)' == 'false|true'">
 		<PropertyGroup>
 			<LocalCacheFolder>"$(UserProfile)\.nuget\packages\$(PackageId)\$(PackageVersion)"</LocalCacheFolder>
 			<NuGetFile>$(PackageOutputPath)$(PackageId).$(PackageVersion).nupkg</NuGetFile>
@@ -13,5 +39,16 @@
 		<Message Text="Copying $(NuGetFile) to $(LocalNuGetRepository)..." Importance="high"/>
 		<Copy SourceFiles="$(NuGetFile)" DestinationFolder="$(LocalNuGetRepository)" SkipUnchangedFiles="false" />
 		<Exec Command="rd /s /q $(LocalCacheFolder)"/>
+	</Target>
+
+	<!-- Build Agent -->
+	<Target Name="CopyToLocalRepo_Server"
+	        AfterTargets="Pack"
+			Condition="'$(SERVER_BUILD)|$(GeneratePackageOnBuild)' == 'true|true'">
+		<PropertyGroup>
+			<NuGetFile>$(PackageOutputPath)$(PackageId).$(PackageVersion).nupkg</NuGetFile>
+		</PropertyGroup>
+		<Message Text="Copying $(NuGetFile) to $(LocalNuGetRepository)..." Importance="high"/>
+		<Copy SourceFiles="$(NuGetFile)" DestinationFolder="$(LocalNuGetRepository)" SkipUnchangedFiles="false" />
 	</Target>
 </Project>

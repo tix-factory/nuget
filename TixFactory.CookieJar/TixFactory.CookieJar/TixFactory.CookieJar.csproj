@@ -6,6 +6,8 @@
 		<RepositoryUrl>https://github.com/tix-factory/nuget</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>http</PackageTags>
+		<RootPath>../../</RootPath>
 	</PropertyGroup>
 
+	<Import Project="$(RootPath)build/build.targets"/>
 </Project>
