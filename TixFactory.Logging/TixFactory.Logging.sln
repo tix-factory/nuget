@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Logging", "TixFactory.Logging\TixFactory.Logging.csproj", "{0EC0B83F-EEF7-4E01-96CF-81BB7E41C107}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Logging.Windows", "TixFactory.Logging.Windows\TixFactory.Logging.Windows.csproj", "{B591264D-1264-421A-9FFF-224E9F688F54}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{0EC0B83F-EEF7-4E01-96CF-81BB7E41C107}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0EC0B83F-EEF7-4E01-96CF-81BB7E41C107}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0EC0B83F-EEF7-4E01-96CF-81BB7E41C107}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B591264D-1264-421A-9FFF-224E9F688F54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B591264D-1264-421A-9FFF-224E9F688F54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B591264D-1264-421A-9FFF-224E9F688F54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B591264D-1264-421A-9FFF-224E9F688F54}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
