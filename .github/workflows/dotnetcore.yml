@@ -26,7 +26,7 @@ jobs:
       working-directory: ./build
     - name: Publish NuGet packages to github
       run: |
-        dotnet run TixFactory.NuGetCredentialsConfig/TixFactory.NuGetCredentialsConfig/TixFactory.NuGetCredentialsConfig.csproj nuget.config ${{ secrets.nuget_apikey }}
+        dotnet run ./TixFactory.NuGetCredentialsConfig/TixFactory.NuGetCredentialsConfig/TixFactory.NuGetCredentialsConfig.csproj nuget.config ${{ secrets.nuget_apikey }}
         dotnet nuget push ./../LocalNuGetRepo/**/*.nupkg --source "GPR"
       working-directory: ./build
     - name: Publish NuGet packages to nuget.org
