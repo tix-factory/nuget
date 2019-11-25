@@ -16,6 +16,8 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 2.2.108
+    - name: Setup NuGet.exe for use with actions
+      uses: NuGet/setup-nuget@v1.0.2
     - name: Build Number Generator
       uses: einaregilsson/build-number@v2
       with:
@@ -28,9 +30,7 @@ jobs:
       run: sed 's/GITHUB_TOKEN/${{ secrets.GITHUB_TOKEN }}/g' ./nuget.config > ./nuget.config
       working-directory: ./build
     - name: SO DUMB
-      run: |
-        value=$(<nuget.config)
-        echo "$value"
+      run: cat ./nuget.config
       shell: bash
       working-directory: ./build
     - name: Publish NuGet packages to github
