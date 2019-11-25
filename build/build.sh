@@ -10,6 +10,7 @@ echo "BUILD_NUMBER: $BUILD_NUMBER"
 if [ "$GITHUB_ACTIONS" = "true" ]; then configuration="Release"; else configuration="Debug"; fi
 
 slns=(
+	"TixFactory.Logging/TixFactory.Logging.sln"
 	"TixFactory.CookieJar/TixFactory.CookieJar.sln"
 	"TixFactory.Http/TixFactory.Http.sln"
 )
