@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<RootPath>../../</RootPath>
+		<PackageTags>operations</PackageTags>
+	</PropertyGroup>
+
+	<Import Project="$(RootPath)build/build.targets"/>
+</Project>

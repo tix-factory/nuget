@@ -11,6 +11,7 @@ if [ "$GITHUB_ACTIONS" = "true" ]; then configuration="Release"; else configurat
 
 slns=(
 	"TixFactory.Logging/TixFactory.Logging.sln"
+	"TixFactory.Operations/TixFactory.Operations.sln"
 	"TixFactory.CookieJar/TixFactory.CookieJar.sln"
 	"TixFactory.Http/TixFactory.Http.sln"
 )
