@@ -11,7 +11,7 @@ namespace TixFactory.NuGetCredentialsConfig
 			var githubToken = args[1];
 
 			var fileName = Path.GetFileName(configFile);
-			if(!File.Exists(configFile) || fileName != "NuGet.config")
+			if(!File.Exists(configFile) || fileName != "nuget.config")
 			{
 				Console.WriteLine("Invalid config file.");
 				Environment.Exit(1);
