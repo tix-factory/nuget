@@ -24,10 +24,11 @@ jobs:
       run: bash build.sh
       shell: bash
       working-directory: ./build
+    - name: Setup nuget.config for github
+      run: sed 's/GITHUB_TOKEN/${{ secrets.GITHUB_TOKEN }}/g' ./nuget.config > ./nuget.config
+      working-directory: ./build
     - name: Publish NuGet packages to github
-      run: |
-        dotnet run --project ./TixFactory.NuGetCredentialsConfig/TixFactory.NuGetCredentialsConfig/TixFactory.NuGetCredentialsConfig.csproj nuget.config ${{ secrets.nuget_apikey }}
-        dotnet nuget push ./../LocalNuGetRepo/**/*.nupkg --source "GPR"
+      run: dotnet nuget push ./../LocalNuGetRepo/**/*.nupkg --source "GPR"
       working-directory: ./build
     - name: Publish NuGet packages to nuget.org
       run: dotnet nuget push ./LocalNuGetRepo/**/*.nupkg --api-key ${{ secrets.nuget_apikey }} --source https://api.nuget.org/v3/index.json --no-symbols true
