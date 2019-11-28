@@ -1,4 +1,9 @@
 <Project>
+	<!-- Build properties -->
+	<PropertyGroup>
+		<DocumentationFile Condition="'$(DocumentationFile)' == ''">bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+	</PropertyGroup>
+
 	<!-- NuGet properties -->
 	<PropertyGroup>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
