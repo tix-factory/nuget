@@ -15,7 +15,6 @@ namespace TixFactory.Configuration
 		private const string _ValuePropertyName = "Value";
 
 		private readonly ISettingValueSource _SettingValueSource;
-		private readonly PropertyInfo _SettingValueProperty;
 		private readonly MethodInfo _TryGetSettingValueMethod;
 		private readonly MethodInfo _WriteSettingValueMethod;
 
@@ -29,10 +28,7 @@ namespace TixFactory.Configuration
 		public SettingsInitializer(ISettingValueSource settingValueSource)
 		{
 			_SettingValueSource = settingValueSource ?? throw new ArgumentNullException(nameof(settingValueSource));
-
-			var individualSettingInterfaceType = typeof(ISetting<>);
-			_SettingValueProperty = individualSettingInterfaceType.GetProperty(_ValuePropertyName);
-
+			
 			var settingValueSourceType = typeof(ISettingValueSource);
 			_TryGetSettingValueMethod = settingValueSourceType.GetMethod(nameof(ISettingValueSource.TryGetSettingValue));
 			_WriteSettingValueMethod = settingValueSourceType.GetMethod(nameof(ISettingValueSource.WriteSettingValue));
@@ -56,7 +52,8 @@ namespace TixFactory.Configuration
 			{
 				var property = GetProperty(settingsType, call.Method);
 				var individualSetting = individualSettings[property.Name];
-				return _SettingValueProperty.GetValue(individualSetting);
+				var settingValueProperty = GetIndividualSettingValueProperty(property);
+				return settingValueProperty.GetValue(individualSetting);
 			});
 
 			A.CallTo(fakedImplementation).Where(call => call.Method.Name.StartsWith("set_")).Invokes(call =>
@@ -96,7 +93,8 @@ namespace TixFactory.Configuration
 				{
 					if (TryGetSettingValue(groupName, settingProperty, out var settingValue))
 					{
-						_SettingValueProperty.SetValue(individualSetting, settingValue);
+						var settingValueProperty = GetIndividualSettingValueProperty(settingProperty);
+						settingValueProperty.SetValue(individualSetting, settingValue);
 					}
 				}
 			};
@@ -170,6 +168,12 @@ namespace TixFactory.Configuration
 			}
 
 			return individualSettings;
+		}
+
+		private PropertyInfo GetIndividualSettingValueProperty(PropertyInfo settingProperty)
+		{
+			var individualSettingInterfaceType = typeof(ISetting<>).MakeGenericType(settingProperty.PropertyType);
+			return individualSettingInterfaceType.GetProperty(_ValuePropertyName);
 		}
 	}
 }
