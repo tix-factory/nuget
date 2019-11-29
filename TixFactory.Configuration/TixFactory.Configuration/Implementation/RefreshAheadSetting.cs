@@ -28,19 +28,31 @@ namespace TixFactory.Configuration
 		/// - <paramref name="valueFactory"/>
 		/// </exception>
 		public RefreshAheadSetting(Func<T> valueFactory, TimeSpan refreshInterval)
+			: this(valueFactory, new Setting<TimeSpan>(refreshInterval))
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new <see cref="RefreshAheadSetting{T}"/>.
+		/// </summary>
+		/// <param name="valueFactory">The value factory for the refreshed <see cref="ManufacturedSetting{T}.Value"/>.</param>
+		/// <param name="refreshIntervalSetting">How often to refresh the <see cref="ManufacturedSetting{T}.Value"/>.</param>
+		/// <exception cref="ArgumentNullException">
+		/// - <paramref name="valueFactory"/>
+		/// - <paramref name="refreshIntervalSetting"/>
+		/// </exception>
+		public RefreshAheadSetting(Func<T> valueFactory, ISetting<TimeSpan> refreshIntervalSetting)
 			: base(valueFactory, refreshOnRead: false)
 		{
-			var refreshIntervalSetting = new Setting<TimeSpan>(refreshInterval);
-
-			RefreshInterval = refreshIntervalSetting;
+			RefreshInterval = refreshIntervalSetting ?? throw new ArgumentNullException(nameof(refreshIntervalSetting));
 			_LastRefresh = new Setting<DateTime?>();
 			_RefreshLock = new SemaphoreSlim(0, 1);
 			_RefreshTimer = new Timer(
 				callback: RefreshValue,
 				state: null,
 				dueTime: TimeSpan.Zero,
-				period: refreshInterval);
-			
+				period: refreshIntervalSetting.Value);
+
 			refreshIntervalSetting.Changed += RefreshIntervalChanged;
 		}
 
