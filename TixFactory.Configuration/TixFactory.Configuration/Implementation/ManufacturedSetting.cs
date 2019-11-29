@@ -36,7 +36,7 @@ namespace TixFactory.Configuration
 		}
 
 		/// <inheritdoc cref="IManufacturedSetting{T}.Refresh"/>
-		public void Refresh()
+		public virtual void Refresh()
 		{
 			var originalValue = _CurrentValue;
 			var newValue = _ValueFactory();
