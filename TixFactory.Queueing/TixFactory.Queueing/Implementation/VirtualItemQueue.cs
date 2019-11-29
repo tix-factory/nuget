@@ -41,12 +41,7 @@ namespace TixFactory.Queueing
 
 			try
 			{
-				var queueItem = new QueueItem<TItem>
-				{
-					Id = Guid.NewGuid().ToString(),
-					Value = item,
-					LockExpiration = DateTime.MinValue
-				};
+				var queueItem = new QueueItem<TItem>(Guid.NewGuid().ToString(), item);
 
 				_Queue.Add(queueItem);
 				CheckSizes();
