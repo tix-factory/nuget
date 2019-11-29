@@ -14,6 +14,7 @@ slns=(
 	"TixFactory.Logging/TixFactory.Logging.sln"
 	"TixFactory.Operations/TixFactory.Operations.sln"
 	"TixFactory.CookieJar/TixFactory.CookieJar.sln"
+	"TixFactory.Serialization/TixFactory.Serialization.sln"
 	"TixFactory.Http/TixFactory.Http.sln"
 	"TixFactory.Configuration/TixFactory.Configuration.sln"
 	"TixFactory.Queueing/TixFactory.Queueing.sln"
