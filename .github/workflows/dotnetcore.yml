@@ -28,9 +28,9 @@ jobs:
       working-directory: ./build
     - name: Publish NuGet packages to github
       run: |
-           for nugetPackage in ./LocalNuGetRepo/**/*.nupkg
+           for nugetPackage in ./LocalNuGetRepo/*.nupkg
            do
-             curl -vX PUT -u "WebGL3D:${{ secrets.github_token }}" -F package=@$nugetPackage https://nuget.pkg.github.com/tix-factory/
+             curl -vX PUT -u "tix-factory:${{ secrets.github_token }}" -F package=@$nugetPackage https://nuget.pkg.github.com/tix-factory/
            done
       shell: bash
     - name: Publish NuGet packages to nuget.org
