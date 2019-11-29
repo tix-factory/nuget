@@ -9,7 +9,7 @@ namespace TixFactory.Configuration
 		private readonly Func<T> _ValueFactory;
 		private T _CurrentValue;
 
-		/// <inheritdoc cref="ISetting{T}.Changed"/>
+		/// <inheritdoc cref="IReadOnlySetting{T}.Changed"/>
 		public event Action<T, T> Changed;
 
 		/// <inheritdoc cref="ISetting{T}.Value"/>
@@ -24,7 +24,6 @@ namespace TixFactory.Configuration
 
 				return _CurrentValue;
 			}
-			set => throw new NotSupportedException($"{nameof(ManufacturedSetting<T>)}.{nameof(Value)} cannot be modified.");
 		}
 		
 		/// <summary>

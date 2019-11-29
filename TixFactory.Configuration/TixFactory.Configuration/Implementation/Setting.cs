@@ -7,7 +7,7 @@ namespace TixFactory.Configuration
 	{
 		private T _CurrentValue;
 
-		/// <inheritdoc cref="ISetting{T}.Changed"/>
+		/// <inheritdoc cref="IReadOnlySetting{T}.Changed"/>
 		public event Action<T, T> Changed;
 
 		/// <inheritdoc cref="ISetting{T}.Value"/>
