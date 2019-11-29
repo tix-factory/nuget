@@ -10,13 +10,17 @@ echo "BUILD_NUMBER: $BUILD_NUMBER"
 if [ "$GITHUB_ACTIONS" = "true" ]; then configuration="Release"; else configuration="Debug"; fi
 
 slns=(
+	# Base Assemblies
 	"TixFactory.Logging/TixFactory.Logging.sln"
 	"TixFactory.Operations/TixFactory.Operations.sln"
 	"TixFactory.CookieJar/TixFactory.CookieJar.sln"
 	"TixFactory.Http/TixFactory.Http.sln"
-	"TixFactory.Firebase/TixFactory.Firebase.sln"
 	"TixFactory.Configuration/TixFactory.Configuration.sln"
 	"TixFactory.Queueing/TixFactory.Queueing.sln"
+
+	# Third Party Link Assemblies
+	"TixFactory.Firebase/TixFactory.Firebase.sln"
+	"TixFactory.Discord/TixFactory.Discord.sln"
 )
 
 echo "Building ${#slns[@]} solutions (configuration: $configuration)..."
