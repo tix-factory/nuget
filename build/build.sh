@@ -16,9 +16,9 @@ slns=(
 	"TixFactory.Operations/TixFactory.Operations.sln"
 	"TixFactory.CookieJar/TixFactory.CookieJar.sln"
 	"TixFactory.Serialization/TixFactory.Serialization.sln"
-	"TixFactory.Http/TixFactory.Http.sln"
 	"TixFactory.Configuration/TixFactory.Configuration.sln"
 	"TixFactory.Queueing/TixFactory.Queueing.sln"
+	"TixFactory.Http/TixFactory.Http.sln"
 
 	# Third Party Link Assemblies
 	"TixFactory.Firebase/TixFactory.Firebase.sln"
