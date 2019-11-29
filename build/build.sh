@@ -15,6 +15,8 @@ slns=(
 	"TixFactory.CookieJar/TixFactory.CookieJar.sln"
 	"TixFactory.Http/TixFactory.Http.sln"
 	"TixFactory.Firebase/TixFactory.Firebase.sln"
+	"TixFactory.Configuration/TixFactory.Configuration.sln"
+	"TixFactory.Queueing/TixFactory.Queueing.sln"
 )
 
 echo "Building ${#slns[@]} solutions (configuration: $configuration)..."
