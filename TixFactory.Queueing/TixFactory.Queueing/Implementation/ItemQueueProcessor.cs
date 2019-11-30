@@ -46,8 +46,8 @@ namespace TixFactory.Queueing
 			_ItemQueueProcessorSettings = itemQueueProcessorSettings ?? throw new ArgumentNullException(nameof(itemQueueProcessorSettings));
 			_Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			_ProcessItemFunc = processItemFunc ?? throw new ArgumentNullException(nameof(processItemFunc));
-			_StartLock = new SemaphoreSlim(1, 1);
-			_ProcessQueueLock = new SemaphoreSlim(0, 1);
+			_StartLock = new SemaphoreSlim(0, 1);
+			_ProcessQueueLock = new SemaphoreSlim(1, 1);
 			_RunningThreads = new List<Task>();
 
 			_RunningTask = new Setting<Task>(defaultValue: null);

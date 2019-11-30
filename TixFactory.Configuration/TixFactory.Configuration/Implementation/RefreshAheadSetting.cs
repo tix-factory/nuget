@@ -46,7 +46,7 @@ namespace TixFactory.Configuration
 		{
 			RefreshInterval = refreshIntervalSetting ?? throw new ArgumentNullException(nameof(refreshIntervalSetting));
 			_LastRefresh = new Setting<DateTime?>();
-			_RefreshLock = new SemaphoreSlim(0, 1);
+			_RefreshLock = new SemaphoreSlim(1, 1);
 			_RefreshTimer = new Timer(
 				callback: RefreshValue,
 				state: null,

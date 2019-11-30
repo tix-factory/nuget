@@ -7,6 +7,7 @@ namespace TixFactory.Configuration
 	{
 		private readonly bool _RefreshOnRead;
 		private readonly Func<T> _ValueFactory;
+		private bool _ValueLoaded = false;
 		private T _CurrentValue;
 
 		/// <inheritdoc cref="IReadOnlySetting{T}.Changed"/>
@@ -17,7 +18,7 @@ namespace TixFactory.Configuration
 		{
 			get
 			{
-				if (_RefreshOnRead)
+				if (_RefreshOnRead || !_ValueLoaded)
 				{
 					Refresh();
 				}
@@ -44,6 +45,7 @@ namespace TixFactory.Configuration
 			if (!newValue.Equals(originalValue))
 			{
 				_CurrentValue = newValue;
+				_ValueLoaded = true;
 				Changed?.Invoke(newValue, originalValue);
 			}
 		}
