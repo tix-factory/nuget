@@ -18,7 +18,7 @@ namespace TixFactory.Configuration
 		{
 			get
 			{
-				if (_RefreshOnRead || !_ValueLoaded)
+				if (ShouldRefresh())
 				{
 					Refresh();
 				}
@@ -48,6 +48,28 @@ namespace TixFactory.Configuration
 				_ValueLoaded = true;
 				Changed?.Invoke(newValue, originalValue);
 			}
+		}
+
+		/// <summary>
+		/// Whether or not the value should be refreshed.
+		/// </summary>
+		/// <remarks>
+		/// Taken into account when reading the <see cref="Value"/>.
+		/// </remarks>
+		/// <returns><c>true</c> if the value should be refreshed.</returns>
+		protected virtual bool ShouldRefresh()
+		{
+			if (!_ValueLoaded)
+			{
+				return true;
+			}
+
+			if (_RefreshOnRead)
+			{
+				return true;
+			}
+
+			return false;
 		}
 	}
 }

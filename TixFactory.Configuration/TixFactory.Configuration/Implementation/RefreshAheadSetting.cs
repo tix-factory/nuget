@@ -9,6 +9,7 @@ namespace TixFactory.Configuration
 		private readonly Timer _RefreshTimer;
 		private readonly ISetting<DateTime?> _LastRefresh;
 		private readonly SemaphoreSlim _RefreshLock;
+		private readonly SemaphoreSlim _RefreshIntervalLock;
 
 		/// <inheritdoc cref="IRefreshAheadSetting{T}.RefreshException"/>
 		public event Action<Exception> RefreshException;
@@ -47,6 +48,7 @@ namespace TixFactory.Configuration
 			RefreshInterval = refreshIntervalSetting ?? throw new ArgumentNullException(nameof(refreshIntervalSetting));
 			_LastRefresh = new Setting<DateTime?>();
 			_RefreshLock = new SemaphoreSlim(1, 1);
+			_RefreshIntervalLock = new SemaphoreSlim(1, 1);
 			_RefreshTimer = new Timer(
 				callback: RefreshValue,
 				state: null,
@@ -59,18 +61,47 @@ namespace TixFactory.Configuration
 		/// <inheritdoc cref="IManufacturedSetting{T}.Refresh"/>
 		public override void Refresh()
 		{
-			base.Refresh();
-			_LastRefresh.Value = DateTime.UtcNow;
+			_RefreshLock.Wait();
+
+			try
+			{
+				base.Refresh();
+				_LastRefresh.Value = DateTime.UtcNow;
+			}
+			finally
+			{
+				_RefreshLock.Release();
+			}
+		}
+
+		/// <inheritdoc cref="ManufacturedSetting{T}.ShouldRefresh"/>
+		protected override bool ShouldRefresh()
+		{
+			if (base.ShouldRefresh())
+			{
+				// If we should refresh but we're already refreshing, wait for it.
+				if (_RefreshLock.CurrentCount == 0)
+				{
+					// https://docs.microsoft.com/en-us/dotnet/api/system.threading.semaphoreslim.availablewaithandle?view=netframework-4.8
+					// A successful wait on the AvailableWaitHandle does not imply a successful wait on the SemaphoreSlim itself, nor does it decrement the semaphore's count.
+					_RefreshLock.AvailableWaitHandle.WaitOne();
+					return false;
+				}
+
+				return true;
+			}
+
+			return false;
 		}
 
 		private void RefreshValue(object state)
 		{
-			if (_RefreshLock.CurrentCount == 0)
+			if (_RefreshIntervalLock.CurrentCount == 0)
 			{
 				return;
 			}
 
-			_RefreshLock.Wait();
+			_RefreshIntervalLock.Wait();
 
 			try
 			{
@@ -82,7 +113,7 @@ namespace TixFactory.Configuration
 			}
 			finally
 			{
-				_RefreshLock.Release();
+				_RefreshIntervalLock.Release();
 			}
 		}
 
