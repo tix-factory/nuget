@@ -14,7 +14,7 @@ namespace TixFactory.Queueing
 		int NumberOfThreads { get; }
 
 		/// <summary>
-		/// How long to hold an item in the queue.
+		/// How long to hold an item from the queue while it is being processed.
 		/// </summary>
 		/// <remarks>
 		/// If the lock times out the item will be given to the next available thread.
@@ -26,12 +26,7 @@ namespace TixFactory.Queueing
 		/// How long a thread should sleep if there is no item to give it.
 		/// </summary>
 		TimeSpan ThreadSleepTime { get; }
-
-		/// <summary>
-		/// How often to check threads for completeness and give them their next task if needed.
-		/// </summary>
-		TimeSpan ThreadCheckInterval { get; }
-
+		
 		/// <summary>
 		/// How long to wait before releasing a message that gracefully failed to process.
 		/// </summary>
