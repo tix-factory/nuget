@@ -86,17 +86,19 @@ namespace TixFactory.Queueing
 
 		private void ProcessItem(QueueItem<TItem> queueItem)
 		{
+			var holderId = queueItem.HolderId;
+
 			try
 			{
 				var processed = _ProcessItemFunc(queueItem.Value);
 				if (processed)
 				{
-					_ItemQueue.RemoveQueueItem(queueItem.Id, queueItem.HolderId);
+					_ItemQueue.RemoveQueueItem(queueItem.Id, holderId);
 					return;
 				}
 
 				Thread.Sleep(_ItemQueueProcessorSettings.ItemRetryDelay);
-				_ItemQueue.ReleaseQueueItem(queueItem.Id, queueItem.HolderId);
+				_ItemQueue.ReleaseQueueItem(queueItem.Id, holderId);
 			}
 			catch (Exception e)
 			{
