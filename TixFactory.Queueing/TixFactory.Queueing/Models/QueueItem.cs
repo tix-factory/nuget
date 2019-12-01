@@ -6,7 +6,7 @@ namespace TixFactory.Queueing
 	/// A queue item.
 	/// </summary>
 	/// <typeparam name="TItem">The item type.</typeparam>
-	public struct QueueItem<TItem>
+	public class QueueItem<TItem>
 	{
 		/// <summary>
 		/// The queued item id.

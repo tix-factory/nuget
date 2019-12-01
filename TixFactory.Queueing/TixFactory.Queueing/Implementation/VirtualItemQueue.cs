@@ -60,7 +60,7 @@ namespace TixFactory.Queueing
 			try
 			{
 				queueItem = _Queue.FirstOrDefault(i => !IsHeld(i));
-				if (default(QueueItem<TItem>).Equals(queueItem))
+				if (queueItem == null)
 				{
 					return false;
 				}
@@ -91,7 +91,7 @@ namespace TixFactory.Queueing
 			try
 			{
 				var item = _Queue.FirstOrDefault(i => i.Id == id && i.HolderId == holderId);
-				if (default(QueueItem<TItem>).Equals(item))
+				if (item == null)
 				{
 					return;
 				}
@@ -113,7 +113,7 @@ namespace TixFactory.Queueing
 			try
 			{
 				var item = _Queue.FirstOrDefault(i => i.Id == id && i.HolderId == holderId);
-				if (default(QueueItem<TItem>).Equals(item))
+				if (item == null)
 				{
 					return;
 				}
