@@ -12,7 +12,7 @@ namespace TixFactory.Discord
 		public DiscordSocketClient CreateBotClient(string botToken)
 		{
 			var client = new DiscordSocketClient();
-			var waitLock = new SemaphoreSlim(1, 1);
+			var waitLock = new SemaphoreSlim(0, 1);
 
 			client.Ready += () =>
 			{
