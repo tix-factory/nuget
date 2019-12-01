@@ -6,7 +6,7 @@
 
 	<!-- NuGet properties -->
 	<PropertyGroup>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<GeneratePackageOnBuild Condition="'$(IsPackable)' != 'false'">true</GeneratePackageOnBuild>
 		<RepositoryUrl>https://github.com/tix-factory/nuget</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageVersion Condition="'$(PackageVersion)' == ''">2.0.$(BUILD_NUMBER)</PackageVersion>

@@ -9,7 +9,7 @@ namespace TixFactory.Serialization.Json
 	/// <inheritdoc cref="ISerializerSettingsFactory"/>
 	public class SerializerSettingsFactory : ISerializerSettingsFactory
 	{
-		private readonly IList<JsonConverter> _GlobalConverters;
+		private readonly JsonSerializerSettings _JsonSerializerSettings;
 
 		/// <summary>
 		/// Initializes a new <see cref="SerializerSettingsFactory"/>.
@@ -28,14 +28,9 @@ namespace TixFactory.Serialization.Json
 
 			globalConvertersList.AddRange(globalConverters);
 
-			_GlobalConverters = globalConvertersList;
-		}
-
-		/// <inheritdoc cref="ISerializerSettingsFactory.GetJsonSerializerSettings"/>
-		public JsonSerializerSettings GetJsonSerializerSettings()
-		{
 			JsonSerializerSettings serializerSettings = null;
 
+			// TODO: Why does this throw a StackOverflowException when called from GetJsonSerializerSettings
 			if (JsonConvert.DefaultSettings != null)
 			{
 				serializerSettings = JsonConvert.DefaultSettings();
@@ -48,7 +43,7 @@ namespace TixFactory.Serialization.Json
 
 			serializerSettings.Converters = serializerSettings.Converters ?? new List<JsonConverter>();
 
-			foreach (var converter in _GlobalConverters)
+			foreach (var converter in globalConvertersList)
 			{
 				if (!HasConverter(serializerSettings.Converters, converter.GetType()))
 				{
@@ -56,7 +51,13 @@ namespace TixFactory.Serialization.Json
 				}
 			}
 
-			return serializerSettings;
+			_JsonSerializerSettings = serializerSettings;
+		}
+
+		/// <inheritdoc cref="ISerializerSettingsFactory.GetJsonSerializerSettings"/>
+		public JsonSerializerSettings GetJsonSerializerSettings()
+		{
+			return _JsonSerializerSettings;
 		}
 
 		private bool HasConverter(ICollection<JsonConverter> converters, Type converterType)
