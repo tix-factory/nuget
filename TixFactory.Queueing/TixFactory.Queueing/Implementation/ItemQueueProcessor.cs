@@ -42,16 +42,19 @@ namespace TixFactory.Queueing
 		public ItemQueueProcessor(IItemQueue<TItem> itemQueue, IItemQueueProcessorSettings itemQueueProcessorSettings,
 			ILogger logger, Func<TItem, bool> processItemFunc)
 		{
+			var runningTaks = new TrackedList<Task>();
+
 			_ItemQueue = itemQueue ?? throw new ArgumentNullException(nameof(itemQueue));
 			_ItemQueueProcessorSettings = itemQueueProcessorSettings ?? throw new ArgumentNullException(nameof(itemQueueProcessorSettings));
 			_Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			_ProcessItemFunc = processItemFunc ?? throw new ArgumentNullException(nameof(processItemFunc));
 			_StartLock = new SemaphoreSlim(0, 1);
 			_ProcessQueueLock = new SemaphoreSlim(1, 1);
-			_RunningThreads = new List<Task>();
+			_RunningThreads = runningTaks;
 
 			_RunningTask = new Setting<Task>(defaultValue: null);
 
+			runningTaks.CountSetting.Changed += (newCount, oldCold) => ProcessQueue();
 			itemQueue.QueueSize.Changed += (newQueueSize, oldQueueSize) => ProcessQueue();
 			itemQueue.HeldQueueSize.Changed += (newQueueSize, oldQueueSize) => ProcessQueue();
 		}
