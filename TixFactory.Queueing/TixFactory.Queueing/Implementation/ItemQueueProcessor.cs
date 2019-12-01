@@ -95,8 +95,8 @@ namespace TixFactory.Queueing
 					return;
 				}
 
-				Thread.Sleep(_ItemQueueProcessorSettings.ItemLockDuration);
-				_ItemQueue.RemoveQueueItem(queueItem.Id, queueItem.HolderId);
+				Thread.Sleep(_ItemQueueProcessorSettings.ItemRetryDelay);
+				_ItemQueue.ReleaseQueueItem(queueItem.Id, queueItem.HolderId);
 			}
 			catch (Exception e)
 			{
