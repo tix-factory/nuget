@@ -122,7 +122,7 @@ namespace TixFactory.Queueing
 
 			try
 			{
-				for (var threadNumber = _RunningThreads.Count; threadNumber <= _ItemQueueProcessorSettings.NumberOfThreads; threadNumber++)
+				for (var threadNumber = _RunningThreads.Count; threadNumber < _ItemQueueProcessorSettings.NumberOfThreads; threadNumber++)
 				{
 					Task runTask;
 
