@@ -71,9 +71,9 @@ namespace TixFactory.Queueing
 			task = _StartLock.WaitAsync(cancellationToken);
 			_RunningTask.Value = task;
 
-			ProcessQueueAsync(cancellationToken);
+			var processTask = ProcessQueueAsync(cancellationToken);
 			
-			return task;
+			return Task.WhenAll(task, processTask);
 		}
 
 		/// <inheritdoc cref="IItemQueueProcessor{TItem}.Stop"/>
