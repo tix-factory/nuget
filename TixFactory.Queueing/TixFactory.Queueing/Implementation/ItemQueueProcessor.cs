@@ -54,9 +54,9 @@ namespace TixFactory.Queueing
 
 			_RunningTask = new Setting<Task>(defaultValue: null);
 
-			runningTaks.CountSetting.Changed += (newCount, oldCold) => ProcessQueue();
-			itemQueue.QueueSize.Changed += (newQueueSize, oldQueueSize) => ProcessQueue();
-			itemQueue.HeldQueueSize.Changed += (newQueueSize, oldQueueSize) => ProcessQueue();
+			runningTaks.CountSetting.Changed += (newCount, oldCold) => ProcessQueueAsync(CancellationToken.None);
+			itemQueue.QueueSize.Changed += (newQueueSize, oldQueueSize) => ProcessQueueAsync(CancellationToken.None);
+			itemQueue.HeldQueueSize.Changed += (newQueueSize, oldQueueSize) => ProcessQueueAsync(CancellationToken.None);
 		}
 
 		/// <inheritdoc cref="IItemQueueProcessor{TItem}.Start"/>
@@ -71,7 +71,7 @@ namespace TixFactory.Queueing
 			task = _StartLock.WaitAsync(cancellationToken);
 			_RunningTask.Value = task;
 
-			ProcessQueue();
+			ProcessQueueAsync(cancellationToken);
 			
 			return task;
 		}
@@ -110,66 +110,73 @@ namespace TixFactory.Queueing
 			}
 		}
 
-		private void ProcessQueue()
+		private Task ProcessQueueAsync(CancellationToken cancellationToken)
 		{
 			var runningTask = _RunningTask.Value;
 			if (runningTask == null)
 			{
-				return;
+				return Task.CompletedTask;
 			}
 
 			if (_ProcessQueueLock.CurrentCount == 0)
 			{
-				return;
+				return Task.CompletedTask;
 			}
 
-			_ProcessQueueLock.Wait();
-
-			try
+			return Task.Run(async () =>
 			{
-				for (var threadNumber = _RunningThreads.Count; threadNumber < _ItemQueueProcessorSettings.NumberOfThreads; threadNumber++)
+				await _ProcessQueueLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+
+				try
 				{
-					Task runTask;
-
-					if (_ItemQueue.TryGetNextQueueItem(_ItemQueueProcessorSettings.ItemLockDuration, out var queueItem))
+					for (var threadNumber = _RunningThreads.Count; threadNumber < _ItemQueueProcessorSettings.NumberOfThreads; threadNumber++)
 					{
-						runTask = Task.Run(() =>
+						Task runTask;
+
+						if (_ItemQueue.TryGetNextQueueItem(_ItemQueueProcessorSettings.ItemLockDuration, out var queueItem))
 						{
-							ProcessItem(queueItem);
-						});
+							runTask = Task.Run(() =>
+							{
+								ProcessItem(queueItem);
+							}, cancellationToken);
+						}
+						else
+						{
+							runTask = Task.Delay(_ItemQueueProcessorSettings.ThreadSleepTime, cancellationToken);
+						}
+
+						_RunningThreads.Add(runTask);
+						RemoveOnCompletion(runTask, cancellationToken);
 					}
-					else
-					{
-						runTask = Task.Delay(_ItemQueueProcessorSettings.ThreadSleepTime);
-					}
-
-					Task.Run(async () =>
-					{
-						try
-						{
-							await runTask.ConfigureAwait(false);
-						}
-						catch (Exception e)
-						{
-							_Logger.Error(e);
-						}
-						finally
-						{
-							_RunningThreads.Remove(runTask);
-						}
-					});
-
-					_RunningThreads.Add(runTask);
 				}
-			}
-			catch (Exception e)
+				catch (Exception e)
+				{
+					_Logger.Error(e);
+				}
+				finally
+				{
+					_ProcessQueueLock.Release();
+				}
+			}, cancellationToken);
+		}
+
+		private void RemoveOnCompletion(Task runTask, CancellationToken cancellationToken)
+		{
+			Task.Run(async () =>
 			{
-				_Logger.Error(e);
-			}
-			finally
-			{
-				_ProcessQueueLock.Release();
-			}
+				try
+				{
+					await runTask.ConfigureAwait(false);
+				}
+				catch (Exception e)
+				{
+					_Logger.Error(e);
+				}
+				finally
+				{
+					_RunningThreads.Remove(runTask);
+				}
+			}, cancellationToken);
 		}
 	}
 }
