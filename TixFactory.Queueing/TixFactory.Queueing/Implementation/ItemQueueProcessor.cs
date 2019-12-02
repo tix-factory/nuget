@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TixFactory.Configuration;
@@ -10,15 +11,13 @@ namespace TixFactory.Queueing
 	/// <inheritdoc cref="IItemQueueProcessor{TItem}"/>
 	public class ItemQueueProcessor<TItem> : IItemQueueProcessor<TItem>
 	{
-		private readonly ISetting<Task> _RunningTask;
+		private int _RunId;
 
 		private readonly IItemQueue<TItem> _ItemQueue;
 		private readonly IItemQueueProcessorSettings _ItemQueueProcessorSettings;
 		private readonly ILogger _Logger;
 		private readonly Func<TItem, bool> _ProcessItemFunc;
-		private readonly SemaphoreSlim _StartLock;
-		private readonly SemaphoreSlim _ProcessQueueLock;
-		private readonly IList<Task> _RunningThreads;
+		private readonly ISetting<Task> _RunningTask;
 
 		/// <inheritdoc cref="IItemQueueProcessor{TItem}.OnUnhandledException"/>
 		public event Action<TItem, Exception> OnUnhandledException;
@@ -42,141 +41,116 @@ namespace TixFactory.Queueing
 		public ItemQueueProcessor(IItemQueue<TItem> itemQueue, IItemQueueProcessorSettings itemQueueProcessorSettings,
 			ILogger logger, Func<TItem, bool> processItemFunc)
 		{
-			var runningTaks = new TrackedList<Task>();
-
 			_ItemQueue = itemQueue ?? throw new ArgumentNullException(nameof(itemQueue));
 			_ItemQueueProcessorSettings = itemQueueProcessorSettings ?? throw new ArgumentNullException(nameof(itemQueueProcessorSettings));
 			_Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			_ProcessItemFunc = processItemFunc ?? throw new ArgumentNullException(nameof(processItemFunc));
-			_StartLock = new SemaphoreSlim(0, 1);
-			_ProcessQueueLock = new SemaphoreSlim(1, 1);
-			_RunningThreads = runningTaks;
-
-			_RunningTask = new Setting<Task>(defaultValue: null);
-
-			runningTaks.CountSetting.Changed += (newCount, oldCold) => ProcessQueueAsync(CancellationToken.None);
-			itemQueue.QueueSize.Changed += (newQueueSize, oldQueueSize) => ProcessQueueAsync(CancellationToken.None);
-			itemQueue.HeldQueueSize.Changed += (newQueueSize, oldQueueSize) => ProcessQueueAsync(CancellationToken.None);
+			_RunningTask = new Setting<Task>();
 		}
 
 		/// <inheritdoc cref="IItemQueueProcessor{TItem}.Start"/>
 		public Task Start(CancellationToken cancellationToken)
 		{
-			var task = _RunningTask.Value;
-			if (task != null)
+			var id = ++_RunId;
+
+			var task = Task.Run(async () =>
 			{
-				return task;
-			}
+				var runningThreads = new List<RunningItem<TItem>>();
 
-			task = _StartLock.WaitAsync(cancellationToken);
+				while (id == _RunId && !cancellationToken.IsCancellationRequested)
+				{
+					Process(runningThreads, cancellationToken);
+					await Task.Delay(_ItemQueueProcessorSettings.ThreadCheckInterval, cancellationToken).ConfigureAwait(false);
+				}
+			}, cancellationToken);
+
 			_RunningTask.Value = task;
-
-			ProcessQueueAsync(cancellationToken);
-			
 			return task;
 		}
 
 		/// <inheritdoc cref="IItemQueueProcessor{TItem}.Stop"/>
 		public void Stop()
 		{
-			var runningTask = _RunningTask.Value;
-			if (runningTask != null)
-			{
-				_StartLock.Release();
-				_RunningTask.Value = null;
-			}
+			++_RunId;
 		}
 
-		private void ProcessItem(QueueItem<TItem> queueItem)
+		private void Process(IList<RunningItem<TItem>> runningItems, CancellationToken cancellationToken)
 		{
-			var holderId = queueItem.HolderId;
+			foreach (var runningItem in runningItems.ToArray())
+			{
+				if (runningItem.Task.IsCompleted || runningItem.Expiration < DateTime.UtcNow)
+				{
+					runningItems.Remove(runningItem);
+				}
+			}
 
 			try
 			{
-				var processed = _ProcessItemFunc(queueItem.Value);
+				for (var n = runningItems.Count; n < _ItemQueueProcessorSettings.NumberOfThreads; n++)
+				{
+					var lockDuration = _ItemQueueProcessorSettings.ItemLockDuration;
+					var hasNextItem = _ItemQueue.TryGetNextQueueItem(lockDuration, out var queueItem);
+
+					var runningItem = new RunningItem<TItem>
+					{
+						Item = queueItem.Value,
+						Expiration = DateTime.UtcNow + lockDuration
+					};
+
+					if (hasNextItem)
+					{
+						runningItem.Task = Task.Run(() => ProcessItem(queueItem.Id, queueItem.Value, queueItem.HolderId), cancellationToken);
+						runningItems.Add(runningItem);
+					}
+					else
+					{
+						// If there's no item to process, put the thread to sleep for now so we don't try to get an item
+						// for it in a few milliseconds.
+						runningItem.Task = Task.Delay(_ItemQueueProcessorSettings.ThreadSleepTime, cancellationToken);
+						runningItems.Add(runningItem);
+
+						break;
+					}
+				}
+
+				for (var n = runningItems.Count; n < _ItemQueueProcessorSettings.NumberOfThreads; n++)
+				{
+					var runningItem = new RunningItem<TItem>
+					{
+						Item = default(TItem),
+						Expiration = DateTime.UtcNow + _ItemQueueProcessorSettings.ItemLockDuration,
+						Task = Task.Delay(_ItemQueueProcessorSettings.ThreadSleepTime, cancellationToken)
+					};
+
+					runningItems.Add(runningItem);
+				}
+			}
+			catch (Exception e)
+			{
+				_Logger.Error(e);
+			}
+		}
+
+		private void ProcessItem(string id, TItem item, string holderId)
+		{
+			try
+			{
+				var processed = _ProcessItemFunc(item);
+
 				if (processed)
 				{
-					_ItemQueue.RemoveQueueItem(queueItem.Id, holderId);
+					_ItemQueue.RemoveQueueItem(id, holderId);
 					return;
 				}
 
 				Thread.Sleep(_ItemQueueProcessorSettings.ItemRetryDelay);
-				_ItemQueue.ReleaseQueueItem(queueItem.Id, holderId);
+				_ItemQueue.ReleaseQueueItem(id, holderId);
 			}
 			catch (Exception e)
 			{
-				OnUnhandledException?.Invoke(queueItem.Value, e);
-				Thread.Sleep(_ItemQueueProcessorSettings.ItemLockDuration);
+				OnUnhandledException?.Invoke(item, e);
+				// If the item errors don't release it, let the lock expire before it gets retried.
 			}
-		}
-
-		private Task ProcessQueueAsync(CancellationToken cancellationToken)
-		{
-			var runningTask = _RunningTask.Value;
-			if (runningTask == null)
-			{
-				return Task.CompletedTask;
-			}
-
-			if (_ProcessQueueLock.CurrentCount == 0)
-			{
-				return Task.CompletedTask;
-			}
-
-			return Task.Run(async () =>
-			{
-				await _ProcessQueueLock.WaitAsync(cancellationToken).ConfigureAwait(false);
-
-				try
-				{
-					for (var threadNumber = _RunningThreads.Count; threadNumber < _ItemQueueProcessorSettings.NumberOfThreads; threadNumber++)
-					{
-						Task runTask;
-
-						if (_ItemQueue.TryGetNextQueueItem(_ItemQueueProcessorSettings.ItemLockDuration, out var queueItem))
-						{
-							runTask = Task.Run(() =>
-							{
-								ProcessItem(queueItem);
-							}, cancellationToken);
-						}
-						else
-						{
-							runTask = Task.Delay(_ItemQueueProcessorSettings.ThreadSleepTime, cancellationToken);
-						}
-
-						_RunningThreads.Add(runTask);
-						RemoveOnCompletion(runTask, cancellationToken);
-					}
-				}
-				catch (Exception e)
-				{
-					_Logger.Error(e);
-				}
-				finally
-				{
-					_ProcessQueueLock.Release();
-				}
-			}, cancellationToken);
-		}
-
-		private void RemoveOnCompletion(Task runTask, CancellationToken cancellationToken)
-		{
-			Task.Run(async () =>
-			{
-				try
-				{
-					await runTask.ConfigureAwait(false);
-				}
-				catch (Exception e)
-				{
-					_Logger.Error(e);
-				}
-				finally
-				{
-					_RunningThreads.Remove(runTask);
-				}
-			}, cancellationToken);
 		}
 	}
 }

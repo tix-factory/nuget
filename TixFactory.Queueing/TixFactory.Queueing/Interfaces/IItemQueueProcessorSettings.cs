@@ -31,5 +31,10 @@ namespace TixFactory.Queueing
 		/// How long to wait before releasing a message that gracefully failed to process.
 		/// </summary>
 		TimeSpan ItemRetryDelay { get; }
+
+		/// <summary>
+		/// How often to check threads for completeness and give them their next task if needed.
+		/// </summary>
+		TimeSpan ThreadCheckInterval { get; }
 	}
 }
