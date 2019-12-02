@@ -142,6 +142,14 @@ namespace TixFactory.Queueing
 				{
 					_RunningThreads.Remove(removalTask);
 				}
+			}
+			catch (Exception e)
+			{
+				_Logger.Error($"Error clearing out running theads.\n{e}");
+			}
+
+			try
+			{
 
 				for (var threadNumber = _RunningThreads.Count; threadNumber < _ItemQueueProcessorSettings.NumberOfThreads; threadNumber++)
 				{
@@ -162,7 +170,7 @@ namespace TixFactory.Queueing
 			}
 			catch (Exception e)
 			{
-				_Logger.Error(e);
+				_Logger.Error($"Error starting processing tasks.\n{e}");
 			}
 			finally
 			{
