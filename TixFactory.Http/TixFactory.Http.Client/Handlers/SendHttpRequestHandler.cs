@@ -172,7 +172,14 @@ namespace TixFactory.Http.Client
 
 			foreach (var name in request.Headers.Keys)
 			{
-				requestMessage.Headers.Add(name, request.Headers.Get(name));
+				switch (name)
+				{
+					case HttpRequestHeaderName.ContentType:
+						continue;
+					default:
+						requestMessage.Headers.Add(name, request.Headers.Get(name));
+						break;
+				}
 			}
 
 			if (!request.Headers.Keys.Contains(HttpRequestHeaderName.UserAgent) && !string.IsNullOrWhiteSpace(_HttpClientSettings.UserAgent))
