@@ -15,10 +15,7 @@ namespace TixFactory.Queueing
 
 		/// <inheritdoc cref="IItemQueueProcessorSettings.ThreadSleepTime"/>
 		public TimeSpan ThreadSleepTime { get; set; } = TimeSpan.FromMilliseconds(500);
-
-		/// <inheritdoc cref="IItemQueueProcessorSettings.ThreadCheckInterval"/>
-		public TimeSpan ThreadCheckInterval { get; set; } = TimeSpan.FromMilliseconds(10);
-
+		
 		/// <inheritdoc cref="IItemQueueProcessorSettings.ItemRetryDelay"/>
 		public TimeSpan ItemRetryDelay { get; set; } = TimeSpan.FromMinutes(1);
 	}
