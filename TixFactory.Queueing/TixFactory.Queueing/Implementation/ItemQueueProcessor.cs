@@ -97,6 +97,7 @@ namespace TixFactory.Queueing
 				if (processed)
 				{
 					await _ItemQueue.RemoveQueueItemAsync(queueItem.Id, holderId, cancellationToken).ConfigureAwait(false);
+					return;
 				}
 
 				await Task.Delay(_ItemQueueProcessorSettings.ItemRetryDelay, cancellationToken).ConfigureAwait(false);
@@ -105,7 +106,6 @@ namespace TixFactory.Queueing
 			catch (Exception e)
 			{
 				OnUnhandledException?.Invoke(queueItem.Value, e);
-				await Task.Delay(_ItemQueueProcessorSettings.ItemLockDuration, cancellationToken).ConfigureAwait(false);
 			}
 		}
 
