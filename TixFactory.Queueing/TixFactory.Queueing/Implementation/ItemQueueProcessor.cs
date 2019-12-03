@@ -124,7 +124,7 @@ namespace TixFactory.Queueing
 			
 			await _ProcessQueueLock.WaitAsync(cancellationToken).ConfigureAwait(false);
 
-			var threadClosureTasks = new List<Task>();
+			var taskContinuationThreads = new List<Task>();
 
 			try
 			{
@@ -165,7 +165,7 @@ namespace TixFactory.Queueing
 					}
 
 					_RunningThreads.Add(runTask);
-					threadClosureTasks.Add(runTask.ContinueWith(_RunningThreads.Remove, cancellationToken));
+					taskContinuationThreads.Add(runTask.ContinueWith(async (t) => await ProcessQueueAsync(cancellationToken).ConfigureAwait(false), cancellationToken));
 				}
 			}
 			catch (Exception e)
@@ -177,7 +177,14 @@ namespace TixFactory.Queueing
 				_ProcessQueueLock.Release();
 			}
 
-			await Task.WhenAll(threadClosureTasks).ConfigureAwait(false);
+			try
+			{
+				await Task.WhenAll(taskContinuationThreads).ConfigureAwait(false);
+			}
+			catch (Exception e)
+			{
+				_Logger.Error(e);
+			}
 		}
 	}
 }
