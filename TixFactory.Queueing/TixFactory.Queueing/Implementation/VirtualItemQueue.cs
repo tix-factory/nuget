@@ -29,10 +29,38 @@ namespace TixFactory.Queueing
 		/// </summary>
 		public VirtualItemQueue()
 		{
-			_QueueLock = new SemaphoreSlim(1, 1);
+			var queueLock = new SemaphoreSlim(1, 1);
+
+			_QueueLock = queueLock;
 			_Queue = new List<QueueItem<TItem>>();
-			_QueueSize = new ManufacturedSetting<long>(() => _Queue.Count, refreshOnRead: true);
-			_HeldQueueSize = new ManufacturedSetting<long>(() => _Queue.Count(IsHeld), refreshOnRead: true);
+
+			_QueueSize = new ManufacturedSetting<long>(() =>
+			{
+				queueLock.Wait();
+
+				try
+				{
+					return _Queue.Count;
+				}
+				finally
+				{
+					queueLock.Release();
+				}
+			}, refreshOnRead: true);
+
+			_HeldQueueSize = new ManufacturedSetting<long>(() =>
+			{
+				queueLock.Wait();
+
+				try
+				{
+					return _Queue.Count(IsHeld);
+				}
+				finally
+				{
+					queueLock.Release();
+				}
+			}, refreshOnRead: true);
 		}
 
 		/// <inheritdoc cref="IItemQueue{TItem}.AppendItemToQueue"/>
@@ -45,12 +73,13 @@ namespace TixFactory.Queueing
 				var queueItem = new QueueItem<TItem>(Guid.NewGuid().ToString(), item);
 
 				_Queue.Add(queueItem);
-				CheckSizes();
 			}
 			finally
 			{
 				_QueueLock.Release();
 			}
+
+			ThreadPool.QueueUserWorkItem(state => CheckSizes());
 		}
 
 		/// <inheritdoc cref="IItemQueue{TItem}.AppendItemToQueueAsync"/>
@@ -75,10 +104,10 @@ namespace TixFactory.Queueing
 
 				queueItem.HolderId = Guid.NewGuid().ToString();
 				queueItem.LockExpiration = DateTime.UtcNow + lockExpiration;
-				CheckSizes();
 
 				ThreadPool.QueueUserWorkItem(state =>
 				{
+					CheckSizes();
 					Thread.Sleep(lockExpiration);
 					CheckSizes();
 				});
@@ -112,12 +141,13 @@ namespace TixFactory.Queueing
 				}
 
 				_Queue.Remove(item);
-				CheckSizes();
 			}
 			finally
 			{
 				_QueueLock.Release();
 			}
+
+			ThreadPool.QueueUserWorkItem(state => CheckSizes());
 		}
 
 		/// <inheritdoc cref="IItemQueue{TItem}.RemoveQueueItemAsync"/>
@@ -141,12 +171,13 @@ namespace TixFactory.Queueing
 				}
 
 				item.LockExpiration = DateTime.MinValue;
-				CheckSizes();
 			}
 			finally
 			{
 				_QueueLock.Release();
 			}
+
+			ThreadPool.QueueUserWorkItem(state => CheckSizes());
 		}
 
 		/// <inheritdoc cref="IItemQueue{TItem}.ReleaseQueueItemAsync"/>
@@ -164,12 +195,13 @@ namespace TixFactory.Queueing
 			try
 			{
 				_Queue.Clear();
-				CheckSizes();
 			}
 			finally
 			{
 				_QueueLock.Release();
 			}
+
+			ThreadPool.QueueUserWorkItem(state => CheckSizes());
 		}
 
 		/// <inheritdoc cref="IItemQueue{TItem}.ClearAsync"/>
