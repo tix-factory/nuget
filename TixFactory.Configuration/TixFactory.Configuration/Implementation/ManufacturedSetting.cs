@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace TixFactory.Configuration
 {
@@ -26,7 +27,7 @@ namespace TixFactory.Configuration
 				return _CurrentValue;
 			}
 		}
-		
+
 		/// <summary>
 		/// Initializes a new <see cref="Setting{T}"/> with a default <see cref="Value"/>.
 		/// </summary>
@@ -46,7 +47,12 @@ namespace TixFactory.Configuration
 			{
 				_CurrentValue = newValue;
 				_ValueLoaded = true;
-				Changed?.Invoke(newValue, originalValue);
+
+				var changedEventListener = Changed;
+				if (changedEventListener != null)
+				{
+					ThreadPool.QueueUserWorkItem(state => changedEventListener.Invoke(newValue, originalValue));
+				}
 			}
 		}
 

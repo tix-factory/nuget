@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace TixFactory.Configuration
 {
@@ -16,11 +17,17 @@ namespace TixFactory.Configuration
 			get => _CurrentValue;
 			set
 			{
-				var currentValue = _CurrentValue;
-				if (!value.Equals(currentValue))
+				var newValue = value;
+				var originalValue = _CurrentValue;
+				if (!newValue.Equals(originalValue))
 				{
-					_CurrentValue = value;
-					Changed?.Invoke(value, currentValue);
+					_CurrentValue = newValue;
+
+					var changedEventListener = Changed;
+					if (changedEventListener != null)
+					{
+						ThreadPool.QueueUserWorkItem(state => changedEventListener.Invoke(newValue, originalValue));
+					}
 				}
 			}
 		}
