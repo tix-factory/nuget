@@ -43,10 +43,10 @@ jobs:
         tag: ${{ format('release-number-{0}', env.BUILD_NUMBER) }}
     - name: Publish NuGet packages to github
       run: |
-           for nugetPackage in ./LocalNuGetRepo/*.nupkg
+           for nugetPackage in ./PublishNuGetRepo/*.nupkg
            do
              curl -vX PUT -u "tix-factory:${{ secrets.github_token }}" -F package=@$nugetPackage https://nuget.pkg.github.com/tix-factory/
            done
       shell: bash
     - name: Publish NuGet packages to nuget.org
-      run: dotnet nuget push ./LocalNuGetRepo/**/*.nupkg --api-key ${{ secrets.nuget_apikey }} --source https://api.nuget.org/v3/index.json --no-symbols true
+      run: dotnet nuget push ./PublishNuGetRepo/**/*.nupkg --api-key ${{ secrets.nuget_apikey }} --source https://api.nuget.org/v3/index.json --no-symbols true
