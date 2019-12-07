@@ -30,6 +30,7 @@
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(SERVER_BUILD)' == 'true'">
 		<LocalNuGetRepository>$(CHECKOUT_DIRECTORY)/LocalNuGetRepo</LocalNuGetRepository>
+		<PublishNuGetRepository>$(CHECKOUT_DIRECTORY)/PublishNuGetRepo</PublishNuGetRepository>
 	</PropertyGroup>
 	<PropertyGroup>
 		<RestoreSources>
@@ -42,6 +43,7 @@
 	<Target Name="CreateLocalNuGetRpository"
 		BeforeTargets="Restore;CollectPackageReferences">
 		<MakeDir Directories="$(LocalNuGetRepository)" Condition="!Exists('$(LocalNuGetRepository)')" />
+		<MakeDir Directories="$(PublishNuGetRepository)" Condition="'$(SERVER_BUILD)' == 'true' AND !Exists('$(PublishNuGetRepository)')" />
 	</Target>
 
 	<!-- Development -->
@@ -64,7 +66,8 @@
 		<PropertyGroup>
 			<NuGetFile>$(PackageOutputPath)$(PackageId).$(PackageVersion).nupkg</NuGetFile>
 		</PropertyGroup>
-		<Message Text="Copying $(NuGetFile) to $(LocalNuGetRepository)..." Importance="high"/>
+		<Message Text="Copying $(NuGetFile) to $(LocalNuGetRepository) and $(PublishNuGetRepository)..." Importance="high"/>
 		<Copy SourceFiles="$(NuGetFile)" DestinationFolder="$(LocalNuGetRepository)" SkipUnchangedFiles="false" />
+		<Copy SourceFiles="$(NuGetFile)" DestinationFolder="$(PublishNuGetRepository)" SkipUnchangedFiles="false" />
 	</Target>
 </Project>
