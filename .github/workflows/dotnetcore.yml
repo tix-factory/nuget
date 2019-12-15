@@ -42,7 +42,7 @@ jobs:
         mode: uploadReleaseAsset
         filePath: ./build/publish.zip
         assetName: publish.zip
-        tag: ${{ format('build-number-{0}', env.BUILD_NUMBER) }}
+        tag: ${{ format('release-number-{0}', env.BUILD_NUMBER) }}
     - name: Attach NuGet packages to release
       uses: tix-factory/release-manager@v1
       with:
@@ -50,7 +50,7 @@ jobs:
         mode: uploadReleaseAsset
         filePath: ./build/nuget.zip
         assetName: nuget.zip
-        tag: ${{ format('build-number-{0}', env.BUILD_NUMBER) }}
+        tag: ${{ format('release-number-{0}', env.BUILD_NUMBER) }}
     - name: Publish NuGet packages
       run: sh nuget_publish.sh ${{ secrets.github_token }} ${{ secrets.nuget_apikey }}
       shell: bash
