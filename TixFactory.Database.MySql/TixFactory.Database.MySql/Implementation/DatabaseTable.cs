@@ -21,19 +21,10 @@ namespace TixFactory.Database.MySql
 		/// - <paramref name="databaseServerConnection"/>
 		/// - <paramref name="databaseNameValidator"/>
 		/// </exception>
-		/// <exception cref="ArgumentException">
-		/// - <paramref name="tableName"/> is invalid.
-		/// </exception>
 		public DatabaseTable(IDatabaseServerConnection databaseServerConnection, IDatabaseNameValidator databaseNameValidator, string tableName)
 		{
 			_DatabaseServerConnection = databaseServerConnection ?? throw new ArgumentNullException(nameof(databaseServerConnection));
 			_DatabaseNameValidator = databaseNameValidator ?? throw new ArgumentNullException(nameof(databaseNameValidator));
-
-			if (databaseNameValidator.IsTableNameValid(tableName))
-			{
-				throw new ArgumentException($"'{nameof(tableName)}' is invalid.", nameof(tableName));
-			}
-
 			Name = tableName;
 		}
 	}
