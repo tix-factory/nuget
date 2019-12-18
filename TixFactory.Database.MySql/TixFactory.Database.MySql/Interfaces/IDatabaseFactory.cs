@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MySql.Data.MySqlClient;
 
 namespace TixFactory.Database.MySql
 {
@@ -17,6 +18,9 @@ namespace TixFactory.Database.MySql
 		/// </remarks>
 		/// <param name="databaseName">The database name.</param>
 		/// <returns>The <see cref="IDatabase"/> (or <c>null</c> if it does not exist).</returns>
+		/// <exception cref="MySqlException">
+		/// - Unexpected error reading databases.
+		/// </exception>
 		IDatabase GetDatabase(string databaseName);
 
 		/// <summary>
@@ -31,8 +35,14 @@ namespace TixFactory.Database.MySql
 		/// - <paramref name="databaseName"/> is invalid.
 		/// - <paramref name="databaseName"/> matches a database that already exists.
 		/// </exception>
+		/// <exception cref="MySqlException">
+		/// - Unexpected error creating database.
+		/// </exception>
+		/// <exception cref="ApplicationException">
+		/// - Unexpected error creating database.
+		/// </exception>
 		IDatabase CreateDatabase(string databaseName);
-		
+
 		/// <summary>
 		/// Attempts to get a database by name and creates it if it does not exist.
 		/// </summary>
@@ -44,12 +54,21 @@ namespace TixFactory.Database.MySql
 		/// <exception cref="ArgumentException">
 		/// - <paramref name="databaseName"/> is invalid.
 		/// </exception>
+		/// <exception cref="MySqlException">
+		/// - Unexpected error creating database.
+		/// </exception>
+		/// <exception cref="ApplicationException">
+		/// - Unexpected error creating database.
+		/// </exception>
 		IDatabase GetOrCreateDatabase(string databaseName);
 
 		/// <summary>
 		/// Gets all the databases.
 		/// </summary>
 		/// <returns>A collection of all the databases on the server.</returns>
+		/// <exception cref="MySqlException">
+		/// - Unexpected error reading databases.
+		/// </exception>
 		IReadOnlyCollection<IDatabase> GetAllDatabases();
 	}
 }

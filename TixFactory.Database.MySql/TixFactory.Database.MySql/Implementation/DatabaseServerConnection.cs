@@ -52,6 +52,22 @@ namespace TixFactory.Database.MySql
 			_DatabaseNameValidator = databaseNameValidator ?? throw new ArgumentNullException(nameof(databaseNameValidator));
 		}
 
+		/// <inheritdoc cref="IDatabaseServerConnection.ExecuteQuery"/>
+		public int ExecuteQuery(string query, IDictionary<string, object> queryParameters)
+		{
+			if (string.IsNullOrWhiteSpace(query))
+			{
+				throw new ArgumentException("Value cannot be null or whitespace.", nameof(query));
+			}
+
+			var connection = GetMySqlConnection();
+			var command = new MySqlCommand(query, connection);
+
+			PopulateQueryParameters(command, queryParameters);
+
+			return command.ExecuteNonQuery();
+		}
+
 		/// <inheritdoc cref="IDatabaseServerConnection.ExecuteQuery{T}"/>
 		public IReadOnlyCollection<T> ExecuteQuery<T>(string query, IDictionary<string, object> queryParameters)
 			where T : class
@@ -64,23 +80,8 @@ namespace TixFactory.Database.MySql
 			var connection = GetMySqlConnection();
 			var command = new MySqlCommand(query, connection);
 
-			if (queryParameters != null)
-			{
-				foreach (var queryParameter in queryParameters)
-				{
-					// User variables are written as @var_name
-					// https://dev.mysql.com/doc/refman/8.0/en/user-variables.html
-					if (_DatabaseNameValidator.IsVariableNameValid(queryParameter.Key))
-					{
-						command.Parameters.AddWithValue($"@{queryParameter.Key}", queryParameter.Value);
-					}
-					else
-					{
-						throw new ArgumentException($"'{nameof(queryParameters)}' contains invalid variable name: '{queryParameter.Key}'", nameof(queryParameters));
-					}
-				}
-			}
-			
+			PopulateQueryParameters(command, queryParameters);
+
 			var reader = command.ExecuteReader();
 			var rows = new List<T>();
 
@@ -103,6 +104,28 @@ namespace TixFactory.Database.MySql
 			}
 
 			return rows;
+		}
+
+		private void PopulateQueryParameters(MySqlCommand command, IDictionary<string, object> queryParameters)
+		{
+			if (queryParameters == null)
+			{
+				return;
+			}
+
+			foreach (var queryParameter in queryParameters)
+			{
+				// User variables are written as @var_name
+				// https://dev.mysql.com/doc/refman/8.0/en/user-variables.html
+				if (_DatabaseNameValidator.IsVariableNameValid(queryParameter.Key))
+				{
+					command.Parameters.AddWithValue($"@{queryParameter.Key}", queryParameter.Value);
+				}
+				else
+				{
+					throw new ArgumentException($"'{nameof(queryParameters)}' contains invalid variable name: '{queryParameter.Key}'", nameof(queryParameters));
+				}
+			}
 		}
 
 		private void UpdateConnectionString(string newConnectionString, string oldConnectionString)
