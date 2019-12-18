@@ -48,6 +48,14 @@ namespace TixFactory.Database.MySql
 			return _DatabaseNameValidationRegex.IsMatch(databaseName);
 		}
 
+		/// <inheritdoc cref="IDatabaseNameValidator.IsDatabaseNameValid"/>
+		public bool IsTableNameValid(string tableName)
+		{
+			// For now assume table naming rules are the same as database naming rules.
+			// Based on: https://dev.mysql.com/doc/refman/8.0/en/identifiers.html
+			return IsDatabaseNameValid(tableName);
+		}
+
 		/// <inheritdoc cref="IDatabaseNameValidator.IsVariableNameValid"/>
 		public bool IsVariableNameValid(string variableName)
 		{

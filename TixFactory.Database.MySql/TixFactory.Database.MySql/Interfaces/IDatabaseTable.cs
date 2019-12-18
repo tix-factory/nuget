@@ -1,12 +1,12 @@
 ﻿namespace TixFactory.Database.MySql
 {
 	/// <summary>
-	/// A MySQL database.
+	/// A table in a MySQL database.
 	/// </summary>
-	public interface IDatabase
+	public interface IDatabaseTable
 	{
 		/// <summary>
-		/// The database name.
+		/// The table name.
 		/// </summary>
 		string Name { get; }
 	}

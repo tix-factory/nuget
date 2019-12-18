@@ -82,24 +82,26 @@ namespace TixFactory.Database.MySql
 
 			PopulateQueryParameters(command, queryParameters);
 
-			var reader = command.ExecuteReader();
 			var rows = new List<T>();
 
-			while (reader.Read())
+			using (var reader = command.ExecuteReader())
 			{
-				var row = new Dictionary<string, object>();
-				for (var i = 0; i < reader.FieldCount; i++)
+				while (reader.Read())
 				{
-					row.Add(reader.GetName(i), reader.GetValue(i));
-				}
+					var row = new Dictionary<string, object>();
+					for (var i = 0; i < reader.FieldCount; i++)
+					{
+						row.Add(reader.GetName(i), reader.GetValue(i));
+					}
 
-				// TODO: Is there a better way to convert reader object -> T?
-				var serializedRow = JsonConvert.SerializeObject(row);
-				var deserializedRow = JsonConvert.DeserializeObject<T>(serializedRow);
+					// TODO: Is there a better way to convert reader object -> T?
+					var serializedRow = JsonConvert.SerializeObject(row);
+					var deserializedRow = JsonConvert.DeserializeObject<T>(serializedRow);
 
-				if (deserializedRow != default(T))
-				{
-					rows.Add(deserializedRow);
+					if (deserializedRow != default(T))
+					{
+						rows.Add(deserializedRow);
+					}
 				}
 			}
 
