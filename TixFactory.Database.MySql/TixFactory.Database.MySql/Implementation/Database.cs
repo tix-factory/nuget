@@ -75,7 +75,7 @@ namespace TixFactory.Database.MySql
 			{
 				if (!_DatabaseTables.ContainsKey(tableName))
 				{
-					_DatabaseTables[tableName] = new DatabaseTable(_DatabaseServerConnection, _DatabaseNameValidator, tableName);
+					_DatabaseTables[tableName] = new DatabaseTable(_DatabaseServerConnection, _DatabaseNameValidator, this, tableName);
 				}
 			}
 		}
