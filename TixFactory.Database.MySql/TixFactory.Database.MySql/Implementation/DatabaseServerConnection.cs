@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
@@ -52,7 +53,7 @@ namespace TixFactory.Database.MySql
 			_DatabaseNameValidator = databaseNameValidator ?? throw new ArgumentNullException(nameof(databaseNameValidator));
 		}
 
-		/// <inheritdoc cref="IDatabaseServerConnection.ExecuteQuery"/>
+		/// <inheritdoc cref="IDatabaseServerConnection.ExecuteQuery(string, IDictionary{string,object})"/>
 		public int ExecuteQuery(string query, IDictionary<string, object> queryParameters)
 		{
 			if (string.IsNullOrWhiteSpace(query))
@@ -60,15 +61,23 @@ namespace TixFactory.Database.MySql
 				throw new ArgumentException("Value cannot be null or whitespace.", nameof(query));
 			}
 
-			var connection = GetMySqlConnection();
-			var command = new MySqlCommand(query, connection);
+			var mySqlParameters = GetMySqlParameters(queryParameters);
+			return ExecuteQuery(query, mySqlParameters);
+		}
 
-			PopulateQueryParameters(command, queryParameters);
-
+		/// <inheritdoc cref="IDatabaseServerConnection.ExecuteQuery{T}(string, IReadOnlyCollection{MySqlParameter})"/>
+		public int ExecuteQuery(string query, IReadOnlyCollection<MySqlParameter> mySqlParameters)
+		{
+			if (string.IsNullOrWhiteSpace(query))
+			{
+				throw new ArgumentException("Value cannot be null or whitespace.", nameof(query));
+			}
+			
+			var command = GetMySqlCommand(query, mySqlParameters);
 			return command.ExecuteNonQuery();
 		}
 
-		/// <inheritdoc cref="IDatabaseServerConnection.ExecuteQuery{T}"/>
+		/// <inheritdoc cref="IDatabaseServerConnection.ExecuteQuery{T}(string, IDictionary{string,object})"/>
 		public IReadOnlyCollection<T> ExecuteQuery<T>(string query, IDictionary<string, object> queryParameters)
 			where T : class
 		{
@@ -77,11 +86,20 @@ namespace TixFactory.Database.MySql
 				throw new ArgumentException("Value cannot be null or whitespace.", nameof(query));
 			}
 
-			var connection = GetMySqlConnection();
-			var command = new MySqlCommand(query, connection);
+			var mySqlParameters = GetMySqlParameters(queryParameters);
+			return ExecuteQuery<T>(query, mySqlParameters);
+		}
 
-			PopulateQueryParameters(command, queryParameters);
+		/// <inheritdoc cref="IDatabaseServerConnection.ExecuteQuery{T}(string, IReadOnlyCollection{MySqlParameter})"/>
+		public IReadOnlyCollection<T> ExecuteQuery<T>(string query, IReadOnlyCollection<MySqlParameter> mySqlParameters) 
+			where T : class
+		{
+			if (string.IsNullOrWhiteSpace(query))
+			{
+				throw new ArgumentException("Value cannot be null or whitespace.", nameof(query));
+			}
 
+			var command = GetMySqlCommand(query, mySqlParameters);
 			var rows = new List<T>();
 
 			using (var reader = command.ExecuteReader())
@@ -108,11 +126,12 @@ namespace TixFactory.Database.MySql
 			return rows;
 		}
 
-		private void PopulateQueryParameters(MySqlCommand command, IDictionary<string, object> queryParameters)
+		private IReadOnlyCollection<MySqlParameter> GetMySqlParameters(IDictionary<string, object> queryParameters)
 		{
+			var mySqlParameters = new List<MySqlParameter>();
 			if (queryParameters == null)
 			{
-				return;
+				return mySqlParameters;
 			}
 
 			foreach (var queryParameter in queryParameters)
@@ -121,21 +140,36 @@ namespace TixFactory.Database.MySql
 				// https://dev.mysql.com/doc/refman/8.0/en/user-variables.html
 				if (_DatabaseNameValidator.IsVariableNameValid(queryParameter.Key))
 				{
-					command.Parameters.AddWithValue($"@{queryParameter.Key}", queryParameter.Value);
+					mySqlParameters.Add(new MySqlParameter($"@{queryParameter.Key}", queryParameter.Value));
 				}
 				else
 				{
 					throw new ArgumentException($"'{nameof(queryParameters)}' contains invalid variable name: '{queryParameter.Key}'", nameof(queryParameters));
 				}
 			}
-		}
 
+			return mySqlParameters;
+		}
+		
 		private void UpdateConnectionString(string newConnectionString, string oldConnectionString)
 		{
 			if (_MySqlConnectionLazy.IsValueCreated)
 			{
 				_MySqlConnectionLazy.Value.ConnectionString = newConnectionString;
 			}
+		}
+
+		private MySqlCommand GetMySqlCommand(string query, IReadOnlyCollection<MySqlParameter> mySqlParameters)
+		{
+			var connection = GetMySqlConnection();
+			var command = new MySqlCommand(query, connection);
+
+			if (mySqlParameters != null)
+			{
+				command.Parameters.AddRange(mySqlParameters.ToArray());
+			}
+
+			return command;
 		}
 
 		private MySqlConnection GetMySqlConnection()
