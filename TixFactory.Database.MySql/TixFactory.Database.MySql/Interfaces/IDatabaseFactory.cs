@@ -10,7 +10,7 @@ namespace TixFactory.Database.MySql
 	public interface IDatabaseFactory
 	{
 		/// <summary>
-		/// Creates a database with the specified name.
+		/// Gets a database with the specified name.
 		/// </summary>
 		/// <remarks>
 		/// If the database name is invalid according the the <see cref="IDatabaseNameValidator"/>
