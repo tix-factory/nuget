@@ -10,6 +10,12 @@ namespace TixFactory.Database.MySql
 	public interface IDatabaseServerConnection
 	{
 		/// <summary>
+		/// Gets the database associated in the connection string.
+		/// </summary>
+		/// <returns>The <see cref="IDatabase"/> selected in the connection string (or <c>null</c> if there wasn't one specified).</returns>
+		IDatabase GetConnectedDatabase();
+
+		/// <summary>
 		/// Executes a query against the database server.
 		/// </summary>
 		/// <param name="query">The MySQL query being executed.</param>

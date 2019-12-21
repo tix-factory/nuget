@@ -13,6 +13,7 @@ namespace TixFactory.Database.MySql
 	public class DatabaseServerConnection : IDatabaseServerConnection
 	{
 		private readonly ILazyWithRetry<MySqlConnection> _MySqlConnectionLazy;
+		private readonly ILazyWithRetry<IDatabase> _ConnectedDatabaseLazy;
 		private readonly IDatabaseNameValidator _DatabaseNameValidator;
 		private readonly SemaphoreSlim _ConnectionLock = new SemaphoreSlim(1, 1);
 
@@ -34,6 +35,7 @@ namespace TixFactory.Database.MySql
 
 			_DatabaseNameValidator = databaseNameValidator ?? throw new ArgumentNullException(nameof(databaseNameValidator));
 			_MySqlConnectionLazy = new LazyWithRetry<MySqlConnection>(() => new MySqlConnection(connectionString.Value));
+			_ConnectedDatabaseLazy = new LazyWithRetry<IDatabase>(LoadConnectedDatabase);
 
 			connectionString.Changed += UpdateConnectionString;
 		}
@@ -51,6 +53,13 @@ namespace TixFactory.Database.MySql
 		{
 			_MySqlConnectionLazy = mySqlConnectionLazy ?? throw new ArgumentNullException(nameof(mySqlConnectionLazy));
 			_DatabaseNameValidator = databaseNameValidator ?? throw new ArgumentNullException(nameof(databaseNameValidator));
+			_ConnectedDatabaseLazy = new LazyWithRetry<IDatabase>(LoadConnectedDatabase);
+		}
+
+		/// <inheritdoc cref="IDatabaseServerConnection.GetConnectedDatabase"/>
+		public IDatabase GetConnectedDatabase()
+		{
+			return _ConnectedDatabaseLazy.Value;
 		}
 
 		/// <inheritdoc cref="IDatabaseServerConnection.ExecuteQuery(string, IDictionary{string,object})"/>
@@ -249,6 +258,7 @@ namespace TixFactory.Database.MySql
 			{
 				// TODO: Do we need to reset the connection or anything after the connection string changes?
 				_MySqlConnectionLazy.Value.ConnectionString = newConnectionString;
+				_ConnectedDatabaseLazy.Refresh();
 			}
 		}
 
@@ -305,6 +315,17 @@ namespace TixFactory.Database.MySql
 			}
 
 			return mySqlConnection;
+		}
+
+		private IDatabase LoadConnectedDatabase()
+		{
+			var connection = GetMySqlConnection();
+			if (string.IsNullOrWhiteSpace(connection.Database))
+			{
+				return null;
+			}
+
+			return new Database(this, _DatabaseNameValidator, connection.Database);
 		}
 	}
 }
