@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text;
 using System.Text.RegularExpressions;
+using MySql.Data.MySqlClient;
 using TixFactory.Configuration;
 
 namespace TixFactory.Database.MySql
@@ -13,6 +16,7 @@ namespace TixFactory.Database.MySql
 	public class SqlQueryBuilder : ISqlQueryBuilder
 	{
 		private const string _CountParameterName = "Count";
+		private readonly IDatabaseTypeParser _DatabaseTypeParser;
 		private readonly Regex _ExpressionCutRegex = new Regex(@"^.*=>\s*");
 		private readonly Regex _CaseInsensitiveReplacementRegex = new Regex(@"(`\w+`|@\w+)\.To(Lower|Upper)\(\)");
 		private readonly Regex _EqualReplacementRegex = new Regex(@"(`\w+`|@\w+)\.Equals\((`\w+`|@\w+),?\s*(\w*)\)");
@@ -21,8 +25,20 @@ namespace TixFactory.Database.MySql
 		private readonly Regex _EndsWithReplacementRegex = new Regex(@"(`\w+`|@\w+)\.EndsWith\((`\w+`|@\w+)\)");
 		private readonly Regex _NullSwapRegex = new Regex(@"null\s*([!=]=)\s*(`\w+`|@\w+)");
 
+		/// <summary>
+		/// Initializes a new <see cref="SqlQueryBuilder"/>.
+		/// </summary>
+		/// <param name="databaseTypeParser">An <see cref="IDatabaseTypeParser"/>.</param>
+		/// <exception cref="ArgumentNullException">
+		/// - <paramref name="databaseTypeParser"/>
+		/// </exception>
+		public SqlQueryBuilder(IDatabaseTypeParser databaseTypeParser)
+		{
+			_DatabaseTypeParser = databaseTypeParser ?? throw new ArgumentNullException(nameof(databaseTypeParser));
+		}
+
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow}(string,string,OrderBy{TRow})"/>
-		public string BuildSelectTopQuery<TRow>(string databaseName, string tableName, OrderBy<TRow> orderBy = null)
+		public ISqlQuery BuildSelectTopQuery<TRow>(string databaseName, string tableName, OrderBy<TRow> orderBy = null)
 			where TRow : class
 		{
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
@@ -30,100 +46,171 @@ namespace TixFactory.Database.MySql
 				databaseName, 
 				tableName,
 				whereClause: null,
-				orderByStatement: ParseOrderBy(orderBy, entityColumnAliases));
+				orderByStatement: ParseOrderBy(orderBy, entityColumnAliases),
+				expressionParameters: Array.Empty<ParameterExpression>());
 		}
 
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow}(string,string,System.Linq.Expressions.Expression{System.Func{TRow,bool}},OrderBy{TRow})"/>
-		public string BuildSelectTopQuery<TRow>(string databaseName, string tableName, Expression<Func<TRow, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		public ISqlQuery BuildSelectTopQuery<TRow>(string databaseName, string tableName, Expression<Func<TRow, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class
 		{
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause<TRow>(whereExpression, whereExpression.Parameters, entityColumnAliases);
+			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
 			var orderByStatement = ParseOrderBy(orderBy, entityColumnAliases);
 
 			return BuildSelectAllQuery(
 				databaseName,
 				tableName,
 				whereClause,
-				orderByStatement);
+				orderByStatement,
+				whereExpression.Parameters);
 		}
 
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1}"/>
-		public string BuildSelectTopQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		public ISqlQuery BuildSelectTopQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class
 		{
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause<TRow>(whereExpression, whereExpression.Parameters, entityColumnAliases);
+			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
 			var orderByStatement = ParseOrderBy(orderBy, entityColumnAliases);
 
 			return BuildSelectAllQuery(
 				databaseName,
 				tableName,
 				whereClause,
-				orderByStatement);
+				orderByStatement,
+				whereExpression.Parameters);
 		}
 
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2}"/>
-		public string BuildSelectTopQuery<TRow, TP1, TP2>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		public ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class
 		{
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause<TRow>(whereExpression, whereExpression.Parameters, entityColumnAliases);
+			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
 			var orderByStatement = ParseOrderBy(orderBy, entityColumnAliases);
 
 			return BuildSelectAllQuery(
 				databaseName,
 				tableName,
 				whereClause,
-				orderByStatement);
+				orderByStatement,
+				whereExpression.Parameters);
 		}
 
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2,TP3}"/>
-		public string BuildSelectTopQuery<TRow, TP1, TP2, TP3>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		public ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2, TP3>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class
 		{
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause<TRow>(whereExpression, whereExpression.Parameters, entityColumnAliases);
+			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
 			var orderByStatement = ParseOrderBy(orderBy, entityColumnAliases);
 
 			return BuildSelectAllQuery(
 				databaseName,
 				tableName,
 				whereClause,
-				orderByStatement);
+				orderByStatement,
+				whereExpression.Parameters);
 		}
 
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2,TP3,TP4}"/>
-		public string BuildSelectTopQuery<TRow, TP1, TP2, TP3, TP4>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		public ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2, TP3, TP4>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class
 		{
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause<TRow>(whereExpression, whereExpression.Parameters, entityColumnAliases);
+			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
 			var orderByStatement = ParseOrderBy(orderBy, entityColumnAliases);
 
 			return BuildSelectAllQuery(
 				databaseName,
 				tableName,
 				whereClause,
-				orderByStatement);
+				orderByStatement,
+				whereExpression.Parameters);
 		}
 
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2,TP3,TP4,TP5}"/>
-		public string BuildSelectTopQuery<TRow, TP1, TP2, TP3, TP4, TP5>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, TP5, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		public ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2, TP3, TP4, TP5>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, TP5, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class
 		{
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause<TRow>(whereExpression, whereExpression.Parameters, entityColumnAliases);
+			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
 			var orderByStatement = ParseOrderBy(orderBy, entityColumnAliases);
 
 			return BuildSelectAllQuery(
 				databaseName,
 				tableName,
 				whereClause,
-				orderByStatement);
+				orderByStatement,
+				whereExpression.Parameters);
 		}
 
-		private string BuildSelectAllQuery(string databaseName, string tableName, string whereClause, string orderByStatement)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildCreateStoredProcedureQuery"/>
+		public ISqlQuery BuildCreateStoredProcedureQuery(string databaseName, string storedProcedureName, ISqlQuery query)
+		{
+			var queryParameters = new StringBuilder();
+			foreach (var parameter in query.Parameters)
+			{
+				string direction;
+				switch (parameter.ParameterDirection)
+				{
+					case ParameterDirection.Output:
+						direction = "OUT";
+						break;
+					case ParameterDirection.InputOutput:
+						direction = "INOUT";
+						break;
+					case ParameterDirection.Input:
+					default:
+						direction = "IN";
+						break;
+				}
+
+				var parameterName = parameter.Name;
+				if (parameterName == _CountParameterName)
+				{
+					parameterName = $"_{_CountParameterName}";
+				}
+
+				var parameterLine = $"{direction} {parameterName} {parameter.DatabaseTypeName}";
+				if (parameter.Length.HasValue)
+				{
+					parameterLine += $"({parameter.Length})";
+				}
+
+				if (queryParameters.Length > 0)
+				{
+					queryParameters.AppendLine(",");
+				}
+
+				queryParameters.Append($"\t{parameterLine}");
+			}
+
+			if (queryParameters.Length > 0)
+			{
+				queryParameters.Insert(0, "\n");
+				queryParameters.AppendLine();
+			}
+
+			var strippedQuery = query.Query
+				.Replace($"@{_CountParameterName}", $"@_{_CountParameterName}")
+				.Replace("@", "");
+
+			var createQuery = new StringBuilder();
+			createQuery.AppendLine("DELIMITER $$");
+			createQuery.AppendLine($"USE `{databaseName}`$$");
+			createQuery.AppendLine($"CREATE PROCEDURE `{storedProcedureName}`({queryParameters})");
+			createQuery.AppendLine("BEGIN");
+			createQuery.AppendLine($"\t{string.Join("\n\t", strippedQuery.Split('\n'))}");
+			createQuery.AppendLine("END$$");
+			createQuery.AppendLine();
+			createQuery.AppendLine("DELIMITER ;");
+
+			return new SqlQuery(createQuery.ToString(), Array.Empty<SqlQueryParameter>());
+		}
+
+		private ISqlQuery BuildSelectAllQuery(string databaseName, string tableName, string whereClause, string orderByStatement, IReadOnlyCollection<ParameterExpression> expressionParameters)
 		{
 			var query = $"SELECT *\n\tFROM `{databaseName}`.`{tableName}`";
 
@@ -138,8 +225,19 @@ namespace TixFactory.Database.MySql
 			}
 
 			query += $"\n\tLIMIT @{_CountParameterName}";
+			
+			var parameters = expressionParameters.Skip(1).Select(p =>
+			{
+				var mySqlType = _DatabaseTypeParser.GetMySqlType(p.Type);
+				var databaseTypeName = _DatabaseTypeParser.GetDatabaseTypeName(mySqlType);
+				var parameter = new SqlQueryParameter(p.Name, databaseTypeName, length: null, parameterDirection: ParameterDirection.Input);
 
-			return query;
+				return parameter;
+			}).ToList();
+
+			parameters.Add(new SqlQueryParameter(_CountParameterName, _DatabaseTypeParser.GetDatabaseTypeName(MySqlDbType.Int32), length: null, parameterDirection: ParameterDirection.Input));
+
+			return new SqlQuery($"{query};", parameters);
 		}
 
 		private string ParseOrderBy<TRow>(OrderBy<TRow> orderBy, IDictionary<string, string> entityColumnAliases)
@@ -154,8 +252,7 @@ namespace TixFactory.Database.MySql
 			return $"`{entityColumnAliases[orderBy.PropertyName]}` {sort}";
 		}
 
-		private string ParseWhereClause<TRow>(Expression queryExpression, IReadOnlyCollection<ParameterExpression> expressionParameters, IDictionary<string, string> entityColumnAliases)
-			where TRow : class
+		private string ParseWhereClause(Expression queryExpression, IReadOnlyCollection<ParameterExpression> expressionParameters, IDictionary<string, string> entityColumnAliases)
 		{
 			// TODO: Regex example
 			var expression = _ExpressionCutRegex.Replace(queryExpression.ToString(), "");

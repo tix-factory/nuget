@@ -26,7 +26,7 @@ namespace TixFactory.Database.MySql.Tests.Unit
 		}
 
 		[Test]
-		[Ignore("TODO: Implement real tests.")]
+		//[Ignore("TODO: Implement real tests.")]
 		public void FakeTest()
 		{
 			var connectionString = File.ReadAllText("testconnectionstring.txt");
@@ -43,8 +43,9 @@ namespace TixFactory.Database.MySql.Tests.Unit
 			var storedProcedures = testDatabase.GetStoredProcedureNames();
 			var result = databaseServerConnection.ExecuteStoredProcedure<object>(storedProcedures.First(), queryParameters: null);
 
-			var sqlQueryBuilder = new SqlQueryBuilder();
-			var selectAllQuery = sqlQueryBuilder.BuildSelectAllQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id > id, new OrderBy<TestTable>(nameof(TestTable.Id), SortOrder.Ascending));
+			var sqlQueryBuilder = new SqlQueryBuilder(new DatabaseTypeParser());
+			var selectAllQuery = sqlQueryBuilder.BuildSelectTopQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id > id, new OrderBy<TestTable>(nameof(TestTable.Id), SortOrder.Ascending));
+			var createStoredProcedure = sqlQueryBuilder.BuildCreateStoredProcedureQuery(testDatabase.Name, "test_stored_procedure", selectAllQuery);
 		}
 	}
 }

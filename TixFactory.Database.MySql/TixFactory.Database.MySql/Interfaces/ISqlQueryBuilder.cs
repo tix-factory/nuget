@@ -16,7 +16,7 @@ namespace TixFactory.Database.MySql
 		/// <param name="tableName">The table name to select in.</param>
 		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
 		/// <returns>The query string.</returns>
-		string BuildSelectTopQuery<TRow>(string databaseName, string tableName, OrderBy<TRow> orderBy = null)
+		ISqlQuery BuildSelectTopQuery<TRow>(string databaseName, string tableName, OrderBy<TRow> orderBy = null)
 			where TRow : class;
 
 		/// <summary>
@@ -28,7 +28,7 @@ namespace TixFactory.Database.MySql
 		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
 		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
 		/// <returns>The query string.</returns>
-		string BuildSelectTopQuery<TRow>(string databaseName, string tableName, Expression<Func<TRow, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		ISqlQuery BuildSelectTopQuery<TRow>(string databaseName, string tableName, Expression<Func<TRow, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class;
 
 		/// <summary>
@@ -41,7 +41,7 @@ namespace TixFactory.Database.MySql
 		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
 		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
 		/// <returns>The query string.</returns>
-		string BuildSelectTopQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		ISqlQuery BuildSelectTopQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class;
 
 		/// <summary>
@@ -55,7 +55,7 @@ namespace TixFactory.Database.MySql
 		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
 		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
 		/// <returns>The query string.</returns>
-		string BuildSelectTopQuery<TRow, TP1, TP2>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class;
 
 		/// <summary>
@@ -70,7 +70,7 @@ namespace TixFactory.Database.MySql
 		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
 		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
 		/// <returns>The query string.</returns>
-		string BuildSelectTopQuery<TRow, TP1, TP2, TP3>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2, TP3>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class;
 
 		/// <summary>
@@ -86,7 +86,7 @@ namespace TixFactory.Database.MySql
 		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
 		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
 		/// <returns>The query string.</returns>
-		string BuildSelectTopQuery<TRow, TP1, TP2, TP3, TP4>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2, TP3, TP4>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class;
 
 		/// <summary>
@@ -103,7 +103,16 @@ namespace TixFactory.Database.MySql
 		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
 		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
 		/// <returns>The query string.</returns>
-		string BuildSelectTopQuery<TRow, TP1, TP2, TP3, TP4, TP5>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, TP5, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2, TP3, TP4, TP5>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, TP5, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class;
+
+		/// <summary>
+		/// Builds a query that can be executed to create a new stored procedure.
+		/// </summary>
+		/// <param name="databaseName">The database name.</param>
+		/// <param name="storedProcedureName">The stored procedure name.</param>
+		/// <param name="query">The embedded query in the stored procedure.</param>
+		/// <returns>The create stored procedure query.</returns>
+		ISqlQuery BuildCreateStoredProcedureQuery(string databaseName, string storedProcedureName, ISqlQuery query);
 	}
 }
