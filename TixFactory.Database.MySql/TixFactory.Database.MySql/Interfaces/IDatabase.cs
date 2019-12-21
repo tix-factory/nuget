@@ -35,5 +35,14 @@ namespace TixFactory.Database.MySql
 		/// - Unexpected error reading database tables.
 		/// </exception>
 		IReadOnlyCollection<IDatabaseTable> GetAllTables();
+
+		/// <summary>
+		/// Gets the names of all the stored procedures in the database.
+		/// </summary>
+		/// <returns>The collection of stored procedure names.</returns>
+		/// <exception cref="MySqlException">
+		/// - Unexpected error reading database stored procedures.
+		/// </exception>
+		IReadOnlyCollection<string> GetStoredProcedureNames();
 	}
 }

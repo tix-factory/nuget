@@ -55,6 +55,14 @@ namespace TixFactory.Database.MySql
 			return _DatabaseTables.Values.ToArray();
 		}
 
+		/// <inheritdoc cref="IDatabase.GetStoredProcedureNames"/>
+		public IReadOnlyCollection<string> GetStoredProcedureNames()
+		{
+			var queryResult = _DatabaseServerConnection.ExecuteQuery<ShowProcedureStatusResult>("SHOW PROCEDURE STATUS", queryParameters: null);
+			var storedProcedureNames = queryResult.Where(p => p.DatabaseName.Equals(Name, StringComparison.OrdinalIgnoreCase) && p.Type == "PROCEDURE").Select(p => p.Name);
+			return new HashSet<string>(storedProcedureNames);
+		}
+
 		private void SyncTables()
 		{
 			var queryResult = _DatabaseServerConnection.ExecuteQuery<IDictionary<string, string>>($"SHOW TABLES FROM `{Name}`;", queryParameters: null);

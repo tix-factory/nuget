@@ -1,10 +1,10 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading;
-using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
 using TixFactory.Configuration;
 
 namespace TixFactory.Database.MySql
@@ -72,7 +72,7 @@ namespace TixFactory.Database.MySql
 			{
 				throw new ArgumentException("Value cannot be null or whitespace.", nameof(query));
 			}
-			
+
 			var command = GetMySqlCommand(query, mySqlParameters);
 			return command.ExecuteNonQuery();
 		}
@@ -91,7 +91,7 @@ namespace TixFactory.Database.MySql
 		}
 
 		/// <inheritdoc cref="IDatabaseServerConnection.ExecuteQuery{T}(string, IReadOnlyCollection{MySqlParameter})"/>
-		public IReadOnlyCollection<T> ExecuteQuery<T>(string query, IReadOnlyCollection<MySqlParameter> mySqlParameters) 
+		public IReadOnlyCollection<T> ExecuteQuery<T>(string query, IReadOnlyCollection<MySqlParameter> mySqlParameters)
 			where T : class
 		{
 			if (string.IsNullOrWhiteSpace(query))
@@ -100,6 +100,98 @@ namespace TixFactory.Database.MySql
 			}
 
 			var command = GetMySqlCommand(query, mySqlParameters);
+			return ExecuteCommand<T>(command);
+		}
+
+		/// <inheritdoc cref="IDatabaseServerConnection.ExecuteStoredProcedure(string, IDictionary{string,object})"/>
+		public int ExecuteStoredProcedure(string storedProcedureName, IDictionary<string, object> queryParameters)
+		{
+			if (string.IsNullOrWhiteSpace(storedProcedureName))
+			{
+				throw new ArgumentException("Value cannot be null or whitespace.", nameof(storedProcedureName));
+			}
+
+			var mySqlParameters = GetMySqlParameters(queryParameters);
+			return ExecuteStoredProcedure(storedProcedureName, mySqlParameters);
+		}
+
+		/// <inheritdoc cref="IDatabaseServerConnection.ExecuteStoredProcedure(string, IReadOnlyCollection{MySqlParameter})"/>
+		public int ExecuteStoredProcedure(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters)
+		{
+			if (string.IsNullOrWhiteSpace(storedProcedureName))
+			{
+				throw new ArgumentException("Value cannot be null or whitespace.", nameof(storedProcedureName));
+			}
+
+			var connection = GetMySqlConnection();
+			if (string.IsNullOrWhiteSpace(connection.Database))
+			{
+				throw new ApplicationException("Database must selected in the connection string with the proper casing in order to execute stored procedures.");
+			}
+
+			try
+			{
+				var command = GetMySqlCommandForStoredProcedure(storedProcedureName, mySqlParameters, connection);
+				return command.ExecuteNonQuery();
+			}
+			catch (MySqlException e) when (e.Code == (int)MySqlErrorCode.NoDatabaseSelected)
+			{
+				// BUG: MySqlException code can actually come back as zero so these catch scopes do nothing right now.
+				throw new ApplicationException("Database must selected in the connection string with the proper casing in order to execute stored procedures.", e);
+			}
+			catch (MySqlException e) when (e.Code == (int)MySqlErrorCode.StoredProcedureDoesNotExist || (e.Message.Contains("Procedure or function") && e.Message.Contains("cannot be found")))
+			{
+				throw new ArgumentException("Could not find stored procedure in database. If you're sure it exists check that your connection string contains the database name with the proper casing.", nameof(storedProcedureName), e);
+			}
+		}
+
+		/// <inheritdoc cref="IDatabaseServerConnection.ExecuteStoredProcedure{T}(string, IDictionary{string,object})"/>
+		public IReadOnlyCollection<T> ExecuteStoredProcedure<T>(string storedProcedureName, IDictionary<string, object> queryParameters) 
+			where T : class
+		{
+			if (string.IsNullOrWhiteSpace(storedProcedureName))
+			{
+				throw new ArgumentException("Value cannot be null or whitespace.", nameof(storedProcedureName));
+			}
+
+			var mySqlParameters = GetMySqlParameters(queryParameters);
+			return ExecuteStoredProcedure<T>(storedProcedureName, mySqlParameters);
+		}
+
+		/// <inheritdoc cref="IDatabaseServerConnection.ExecuteStoredProcedure{T}(string, IReadOnlyCollection{MySqlParameter})"/>
+		public IReadOnlyCollection<T> ExecuteStoredProcedure<T>(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters) 
+			where T : class
+		{
+			if (string.IsNullOrWhiteSpace(storedProcedureName))
+			{
+				throw new ArgumentException("Value cannot be null or whitespace.", nameof(storedProcedureName));
+			}
+
+			var connection = GetMySqlConnection();
+			if (string.IsNullOrWhiteSpace(connection.Database))
+			{
+				throw new ApplicationException("Database must selected in the connection string with the proper casing in order to execute stored procedures.");
+			}
+
+			try
+			{
+				var command = GetMySqlCommandForStoredProcedure(storedProcedureName, mySqlParameters, connection);
+				return ExecuteCommand<T>(command);
+			}
+			catch (MySqlException e) when (e.Code == (int)MySqlErrorCode.NoDatabaseSelected)
+			{
+				// BUG: MySqlException code can actually come back as zero so these catch scopes do nothing right now.
+				throw new ApplicationException("Database must selected in the connection string with the proper casing in order to execute stored procedures.", e);
+			}
+			catch (MySqlException e) when (e.Code == (int)MySqlErrorCode.StoredProcedureDoesNotExist || (e.Message.Contains("Procedure or function") && e.Message.Contains("cannot be found")))
+			{
+				throw new ArgumentException("Could not find stored procedure in database. If you're sure it exists check that your connection string contains the database name with the proper casing.", nameof(storedProcedureName), e);
+			}
+		}
+
+		private IReadOnlyCollection<T> ExecuteCommand<T>(MySqlCommand command)
+			where T : class
+		{
 			var rows = new List<T>();
 
 			using (var reader = command.ExecuteReader())
@@ -150,11 +242,12 @@ namespace TixFactory.Database.MySql
 
 			return mySqlParameters;
 		}
-		
+
 		private void UpdateConnectionString(string newConnectionString, string oldConnectionString)
 		{
 			if (_MySqlConnectionLazy.IsValueCreated)
 			{
+				// TODO: Do we need to reset the connection or anything after the connection string changes?
 				_MySqlConnectionLazy.Value.ConnectionString = newConnectionString;
 			}
 		}
@@ -163,6 +256,20 @@ namespace TixFactory.Database.MySql
 		{
 			var connection = GetMySqlConnection();
 			var command = new MySqlCommand(query, connection);
+
+			if (mySqlParameters != null)
+			{
+				command.Parameters.AddRange(mySqlParameters.ToArray());
+			}
+
+			return command;
+		}
+
+		private MySqlCommand GetMySqlCommandForStoredProcedure(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters, MySqlConnection connection)
+		{
+			var command = new MySqlCommand(storedProcedureName, connection);
+
+			command.CommandType = CommandType.StoredProcedure;
 
 			if (mySqlParameters != null)
 			{
