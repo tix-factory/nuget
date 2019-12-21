@@ -23,8 +23,22 @@
 		/// Checks if a table name matches MySQL table naming rules.
 		/// </summary>
 		/// <param name="tableName">The table name to check.</param>
-		/// <returns><c>true</c> if the name is valid for a MySQL database (otherwise <c>false</c>).</returns>
+		/// <returns><c>true</c> if the name is valid for a MySQL table (otherwise <c>false</c>).</returns>
 		bool IsTableNameValid(string tableName);
+
+		/// <summary>
+		/// Checks if a column name matches MySQL column naming rules.
+		/// </summary>
+		/// <param name="columnName">The column name to check.</param>
+		/// <returns><c>true</c> if the name is valid for a MySQL table column (otherwise <c>false</c>).</returns>
+		bool IsColumnNameValid(string columnName);
+
+		/// <summary>
+		/// Checks if a index name matches MySQL column naming rules.
+		/// </summary>
+		/// <param name="indexName">The index name to check.</param>
+		/// <returns><c>true</c> if the name is valid for a MySQL table index (otherwise <c>false</c>).</returns>
+		bool IsIndexNameValid(string indexName);
 
 		/// <summary>
 		/// Checks if a string is valid to be a variable name.

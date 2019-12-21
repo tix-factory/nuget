@@ -56,6 +56,20 @@ namespace TixFactory.Database.MySql
 			return IsDatabaseNameValid(tableName);
 		}
 
+		/// <inheritdoc cref="IDatabaseNameValidator.IsColumnNameValid"/>
+		public bool IsColumnNameValid(string columnName)
+		{
+			// TODO: Do this properly. I did not validate these as actual naming restrictions for column names.
+			return IsDatabaseNameValid(columnName);
+		}
+
+		/// <inheritdoc cref="IDatabaseNameValidator.IsIndexNameValid"/>
+		public bool IsIndexNameValid(string indexName)
+		{
+			// TODO: Do this properly. I did not validate these as actual naming restrictions for index names.
+			return IsDatabaseNameValid(indexName);
+		}
+
 		/// <inheritdoc cref="IDatabaseNameValidator.IsVariableNameValid"/>
 		public bool IsVariableNameValid(string variableName)
 		{

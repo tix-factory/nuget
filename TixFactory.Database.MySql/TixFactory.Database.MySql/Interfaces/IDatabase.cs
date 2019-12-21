@@ -17,7 +17,7 @@ namespace TixFactory.Database.MySql
 		/// Gets an <see cref="IDatabaseTable"/> with the specified name.
 		/// </summary>
 		/// <remarks>
-		/// If the database name is invalid according the the <see cref="IDatabaseNameValidator"/>
+		/// If the table name is invalid according the the <see cref="IDatabaseNameValidator"/>
 		/// the returned value will be <c>null</c>. If it's not valid it can't possibly exist, right?
 		/// </remarks>
 		/// <param name="tableName">The table name.</param>

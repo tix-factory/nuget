@@ -12,6 +12,7 @@ namespace TixFactory.Database.MySql
 		private readonly IDatabaseNameValidator _DatabaseNameValidator;
 		private readonly IDatabase _Database;
 		private readonly ConcurrentDictionary<string, IDatabaseTableColumn> _DatabaseTableColumns;
+		private readonly ConcurrentDictionary<string, IDatabaseTableIndex> _DatabaseTableIndexes;
 		private ISet<string> _OrderedDatabaseColumnNames;
 
 		/// <inheritdoc cref="IDatabaseTable.Name"/>
@@ -38,6 +39,21 @@ namespace TixFactory.Database.MySql
 
 			_OrderedDatabaseColumnNames = new HashSet<string>();
 			_DatabaseTableColumns = new ConcurrentDictionary<string, IDatabaseTableColumn>(StringComparer.OrdinalIgnoreCase);
+			_DatabaseTableIndexes = new ConcurrentDictionary<string, IDatabaseTableIndex>(StringComparer.OrdinalIgnoreCase);
+		}
+
+		/// <inheritdoc cref="IDatabaseTable.GetColumn"/>
+		public IDatabaseTableColumn GetColumn(string columnName)
+		{
+			if (!_DatabaseNameValidator.IsColumnNameValid(columnName))
+			{
+				return null;
+			}
+
+			SyncColumns();
+			_DatabaseTableColumns.TryGetValue(columnName, out var column);
+
+			return column;
 		}
 
 		/// <inheritdoc cref="IDatabaseTable.GetAllColumns"/>
@@ -46,7 +62,28 @@ namespace TixFactory.Database.MySql
 			SyncColumns();
 			return _OrderedDatabaseColumnNames.Select(c => _DatabaseTableColumns[c]).ToArray();
 		}
-		
+
+		/// <inheritdoc cref="IDatabaseTable.GetIndex"/>
+		public IDatabaseTableIndex GetIndex(string indexName)
+		{
+			if (!_DatabaseNameValidator.IsIndexNameValid(indexName))
+			{
+				return null;
+			}
+
+			SyncIndexes();
+			_DatabaseTableIndexes.TryGetValue(indexName, out var index);
+
+			return index;
+		}
+
+		/// <inheritdoc cref="IDatabaseTable.GetAllIndexes"/>
+		public IReadOnlyCollection<IDatabaseTableIndex> GetAllIndexes()
+		{
+			SyncIndexes();
+			return _DatabaseTableIndexes.Values.ToArray();
+		}
+
 		private void SyncColumns()
 		{
 			var queryResult = _DatabaseServerConnection.ExecuteQuery<ShowColumnsResult>($"SHOW COLUMNS FROM `{_Database.Name}`.`{Name}`;", queryParameters: null);
@@ -69,6 +106,33 @@ namespace TixFactory.Database.MySql
 			}
 
 			_OrderedDatabaseColumnNames = columnNames;
+		}
+
+		private void SyncIndexes()
+		{
+			SyncColumns();
+
+			var queryResult = _DatabaseServerConnection.ExecuteQuery<ShowIndexResult>($"SHOW INDEX FROM `{_Database.Name}`.`{Name}`;", queryParameters: null);
+			var indexNames = new HashSet<string>(queryResult.Select(c => c.IndexName), StringComparer.OrdinalIgnoreCase);
+
+			foreach (var indexName in _DatabaseTableIndexes.Keys)
+			{
+				if (!indexNames.Contains(indexName))
+				{
+					_DatabaseTableIndexes.TryRemove(indexName, out _);
+				}
+			}
+
+			foreach (var indexName in indexNames)
+			{
+				var showIndexResults = queryResult.Where(i => i.IndexName == indexName).ToList();
+				showIndexResults.Sort((a, b) => a.Order - b.Order);
+
+				var decidingColumn = showIndexResults.First();
+				var indexColumns = showIndexResults.Select(c => new DatabaseTableIndexColumn(_DatabaseTableColumns[c.ColumnName], c)).ToArray();
+
+				_DatabaseTableIndexes[indexName] = new DatabaseTableIndex(indexName, !decidingColumn.NonUnique, indexColumns);
+			}
 		}
 	}
 }
