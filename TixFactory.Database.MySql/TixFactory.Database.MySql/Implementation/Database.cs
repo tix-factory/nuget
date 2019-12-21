@@ -10,6 +10,7 @@ namespace TixFactory.Database.MySql
 	{
 		private readonly IDatabaseServerConnection _DatabaseServerConnection;
 		private readonly IDatabaseNameValidator _DatabaseNameValidator;
+		private readonly IDatabaseTypeParser _DatabaseTypeParser;
 		private readonly ConcurrentDictionary<string, IDatabaseTable> _DatabaseTables;
 
 		/// <inheritdoc cref="IDatabase.Name"/>
@@ -20,15 +21,18 @@ namespace TixFactory.Database.MySql
 		/// </summary>
 		/// <param name="databaseServerConnection">An <see cref="IDatabaseServerConnection"/>.</param>
 		/// <param name="databaseNameValidator">An <see cref="IDatabaseNameValidator"/>.</param>
+		/// <param name="databaseTypeParser">An <see cref="IDatabaseTypeParser"/>.</param>
 		/// <param name="databaseName">The database name.</param>
 		/// <exception cref="ArgumentNullException">
 		/// - <paramref name="databaseServerConnection"/>
 		/// - <paramref name="databaseNameValidator"/>
+		/// - <paramref name="databaseTypeParser"/>
 		/// </exception>
-		public Database(IDatabaseServerConnection databaseServerConnection, IDatabaseNameValidator databaseNameValidator, string databaseName)
+		public Database(IDatabaseServerConnection databaseServerConnection, IDatabaseNameValidator databaseNameValidator, IDatabaseTypeParser databaseTypeParser, string databaseName)
 		{
 			_DatabaseServerConnection = databaseServerConnection ?? throw new ArgumentNullException(nameof(databaseServerConnection));
 			_DatabaseNameValidator = databaseNameValidator ?? throw new ArgumentNullException(nameof(databaseNameValidator));
+			_DatabaseTypeParser = databaseTypeParser ?? throw new ArgumentNullException(nameof(databaseTypeParser));
 			Name = databaseName;
 
 			_DatabaseTables = new ConcurrentDictionary<string, IDatabaseTable>(StringComparer.OrdinalIgnoreCase);
@@ -83,7 +87,7 @@ namespace TixFactory.Database.MySql
 			{
 				if (!_DatabaseTables.ContainsKey(tableName))
 				{
-					_DatabaseTables[tableName] = new DatabaseTable(_DatabaseServerConnection, _DatabaseNameValidator, this, tableName);
+					_DatabaseTables[tableName] = new DatabaseTable(_DatabaseServerConnection, _DatabaseNameValidator, _DatabaseTypeParser, this, tableName);
 				}
 			}
 		}

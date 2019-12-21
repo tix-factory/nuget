@@ -30,12 +30,19 @@ namespace TixFactory.Database.MySql
 		/// <summary>
 		/// Initializes a new <see cref="DatabaseTableColumn"/>.
 		/// </summary>
+		/// <param name="databaseTypeParser">An <see cref="IDatabaseTypeParser"/>.</param>
 		/// <param name="showColumnsResult">A <see cref="ShowColumnsResult"/>.</param>
-		/// <exception cref="ShowColumnsResult">
+		/// <exception cref="ArgumentNullException">
+		/// - <paramref name="databaseTypeParser"/>
 		/// - <paramref name="showColumnsResult"/>
 		/// </exception>
-		public DatabaseTableColumn(ShowColumnsResult showColumnsResult)
+		public DatabaseTableColumn(IDatabaseTypeParser databaseTypeParser, ShowColumnsResult showColumnsResult)
 		{
+			if (databaseTypeParser == null)
+			{
+				throw new ArgumentNullException(nameof(databaseTypeParser));
+			}
+
 			if (showColumnsResult == null)
 			{
 				throw new ArgumentNullException(nameof(showColumnsResult));
@@ -45,7 +52,7 @@ namespace TixFactory.Database.MySql
 			Primary = showColumnsResult.Key == "PRI";
 			Unique = Primary || showColumnsResult.Key == "UNI"; // The primary key has to be unique.
 
-			var parseResult = new TypeDbTypeParseResult(showColumnsResult.RawDataType, showColumnsResult.IsNullable == "YES");
+			var parseResult = databaseTypeParser.ParseDatabaseType(showColumnsResult.RawDataType, showColumnsResult.IsNullable == "YES");
 			Type = parseResult.Type;
 			MySqlType = parseResult.MySqlType;
 

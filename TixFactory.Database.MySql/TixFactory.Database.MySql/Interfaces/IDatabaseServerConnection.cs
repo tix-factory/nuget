@@ -16,6 +16,12 @@ namespace TixFactory.Database.MySql
 		IDatabase GetConnectedDatabase();
 
 		/// <summary>
+		/// Builds an <see cref="IDatabaseFactory"/> with the connection.
+		/// </summary>
+		/// <returns>The <see cref="IDatabaseFactory"/>.</returns>
+		IDatabaseFactory BuildDatabaseFactory();
+
+		/// <summary>
 		/// Executes a query against the database server.
 		/// </summary>
 		/// <param name="query">The MySQL query being executed.</param>

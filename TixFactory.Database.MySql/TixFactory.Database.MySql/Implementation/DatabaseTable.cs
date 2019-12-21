@@ -10,6 +10,7 @@ namespace TixFactory.Database.MySql
 	{
 		private readonly IDatabaseServerConnection _DatabaseServerConnection;
 		private readonly IDatabaseNameValidator _DatabaseNameValidator;
+		private readonly IDatabaseTypeParser _DatabaseTypeParser;
 		private readonly IDatabase _Database;
 		private readonly ConcurrentDictionary<string, IDatabaseTableColumn> _DatabaseTableColumns;
 		private readonly ConcurrentDictionary<string, IDatabaseTableIndex> _DatabaseTableIndexes;
@@ -23,17 +24,20 @@ namespace TixFactory.Database.MySql
 		/// </summary>
 		/// <param name="databaseServerConnection">An <see cref="IDatabaseServerConnection"/>.</param>
 		/// <param name="databaseNameValidator">An <see cref="IDatabaseNameValidator"/>.</param>
+		/// <param name="databaseTypeParser">An <see cref="IDatabaseTypeParser"/>.</param>
 		/// <param name="database">The <see cref="IDatabase"/> the table belongs to.</param>
 		/// <param name="tableName">The table name.</param>
 		/// <exception cref="ArgumentNullException">
 		/// - <paramref name="databaseServerConnection"/>
 		/// - <paramref name="databaseNameValidator"/>
+		/// - <paramref name="databaseTypeParser"/>
 		/// - <paramref name="database"/>
 		/// </exception>
-		public DatabaseTable(IDatabaseServerConnection databaseServerConnection, IDatabaseNameValidator databaseNameValidator, IDatabase database, string tableName)
+		public DatabaseTable(IDatabaseServerConnection databaseServerConnection, IDatabaseNameValidator databaseNameValidator, IDatabaseTypeParser databaseTypeParser, IDatabase database, string tableName)
 		{
 			_DatabaseServerConnection = databaseServerConnection ?? throw new ArgumentNullException(nameof(databaseServerConnection));
 			_DatabaseNameValidator = databaseNameValidator ?? throw new ArgumentNullException(nameof(databaseNameValidator));
+			_DatabaseTypeParser = databaseTypeParser ?? throw new ArgumentNullException(nameof(databaseTypeParser));
 			_Database = database ?? throw new ArgumentNullException(nameof(database));
 			Name = tableName;
 
@@ -101,7 +105,7 @@ namespace TixFactory.Database.MySql
 			{
 				if (!_DatabaseTableColumns.ContainsKey(columnName))
 				{
-					_DatabaseTableColumns[columnName] = new DatabaseTableColumn(queryResult.First(c => c.Name == columnName));
+					_DatabaseTableColumns[columnName] = new DatabaseTableColumn(_DatabaseTypeParser, queryResult.First(c => c.Name == columnName));
 				}
 			}
 

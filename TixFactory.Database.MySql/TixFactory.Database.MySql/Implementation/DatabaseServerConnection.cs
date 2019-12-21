@@ -15,18 +15,33 @@ namespace TixFactory.Database.MySql
 		private readonly ILazyWithRetry<MySqlConnection> _MySqlConnectionLazy;
 		private readonly ILazyWithRetry<IDatabase> _ConnectedDatabaseLazy;
 		private readonly IDatabaseNameValidator _DatabaseNameValidator;
+		private readonly IDatabaseTypeParser _DatabaseTypeParser;
 		private readonly SemaphoreSlim _ConnectionLock = new SemaphoreSlim(1, 1);
 
 		/// <summary>
 		/// Initializes a new <see cref="DatabaseServerConnection"/>.
 		/// </summary>
 		/// <param name="connectionString">An <see cref="IReadOnlySetting{T}"/> evaluating to the database server connection string.</param>
+		/// <exception cref="ArgumentNullException">
+		/// - <paramref name="connectionString"/>
+		/// </exception>
+		public DatabaseServerConnection(IReadOnlySetting<string> connectionString)
+			: this(connectionString, new DatabaseNameValidator(), new DatabaseTypeParser())
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new <see cref="DatabaseServerConnection"/>.
+		/// </summary>
+		/// <param name="connectionString">An <see cref="IReadOnlySetting{T}"/> evaluating to the database server connection string.</param>
 		/// <param name="databaseNameValidator">An <see cref="IDatabaseNameValidator"/>.</param>
+		/// <param name="databaseTypeParser">An <see cref="IDatabaseTypeParser"/>.</param>
 		/// <exception cref="ArgumentNullException">
 		/// - <paramref name="connectionString"/>
 		/// - <paramref name="databaseNameValidator"/>
+		/// - <paramref name="databaseTypeParser"/>
 		/// </exception>
-		public DatabaseServerConnection(IReadOnlySetting<string> connectionString, IDatabaseNameValidator databaseNameValidator)
+		public DatabaseServerConnection(IReadOnlySetting<string> connectionString, IDatabaseNameValidator databaseNameValidator, IDatabaseTypeParser databaseTypeParser)
 		{
 			if (connectionString == null)
 			{
@@ -34,6 +49,7 @@ namespace TixFactory.Database.MySql
 			}
 
 			_DatabaseNameValidator = databaseNameValidator ?? throw new ArgumentNullException(nameof(databaseNameValidator));
+			_DatabaseTypeParser = databaseTypeParser ?? throw new ArgumentNullException(nameof(databaseTypeParser));
 			_MySqlConnectionLazy = new LazyWithRetry<MySqlConnection>(() => new MySqlConnection(connectionString.Value));
 			_ConnectedDatabaseLazy = new LazyWithRetry<IDatabase>(LoadConnectedDatabase);
 
@@ -44,15 +60,30 @@ namespace TixFactory.Database.MySql
 		/// Initializes a new <see cref="DatabaseServerConnection"/>.
 		/// </summary>
 		/// <param name="mySqlConnectionLazy">An <see cref="ILazyWithRetry{T}"/> evaluating to the <see cref="MySqlConnection"/>.</param>
+		/// <exception cref="ArgumentNullException">
+		/// - <paramref name="mySqlConnectionLazy"/>
+		/// </exception>
+		public DatabaseServerConnection(ILazyWithRetry<MySqlConnection> mySqlConnectionLazy)
+			: this(mySqlConnectionLazy, new DatabaseNameValidator(), new DatabaseTypeParser())
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new <see cref="DatabaseServerConnection"/>.
+		/// </summary>
+		/// <param name="mySqlConnectionLazy">An <see cref="ILazyWithRetry{T}"/> evaluating to the <see cref="MySqlConnection"/>.</param>
 		/// <param name="databaseNameValidator">An <see cref="IDatabaseNameValidator"/>.</param>
+		/// <param name="databaseTypeParser">An <see cref="IDatabaseTypeParser"/>.</param>
 		/// <exception cref="ArgumentNullException">
 		/// - <paramref name="mySqlConnectionLazy"/>
 		/// - <paramref name="databaseNameValidator"/>
+		/// - <paramref name="databaseTypeParser"/>
 		/// </exception>
-		public DatabaseServerConnection(ILazyWithRetry<MySqlConnection> mySqlConnectionLazy, IDatabaseNameValidator databaseNameValidator)
+		public DatabaseServerConnection(ILazyWithRetry<MySqlConnection> mySqlConnectionLazy, IDatabaseNameValidator databaseNameValidator, IDatabaseTypeParser databaseTypeParser)
 		{
 			_MySqlConnectionLazy = mySqlConnectionLazy ?? throw new ArgumentNullException(nameof(mySqlConnectionLazy));
 			_DatabaseNameValidator = databaseNameValidator ?? throw new ArgumentNullException(nameof(databaseNameValidator));
+			_DatabaseTypeParser = databaseTypeParser ?? throw new ArgumentNullException(nameof(databaseTypeParser));
 			_ConnectedDatabaseLazy = new LazyWithRetry<IDatabase>(LoadConnectedDatabase);
 		}
 
@@ -60,6 +91,12 @@ namespace TixFactory.Database.MySql
 		public IDatabase GetConnectedDatabase()
 		{
 			return _ConnectedDatabaseLazy.Value;
+		}
+
+		/// <inheritdoc cref="IDatabaseServerConnection.BuildDatabaseFactory"/>
+		public IDatabaseFactory BuildDatabaseFactory()
+		{
+			return new DatabaseFactory(this, _DatabaseNameValidator, _DatabaseTypeParser);
 		}
 
 		/// <inheritdoc cref="IDatabaseServerConnection.ExecuteQuery(string, IDictionary{string,object})"/>
@@ -325,7 +362,7 @@ namespace TixFactory.Database.MySql
 				return null;
 			}
 
-			return new Database(this, _DatabaseNameValidator, connection.Database);
+			return new Database(this, _DatabaseNameValidator, _DatabaseTypeParser, connection.Database);
 		}
 	}
 }

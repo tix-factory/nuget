@@ -11,6 +11,7 @@ namespace TixFactory.Database.MySql
 	{
 		private readonly IDatabaseServerConnection _DatabaseServerConnection;
 		private readonly IDatabaseNameValidator _DatabaseNameValidator;
+		private readonly IDatabaseTypeParser _DatabaseTypeParser;
 		private readonly ConcurrentDictionary<string, IDatabase> _Databases;
 
 		/// <summary>
@@ -18,14 +19,17 @@ namespace TixFactory.Database.MySql
 		/// </summary>
 		/// <param name="databaseServerConnection">An <see cref="IDatabaseServerConnection"/>.</param>
 		/// <param name="databaseNameValidator">An <see cref="IDatabaseNameValidator"/>.</param>
+		/// <param name="databaseTypeParser">An <see cref="IDatabaseTypeParser"/>.</param>
 		/// <exception cref="ArgumentNullException">
 		/// - <paramref name="databaseServerConnection"/>
 		/// - <paramref name="databaseNameValidator"/>
+		/// - <paramref name="databaseTypeParser"/>
 		/// </exception>
-		public DatabaseFactory(IDatabaseServerConnection databaseServerConnection, IDatabaseNameValidator databaseNameValidator)
+		public DatabaseFactory(IDatabaseServerConnection databaseServerConnection, IDatabaseNameValidator databaseNameValidator, IDatabaseTypeParser databaseTypeParser)
 		{
 			_DatabaseServerConnection = databaseServerConnection ?? throw new ArgumentNullException(nameof(databaseServerConnection));
 			_DatabaseNameValidator = databaseNameValidator ?? throw new ArgumentNullException(nameof(databaseNameValidator));
+			_DatabaseTypeParser = databaseTypeParser ?? throw new ArgumentNullException(nameof(databaseTypeParser));
 			_Databases = new ConcurrentDictionary<string, IDatabase>(StringComparer.OrdinalIgnoreCase);
 		}
 
@@ -114,7 +118,7 @@ namespace TixFactory.Database.MySql
 			{
 				if (!_Databases.ContainsKey(databaseName))
 				{
-					_Databases[databaseName] = new Database(_DatabaseServerConnection, _DatabaseNameValidator, databaseName);
+					_Databases[databaseName] = new Database(_DatabaseServerConnection, _DatabaseNameValidator, _DatabaseTypeParser, databaseName);
 				}
 			}
 		}
