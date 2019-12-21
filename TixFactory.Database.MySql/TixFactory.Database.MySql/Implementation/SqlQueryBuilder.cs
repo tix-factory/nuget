@@ -12,6 +12,7 @@ namespace TixFactory.Database.MySql
 	/// <inheritdoc cref="ISqlQueryBuilder"/>
 	public class SqlQueryBuilder : ISqlQueryBuilder
 	{
+		private const string _CountParameterName = "Count";
 		private readonly Regex _ExpressionCutRegex = new Regex(@"^.*=>\s*");
 		private readonly Regex _CaseInsensitiveReplacementRegex = new Regex(@"(`\w+`|@\w+)\.To(Lower|Upper)\(\)");
 		private readonly Regex _EqualReplacementRegex = new Regex(@"(`\w+`|@\w+)\.Equals\((`\w+`|@\w+),?\s*(\w*)\)");
@@ -20,8 +21,8 @@ namespace TixFactory.Database.MySql
 		private readonly Regex _EndsWithReplacementRegex = new Regex(@"(`\w+`|@\w+)\.EndsWith\((`\w+`|@\w+)\)");
 		private readonly Regex _NullSwapRegex = new Regex(@"null\s*([!=]=)\s*(`\w+`|@\w+)");
 
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectAllQuery{TRow}(string, string, OrderBy{TRow})"/>
-		public string BuildSelectAllQuery<TRow>(string databaseName, string tableName, OrderBy<TRow> orderBy = null)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow}(string,string,OrderBy{TRow})"/>
+		public string BuildSelectTopQuery<TRow>(string databaseName, string tableName, OrderBy<TRow> orderBy = null)
 			where TRow : class
 		{
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
@@ -32,8 +33,8 @@ namespace TixFactory.Database.MySql
 				orderByStatement: ParseOrderBy(orderBy, entityColumnAliases));
 		}
 
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectAllQuery{TRow}(string, string, Expression{Func{TRow, bool}}, OrderBy{TRow})"/>
-		public string BuildSelectAllQuery<TRow>(string databaseName, string tableName, Expression<Func<TRow, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow}(string,string,System.Linq.Expressions.Expression{System.Func{TRow,bool}},OrderBy{TRow})"/>
+		public string BuildSelectTopQuery<TRow>(string databaseName, string tableName, Expression<Func<TRow, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class
 		{
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
@@ -47,8 +48,8 @@ namespace TixFactory.Database.MySql
 				orderByStatement);
 		}
 
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectAllQuery{TRow,TP1}"/>
-		public string BuildSelectAllQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1}"/>
+		public string BuildSelectTopQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class
 		{
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
@@ -62,8 +63,8 @@ namespace TixFactory.Database.MySql
 				orderByStatement);
 		}
 
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectAllQuery{TRow,TP1,TP2}"/>
-		public string BuildSelectAllQuery<TRow, TP1, TP2>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2}"/>
+		public string BuildSelectTopQuery<TRow, TP1, TP2>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class
 		{
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
@@ -77,8 +78,8 @@ namespace TixFactory.Database.MySql
 				orderByStatement);
 		}
 
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectAllQuery{TRow,TP1,TP2,TP3}"/>
-		public string BuildSelectAllQuery<TRow, TP1, TP2, TP3>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2,TP3}"/>
+		public string BuildSelectTopQuery<TRow, TP1, TP2, TP3>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class
 		{
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
@@ -92,8 +93,8 @@ namespace TixFactory.Database.MySql
 				orderByStatement);
 		}
 
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectAllQuery{TRow,TP1,TP2,TP3,TP4}"/>
-		public string BuildSelectAllQuery<TRow, TP1, TP2, TP3, TP4>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2,TP3,TP4}"/>
+		public string BuildSelectTopQuery<TRow, TP1, TP2, TP3, TP4>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class
 		{
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
@@ -107,8 +108,8 @@ namespace TixFactory.Database.MySql
 				orderByStatement);
 		}
 
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectAllQuery{TRow,TP1,TP2,TP3,TP4,TP5}"/>
-		public string BuildSelectAllQuery<TRow, TP1, TP2, TP3, TP4, TP5>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, TP5, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2,TP3,TP4,TP5}"/>
+		public string BuildSelectTopQuery<TRow, TP1, TP2, TP3, TP4, TP5>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, TP5, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class
 		{
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
@@ -135,6 +136,8 @@ namespace TixFactory.Database.MySql
 			{
 				query += $"\n\tORDER BY {orderByStatement}";
 			}
+
+			query += $"\n\tLIMIT @{_CountParameterName}";
 
 			return query;
 		}
@@ -222,6 +225,11 @@ namespace TixFactory.Database.MySql
 		/// </example>
 		private string ReplaceParameterNames(string expression, ICollection<string> parameterNames)
 		{
+			if (parameterNames.Contains(_CountParameterName, StringComparer.OrdinalIgnoreCase))
+			{
+				throw new ApplicationException($"The query parameter name '@{_CountParameterName}' is reserved.");
+			}
+
 			foreach (var parameterName in parameterNames)
 			{
 				var replaceRegex = new Regex($"[^`]?({parameterName})[^`]?");
