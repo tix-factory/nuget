@@ -24,6 +24,9 @@ namespace TixFactory.Database.MySql
 		/// <inheritdoc cref="IDatabaseTableColumn.Primary"/>
 		public bool Primary { get; }
 
+		/// <inheritdoc cref="IDatabaseTableColumn.AutoIncrementing"/>
+		public bool AutoIncrementing { get; }
+
 		/// <summary>
 		/// Initializes a new <see cref="DatabaseTableColumn"/>.
 		/// </summary>
@@ -50,6 +53,8 @@ namespace TixFactory.Database.MySql
 			{
 				Length = parseResult.Length.Value;
 			}
+
+			AutoIncrementing = showColumnsResult.Extra == "auto_increment";
 		}
 	}
 }

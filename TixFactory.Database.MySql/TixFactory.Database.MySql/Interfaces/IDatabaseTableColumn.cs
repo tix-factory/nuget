@@ -40,5 +40,10 @@ namespace TixFactory.Database.MySql
 		/// Whether or not this is the primary column.
 		/// </summary>
 		bool Primary { get; }
+
+		/// <summary>
+		/// Whether or not the column is auto-incrementing.
+		/// </summary>
+		bool AutoIncrementing { get; }
 	}
 }
