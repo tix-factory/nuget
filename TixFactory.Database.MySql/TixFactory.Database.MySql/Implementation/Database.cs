@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using MySql.Data.MySqlClient;
 
 namespace TixFactory.Database.MySql
 {
@@ -12,6 +13,7 @@ namespace TixFactory.Database.MySql
 		private readonly IDatabaseNameValidator _DatabaseNameValidator;
 		private readonly IDatabaseTypeParser _DatabaseTypeParser;
 		private readonly ConcurrentDictionary<string, IDatabaseTable> _DatabaseTables;
+		private readonly ISqlQueryBuilder _SqlQueryBuilder;
 
 		/// <inheritdoc cref="IDatabase.Name"/>
 		public string Name { get; }
@@ -36,6 +38,7 @@ namespace TixFactory.Database.MySql
 			Name = databaseName;
 
 			_DatabaseTables = new ConcurrentDictionary<string, IDatabaseTable>(StringComparer.OrdinalIgnoreCase);
+			_SqlQueryBuilder = new SqlQueryBuilder(databaseTypeParser);
 		}
 
 		/// <inheritdoc cref="IDatabase.GetTable"/>
@@ -65,6 +68,54 @@ namespace TixFactory.Database.MySql
 			var queryResult = _DatabaseServerConnection.ExecuteQuery<ShowProcedureStatusResult>("SHOW PROCEDURE STATUS", queryParameters: null);
 			var storedProcedureNames = queryResult.Where(p => p.DatabaseName.Equals(Name, StringComparison.OrdinalIgnoreCase) && p.Type == "PROCEDURE").Select(p => p.Name);
 			return new HashSet<string>(storedProcedureNames);
+		}
+
+		/// <inheritdoc cref="IDatabase.RegisterStoredProcedure"/>
+		public bool RegisterStoredProcedure(string storedProcedureName, ISqlQuery query)
+		{
+			if (!_DatabaseNameValidator.IsStoredProcedureNameValid(storedProcedureName))
+			{
+				throw new ArgumentException($"Invalid stored procedure name: `{storedProcedureName}`", nameof(storedProcedureName));
+			}
+
+			if (query == null)
+			{
+				throw new ArgumentNullException(nameof(query));
+			}
+
+			try
+			{
+				var createStoredProcedureQuery = _SqlQueryBuilder.BuildCreateStoredProcedureQuery(Name, storedProcedureName, query, useDelimiter: false);
+				_DatabaseServerConnection.ExecuteQuery(createStoredProcedureQuery.Query, queryParameters: null);
+
+				return true;
+			}
+			catch (MySqlException e) when (e.Number == (int)MySqlErrorCode.StoredProcedureAlreadyExists)
+			{
+				return false;
+			}
+		}
+
+		/// <inheritdoc cref="IDatabase.DropStoredProcedure"/>
+		public bool DropStoredProcedure(string storedProcedureName)
+		{
+			var storedProcedures = GetStoredProcedureNames();
+			if (!storedProcedures.Contains(storedProcedureName))
+			{
+				return false;
+			}
+			
+			try
+			{
+				var dropQuery = _SqlQueryBuilder.BuildDropStoredProcedureQuery(Name, storedProcedureName);
+				_DatabaseServerConnection.ExecuteQuery(dropQuery.Query, queryParameters: null);
+
+				return true;
+			}
+			catch (MySqlException e) when (e.Number == (int)MySqlErrorCode.StoredProcedureDoesNotExist)
+			{
+				return false;
+			}
 		}
 
 		private void SyncTables()

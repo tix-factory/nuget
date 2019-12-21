@@ -46,5 +46,12 @@
 		/// <param name="variableName">The string to check.</param>
 		/// <returns><c>true</c> if the name is valid for a MySQL variable (otherwise <c>false</c>).</returns>
 		bool IsVariableNameValid(string variableName);
+
+		/// <summary>
+		/// Checks if a string matches MySQL stored procedure naming rules.
+		/// </summary>
+		/// <param name="storedProcedureName">The stored procedure name to check.</param>
+		/// <returns><c>true</c> if the name is valid for a MySQL stored procedure (otherwise <c>false</c>).</returns>
+		bool IsStoredProcedureNameValid(string storedProcedureName);
 	}
 }

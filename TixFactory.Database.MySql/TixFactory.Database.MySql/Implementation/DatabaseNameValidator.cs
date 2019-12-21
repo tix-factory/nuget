@@ -80,5 +80,12 @@ namespace TixFactory.Database.MySql
 
 			return _VariableNameValidationRegex.IsMatch(variableName);
 		}
+
+		/// <inheritdoc cref="IDatabaseNameValidator.IsStoredProcedureNameValid"/>
+		public bool IsStoredProcedureNameValid(string storedProcedureName)
+		{
+			// TODO: Do this properly. I did not validate these as actual naming restrictions for stored procedures.
+			return IsDatabaseNameValid(storedProcedureName);
+		}
 	}
 }

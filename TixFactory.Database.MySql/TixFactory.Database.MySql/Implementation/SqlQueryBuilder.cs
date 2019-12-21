@@ -147,7 +147,7 @@ namespace TixFactory.Database.MySql
 		}
 
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildCreateStoredProcedureQuery"/>
-		public ISqlQuery BuildCreateStoredProcedureQuery(string databaseName, string storedProcedureName, ISqlQuery query)
+		public ISqlQuery BuildCreateStoredProcedureQuery(string databaseName, string storedProcedureName, ISqlQuery query, bool useDelimiter)
 		{
 			var queryParameters = new StringBuilder();
 			foreach (var parameter in query.Parameters)
@@ -198,16 +198,39 @@ namespace TixFactory.Database.MySql
 				.Replace("@", "");
 
 			var createQuery = new StringBuilder();
-			createQuery.AppendLine("DELIMITER $$");
-			createQuery.AppendLine($"USE `{databaseName}`$$");
+
+			if (useDelimiter)
+			{
+				createQuery.AppendLine("DELIMITER $$");
+				createQuery.AppendLine($"USE `{databaseName}`$$");
+			}
+			else
+			{
+				createQuery.AppendLine($"USE `{databaseName}`;");
+			}
+
 			createQuery.AppendLine($"CREATE PROCEDURE `{storedProcedureName}`({queryParameters})");
 			createQuery.AppendLine("BEGIN");
 			createQuery.AppendLine($"\t{string.Join("\n\t", strippedQuery.Split('\n'))}");
-			createQuery.AppendLine("END$$");
-			createQuery.AppendLine();
-			createQuery.AppendLine("DELIMITER ;");
+
+			if (useDelimiter)
+			{
+				createQuery.AppendLine("END$$");
+				createQuery.AppendLine();
+				createQuery.AppendLine("DELIMITER ;");
+			}
+			else
+			{
+				createQuery.AppendLine("END;");
+			}
 
 			return new SqlQuery(createQuery.ToString(), Array.Empty<SqlQueryParameter>());
+		}
+
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildDropStoredProcedureQuery"/>
+		public ISqlQuery BuildDropStoredProcedureQuery(string databaseName, string storedProcedureName)
+		{
+			return new SqlQuery($"DROP PROCEDURE `{databaseName}`.`{storedProcedureName}`;", Array.Empty<SqlQueryParameter>());
 		}
 
 		private ISqlQuery BuildSelectAllQuery(string databaseName, string tableName, string whereClause, string orderByStatement, IReadOnlyCollection<ParameterExpression> expressionParameters)
