@@ -38,6 +38,9 @@ namespace TixFactory.Database.MySql
 		/// <summary>
 		/// Executes a query against the database server.
 		/// </summary>
+		/// <remarks>
+		/// NOTE: If your <see cref="MySqlParameter.Value"/> is explicitly zero you will have to make it an "object": https://stackoverflow.com/a/18789917/1663648 
+		/// </remarks>
 		/// <param name="query">The MySQL query being executed.</param>
 		/// <param name="mySqlParameters">The MySQL query parameters.</param>
 		/// <returns>The number of rows affected.</returns>
@@ -68,6 +71,9 @@ namespace TixFactory.Database.MySql
 		/// <summary>
 		/// Executes a query against the database server and parses the returned rows.
 		/// </summary>
+		/// <remarks>
+		/// NOTE: If your <see cref="MySqlParameter.Value"/> is explicitly zero you will have to make it an "object": https://stackoverflow.com/a/18789917/1663648 
+		/// </remarks>
 		/// <typeparam name="T">The class type to deserialize the returned rows into.</typeparam>
 		/// <param name="query">The MySQL query being executed.</param>
 		/// <param name="mySqlParameters">The MySQL query parameters.</param>
@@ -101,6 +107,9 @@ namespace TixFactory.Database.MySql
 		/// <summary>
 		/// Executes a query against the database server.
 		/// </summary>
+		/// <remarks>
+		/// NOTE: If your <see cref="MySqlParameter.Value"/> is explicitly zero you will have to make it an "object": https://stackoverflow.com/a/18789917/1663648 
+		/// </remarks>
 		/// <param name="storedProcedureName">The MySQL query being executed.</param>
 		/// <param name="mySqlParameters">The MySQL parameters passed to the stored procedure.</param>
 		/// <returns>The number of rows affected.</returns>
@@ -137,6 +146,9 @@ namespace TixFactory.Database.MySql
 		/// <summary>
 		/// Executes a stored procedure against the database server and parses the returned rows.
 		/// </summary>
+		/// <remarks>
+		/// NOTE: If your <see cref="MySqlParameter.Value"/> is explicitly zero you will have to make it an "object": https://stackoverflow.com/a/18789917/1663648 
+		/// </remarks>
 		/// <typeparam name="T">The class type to deserialize the returned rows into.</typeparam>
 		/// <param name="storedProcedureName">The MySQL query being executed.</param>
 		/// <param name="mySqlParameters">The MySQL parameters passed to the stored procedure.</param>

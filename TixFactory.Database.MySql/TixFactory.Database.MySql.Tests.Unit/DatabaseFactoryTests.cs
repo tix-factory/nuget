@@ -1,9 +1,8 @@
-﻿using System;
+﻿using FakeItEasy;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
-using FakeItEasy;
 using TixFactory.Configuration;
 
 namespace TixFactory.Database.MySql.Tests.Unit
@@ -41,15 +40,23 @@ namespace TixFactory.Database.MySql.Tests.Unit
 			var testDatabase = databaseServerConnection.GetConnectedDatabase();
 			var testTable = testDatabase.GetTable("new_table");
 			var storedProcedures = testDatabase.GetStoredProcedureNames();
-			var result = databaseServerConnection.ExecuteStoredProcedure<object>(storedProcedures.First(), queryParameters: null);
 
 			var sqlQueryBuilder = new SqlQueryBuilder(new DatabaseTypeParser());
 			var selectAllQuery = sqlQueryBuilder.BuildSelectTopQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id > id, new OrderBy<TestTable>(nameof(TestTable.Id), SortOrder.Ascending));
 
 			var registered = testDatabase.RegisterStoredProcedure("test_stored_procedure", selectAllQuery);
-			var dropped = testDatabase.DropStoredProcedure("test_stored_procedure");
-			
-			
+			//var dropped = testDatabase.DropStoredProcedure("test_stored_procedure");
+
+			var mySqlParameters = new Dictionary<string, object>
+			{
+				{ "_id", 0 },
+				{ "_Count", 1 }
+			};
+
+			var result = databaseServerConnection.ExecuteStoredProcedure<object>("test_stored_procedure", mySqlParameters);
+
+			var query = databaseServerConnection.ExecuteQuery<object>("SELECT @_id, @_Count;", mySqlParameters);
+
 		}
 	}
 }

@@ -167,12 +167,7 @@ namespace TixFactory.Database.MySql
 						break;
 				}
 
-				var parameterName = parameter.Name;
-				if (parameterName == _CountParameterName)
-				{
-					parameterName = $"_{_CountParameterName}";
-				}
-
+				var parameterName = $"_{parameter.Name}"; // Prefix variables with underscores to prevent issues where the the column names match the variable names.
 				var parameterLine = $"{direction} {parameterName} {parameter.DatabaseTypeName}";
 				if (parameter.Length.HasValue)
 				{
@@ -194,8 +189,7 @@ namespace TixFactory.Database.MySql
 			}
 
 			var strippedQuery = query.Query
-				.Replace($"@{_CountParameterName}", $"@_{_CountParameterName}")
-				.Replace("@", "");
+				.Replace("@", "_");
 
 			var createQuery = new StringBuilder();
 
