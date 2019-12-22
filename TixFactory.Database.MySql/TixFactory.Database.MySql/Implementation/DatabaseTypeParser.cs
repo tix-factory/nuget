@@ -55,11 +55,18 @@ namespace TixFactory.Database.MySql
 			// ADD/REMOVE VALUES CAREFULLY.
 			// The order of this array also decides the output GetMySqlType
 			// e.g. string currently outputs VarBinary as the MySqlDbType because _VarBinary is the last item in this array that represents strings.
+			// Prefer MySqlDbType.DateTime https://stackoverflow.com/a/45632196/1663648 (it will store dates after January 2038).
+			// Prefer MySqlDbType.VarBinary for string: https://dev.mysql.com/doc/refman/8.0/en/binary-varbinary.html (stores in bytes rather than characters)
 			var parseableTypes = new[]
 			{
 				_Bit,
 				_Bool,
 				_Boolean,
+				_Date,
+				_Time,
+				_TimeStamp,
+				_DateTime,
+				_Year,
 				_TinyInt,
 				_SmallInt,
 				_MediumInt,
@@ -70,11 +77,6 @@ namespace TixFactory.Database.MySql
 				_Decimal,
 				_Float,
 				_Double,
-				_Date,
-				_Time,
-				_DateTime,
-				_TimeStamp,
-				_Year,
 				// TODO: _Char,
 				_VarChar,
 				_TinyBlob,
@@ -97,12 +99,19 @@ namespace TixFactory.Database.MySql
 
 			foreach (var type in parseableTypes)
 			{
-				var parsedType = ParseDatabaseType(type, nullable: false);
-				var nullableParsedType = ParseDatabaseType(type, nullable: true);
+				var types = new[]
+				{
+					ParseDatabaseType(type, nullable: false),
+					ParseDatabaseType(type, nullable: true),
+					ParseDatabaseType($"{type}() {_UnsignedSuffix}", nullable: false),
+					ParseDatabaseType($"{type}() {_UnsignedSuffix}", nullable: true)
+				};
 
-				databaseTypeNamesByMySqlType[parsedType.MySqlType] = parsedType.Name;
-				mySqlTypesByType[parsedType.Type] = parsedType.MySqlType;
-				mySqlTypesByType[nullableParsedType.Type] = parsedType.MySqlType;
+				foreach (var parsedType in types)
+				{
+					databaseTypeNamesByMySqlType[parsedType.MySqlType] = parsedType.Name;
+					mySqlTypesByType[parsedType.Type] = parsedType.MySqlType;
+				}
 			}
 
 			_DatabaseTypeNamesByMySqlType = databaseTypeNamesByMySqlType;
@@ -192,8 +201,17 @@ namespace TixFactory.Database.MySql
 
 					break;
 				case _BigInt:
-					type = nullable ? typeof(long?) : typeof(long);
-					mySqlType = MySqlDbType.Int64;
+					if (unsigned)
+					{
+						type = nullable ? typeof(ulong?) : typeof(ulong);
+						mySqlType = MySqlDbType.UInt64;
+					}
+					else
+					{
+						type = nullable ? typeof(long?) : typeof(long);
+						mySqlType = MySqlDbType.Int64;
+					}
+
 					break;
 				case _Dec:
 				case _Decimal:
