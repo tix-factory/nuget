@@ -9,6 +9,18 @@ namespace TixFactory.Database.MySql
 	public interface ISqlQueryBuilder
 	{
 		/// <summary>
+		/// Builds a delete query.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <typeparam name="TP1">The first query parameter.</typeparam>
+		/// <param name="databaseName">The database name to delete in.</param>
+		/// <param name="tableName">The table name to delete in.</param>
+		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
+		/// <returns>The <see cref="ISqlQuery"/>.</returns>
+		ISqlQuery BuildDeleteQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression)
+			where TRow : class;
+
+		/// <summary>
 		/// Builds a select query without a WHERE clause.
 		/// </summary>
 		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>

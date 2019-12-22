@@ -1,0 +1,9 @@
+﻿<#@ template language="C#" debug="true" hostspecific="false" visibility="internal" #>
+<#@ output extension=".sql" #>
+<#@ assembly name="System.Core" #>
+<#@ parameter type="TixFactory.Database.MySql.Templates.DeleteQueryVariables" name="Vars" #>
+
+DELETE
+	FROM `<#= Vars.DatabaseName #>`.`<#= Vars.TableName #>`
+	WHERE <#= Vars.WhereClause #>
+	LIMIT 1;

@@ -18,6 +18,11 @@
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>CreateProcedureQuery.tt</DependentUpon>
 	  </Compile>
+	  <Compile Update="Templates\DeleteQuery.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>DeleteQuery.tt</DependentUpon>
+	  </Compile>
 	  <Compile Update="Templates\SelectPagedQuery.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
@@ -35,14 +40,18 @@
 	    <Generator>TextTemplatingFilePreprocessor</Generator>
 	    <LastGenOutput>CreateProcedureQuery.cs</LastGenOutput>
 	  </None>
+	  <None Update="Templates\DeleteQuery.tt">
+	    <Generator>TextTemplatingFilePreprocessor</Generator>
+	    <LastGenOutput>DeleteQuery.cs</LastGenOutput>
+	  </None>
 	  <None Update="Templates\SelectPagedQuery.tt">
 	    <Generator>TextTemplatingFilePreprocessor</Generator>
 	    <LastGenOutput>SelectPagedQuery.cs</LastGenOutput>
 	  </None>
-	  <None Update="Templates\SelectTopQuery.tt">
-	    <Generator>TextTemplatingFilePreprocessor</Generator>
-	    <LastGenOutput>SelectTopQuery.cs</LastGenOutput>
-	  </None>
+		<None Update="Templates\SelectTopQuery.tt">
+			<Generator>TextTemplatingFilePreprocessor</Generator>
+			<LastGenOutput>SelectTopQuery.cs</LastGenOutput>
+		</None>
 	</ItemGroup>
 
 	<Import Project="$(RootPath)build/build.targets" />

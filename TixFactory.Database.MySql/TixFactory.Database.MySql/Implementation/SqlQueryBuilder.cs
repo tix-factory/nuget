@@ -40,6 +40,20 @@ namespace TixFactory.Database.MySql
 			_DatabaseTypeParser = databaseTypeParser ?? throw new ArgumentNullException(nameof(databaseTypeParser));
 		}
 
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildDeleteQuery{TRow,TP1}"/>
+		public ISqlQuery BuildDeleteQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression) 
+			where TRow : class
+		{
+			var entityColumnAliases = GetEntityColumnAliases<TRow>();
+			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
+
+			return BuildDeleteQuery(
+				databaseName,
+				tableName,
+				whereClause,
+				whereExpression.Parameters);
+		}
+
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow}(string,string,OrderBy{TRow})"/>
 		public ISqlQuery BuildSelectTopQuery<TRow>(string databaseName, string tableName, OrderBy<TRow> orderBy = null)
 			where TRow : class
@@ -179,7 +193,7 @@ namespace TixFactory.Database.MySql
 
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
 			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
-			
+
 			return BuildSelectPagedQuery(
 				databaseName,
 				tableName,
@@ -314,6 +328,29 @@ namespace TixFactory.Database.MySql
 		public ISqlQuery BuildDropStoredProcedureQuery(string databaseName, string storedProcedureName)
 		{
 			return new SqlQuery($"DROP PROCEDURE `{databaseName}`.`{storedProcedureName}`;", Array.Empty<SqlQueryParameter>());
+		}
+
+		private ISqlQuery BuildDeleteQuery(string databaseName, string tableName, string whereClause, IReadOnlyCollection<ParameterExpression> expressionParameters)
+		{
+			var templateVariables = new DeleteQueryVariables
+			{
+				DatabaseName = databaseName,
+				TableName = tableName,
+				WhereClause = whereClause
+			};
+
+			var query = CompileTemplate<DeleteQuery>(templateVariables);
+
+			var parameters = expressionParameters.Skip(1).Select(p =>
+			{
+				var mySqlType = _DatabaseTypeParser.GetMySqlType(p.Type);
+				var databaseTypeName = _DatabaseTypeParser.GetDatabaseTypeName(mySqlType);
+				var parameter = new SqlQueryParameter(p.Name, databaseTypeName, length: null, parameterDirection: ParameterDirection.Input);
+
+				return parameter;
+			}).ToList();
+
+			return new SqlQuery(query, parameters);
 		}
 
 		private ISqlQuery BuildSelectAllQuery(string databaseName, string tableName, string whereClause, string orderByStatement, IReadOnlyCollection<ParameterExpression> expressionParameters)
