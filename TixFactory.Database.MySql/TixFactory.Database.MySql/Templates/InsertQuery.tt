@@ -1,0 +1,18 @@
+﻿<#@ template language="C#" debug="true" hostspecific="false" visibility="internal" #>
+<#@ output extension=".sql" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ parameter type="TixFactory.Database.MySql.Templates.InsertQueryVariables" name="Vars" #>
+
+INSERT INTO `<#= Vars.DatabaseName #>`.`<#= Vars.TableName #>`
+(
+<# foreach (var column in Vars.Columns) { #>
+	`<#= column.ColumnName #>`<#= column == Vars.Columns.ElementAt(Vars.Columns.Count - 1) ? "" : "," #>
+<# } #>
+)
+VALUES
+(
+<# foreach (var column in Vars.Columns) { #>
+	<#= column.InsertValue #><#= column == Vars.Columns.ElementAt(Vars.Columns.Count - 1) ? "" : "," #>
+<# } #>
+);

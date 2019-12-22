@@ -21,6 +21,16 @@ namespace TixFactory.Database.MySql
 			where TRow : class;
 
 		/// <summary>
+		/// Builds an insert query.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <param name="databaseName">The database name to insert into.</param>
+		/// <param name="tableName">The table name to insert into.</param>
+		/// <returns>The <see cref="ISqlQuery"/>.</returns>
+		ISqlQuery BuildInsertQuery<TRow>(string databaseName, string tableName)
+			where TRow : class;
+
+		/// <summary>
 		/// Builds a select query without a WHERE clause.
 		/// </summary>
 		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
