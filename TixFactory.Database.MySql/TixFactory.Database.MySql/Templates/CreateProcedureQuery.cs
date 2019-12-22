@@ -9,15 +9,17 @@
 // ------------------------------------------------------------------------------
 namespace TixFactory.Database.MySql.Templates
 {
+    using System.Data;
+    using System.Linq;
     using System;
     
     /// <summary>
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectTopQuery.tt"
+    #line 1 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "15.0.0.0")]
-    internal partial class SelectTopQuery : SelectTopQueryBase
+    internal partial class CreateProcedureQuery : CreateProcedureQueryBase
     {
 #line hidden
         /// <summary>
@@ -25,73 +27,151 @@ namespace TixFactory.Database.MySql.Templates
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("\r\nSELECT *\r\n\tFROM `");
+            this.Write("\r\n");
             
-            #line 7 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectTopQuery.tt"
+            #line 8 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
+ if (Vars.Delimiter != ";") { 
+            
+            #line default
+            #line hidden
+            this.Write("DELIMITER ");
+            
+            #line 9 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.Delimiter));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n");
+            
+            #line 10 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("USE `");
+            
+            #line 11 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Vars.DatabaseName));
             
             #line default
             #line hidden
-            this.Write("`.`");
+            this.Write("`");
             
-            #line 7 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectTopQuery.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.TableName));
-            
-            #line default
-            #line hidden
-            this.Write("`\r\n");
-            
-            #line 8 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectTopQuery.tt"
- if (!string.IsNullOrWhiteSpace(Vars.WhereClause)) { 
+            #line 11 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.Delimiter));
             
             #line default
             #line hidden
-            this.Write("\tWHERE ");
+            this.Write("\r\nCREATE PROCEDURE `");
             
-            #line 9 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectTopQuery.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.WhereClause));
+            #line 12 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.StoredProcedureName));
+            
+            #line default
+            #line hidden
+            this.Write("`(\r\n");
+            
+            #line 13 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
+ foreach (var parameter in Vars.Parameters) { 
+            
+            #line default
+            #line hidden
+            
+            #line 14 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
+ // // Prefix variables with underscores to prevent issues where the the column names match the variable names. 
+            
+            #line default
+            #line hidden
+            this.Write("\t");
+            
+            #line 15 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GetParameterDirectionText(parameter.ParameterDirection)));
+            
+            #line default
+            #line hidden
+            this.Write(" _");
+            
+            #line 15 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(parameter.Name));
+            
+            #line default
+            #line hidden
+            this.Write(" ");
+            
+            #line 15 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(parameter.DatabaseTypeName + (parameter == Vars.Parameters.ElementAt(Vars.Parameters.Count - 1) ? "" : ",")));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 10 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectTopQuery.tt"
+            #line 16 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
  } 
             
             #line default
             #line hidden
+            this.Write(")\r\nBEGIN\r\n\t");
             
-            #line 11 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectTopQuery.tt"
- if (!string.IsNullOrWhiteSpace(Vars.OrderBy)) { 
+            #line 18 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Join("\n\t", StripQuery(Vars.Query).Split('\n'))));
             
             #line default
             #line hidden
-            this.Write("\tORDER BY ");
+            this.Write("\r\nEND");
             
-            #line 12 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectTopQuery.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.OrderBy));
+            #line 19 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.Delimiter));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\r\n");
+            
+            #line 21 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
+ if (Vars.Delimiter != ";") { 
+            
+            #line default
+            #line hidden
+            this.Write("DELIMITER ;\r\n");
+            
+            #line 23 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
+ } 
             
             #line default
             #line hidden
             this.Write("\r\n");
-            
-            #line 13 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectTopQuery.tt"
- } 
-            
-            #line default
-            #line hidden
-            this.Write("\tLIMIT @Count;\r\n");
             return this.GenerationEnvironment.ToString();
         }
         
-        #line 1 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectTopQuery.tt"
+        #line 25 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
 
-private global::TixFactory.Database.MySql.Templates.SelectQueryVariables _VarsField;
+private string StripQuery(string query) {
+	return query.Replace("@", "_");
+}
+
+private string GetParameterDirectionText(ParameterDirection direction) {
+	switch(direction) {
+		case ParameterDirection.Output:
+			return "OUT";
+		case ParameterDirection.InputOutput:
+			return "INOUT";
+		case ParameterDirection.Input:
+		default:
+			return "IN";
+	}
+}
+
+        
+        #line default
+        #line hidden
+        
+        #line 1 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
+
+private global::TixFactory.Database.MySql.Templates.CreateProcedureVariables _VarsField;
 
 /// <summary>
 /// Access the Vars parameter of the template.
 /// </summary>
-private global::TixFactory.Database.MySql.Templates.SelectQueryVariables Vars
+private global::TixFactory.Database.MySql.Templates.CreateProcedureVariables Vars
 {
     get
     {
@@ -110,7 +190,7 @@ public virtual void Initialize()
 bool VarsValueAcquired = false;
 if (this.Session.ContainsKey("Vars"))
 {
-    this._VarsField = ((global::TixFactory.Database.MySql.Templates.SelectQueryVariables)(this.Session["Vars"]));
+    this._VarsField = ((global::TixFactory.Database.MySql.Templates.CreateProcedureVariables)(this.Session["Vars"]));
     VarsValueAcquired = true;
 }
 if ((VarsValueAcquired == false))
@@ -118,7 +198,7 @@ if ((VarsValueAcquired == false))
     object data = global::System.Runtime.Remoting.Messaging.CallContext.LogicalGetData("Vars");
     if ((data != null))
     {
-        this._VarsField = ((global::TixFactory.Database.MySql.Templates.SelectQueryVariables)(data));
+        this._VarsField = ((global::TixFactory.Database.MySql.Templates.CreateProcedureVariables)(data));
     }
 }
 
@@ -139,7 +219,7 @@ if ((VarsValueAcquired == false))
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "15.0.0.0")]
-    internal class SelectTopQueryBase
+    internal class CreateProcedureQueryBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

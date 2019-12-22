@@ -1,0 +1,41 @@
+﻿<#@ template language="C#" debug="true" hostspecific="false" visibility="internal" #>
+<#@ output extension=".sql" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Linq" #>
+<#@ parameter type="TixFactory.Database.MySql.Templates.CreateProcedureVariables" name="Vars" #>
+
+<# if (Vars.Delimiter != ";") { #>
+DELIMITER <#= Vars.Delimiter #>
+<# } #>
+USE `<#= Vars.DatabaseName #>`<#= Vars.Delimiter #>
+CREATE PROCEDURE `<#= Vars.StoredProcedureName #>`(
+<# foreach (var parameter in Vars.Parameters) { #>
+<# // // Prefix variables with underscores to prevent issues where the the column names match the variable names. #>
+	<#= GetParameterDirectionText(parameter.ParameterDirection) #> _<#= parameter.Name #> <#= parameter.DatabaseTypeName + (parameter == Vars.Parameters.ElementAt(Vars.Parameters.Count - 1) ? "" : ",") #>
+<# } #>)
+BEGIN
+	<#= string.Join("\n\t", StripQuery(Vars.Query).Split('\n')) #>
+END<#= Vars.Delimiter #>
+
+<# if (Vars.Delimiter != ";") { #>
+DELIMITER ;
+<# } #>
+
+<#+
+private string StripQuery(string query) {
+	return query.Replace("@", "_");
+}
+
+private string GetParameterDirectionText(ParameterDirection direction) {
+	switch(direction) {
+		case ParameterDirection.Output:
+			return "OUT";
+		case ParameterDirection.InputOutput:
+			return "INOUT";
+		case ParameterDirection.Input:
+		default:
+			return "IN";
+	}
+}
+#>

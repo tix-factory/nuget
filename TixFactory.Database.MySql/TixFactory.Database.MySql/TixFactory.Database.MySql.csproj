@@ -13,6 +13,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Templates\CreateProcedureQuery.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>CreateProcedureQuery.tt</DependentUpon>
+	  </Compile>
 	  <Compile Update="Templates\SelectTopQuery.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
@@ -21,6 +26,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Update="Templates\CreateProcedureQuery.tt">
+	    <Generator>TextTemplatingFilePreprocessor</Generator>
+	    <LastGenOutput>CreateProcedureQuery.cs</LastGenOutput>
+	  </None>
 	  <None Update="Templates\SelectTopQuery.tt">
 	    <Generator>TextTemplatingFilePreprocessor</Generator>
 	    <LastGenOutput>SelectTopQuery.cs</LastGenOutput>

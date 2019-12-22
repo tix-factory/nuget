@@ -1,7 +1,7 @@
 ﻿<#@ template language="C#" debug="true" hostspecific="false" visibility="internal" #>
 <#@ output extension=".sql" #>
 <#@ assembly name="System.Core" #>
-<#@ parameter type="TixFactory.Database.MySql.SelectQueryVariables" name="Vars" #>
+<#@ parameter type="TixFactory.Database.MySql.Templates.SelectQueryVariables" name="Vars" #>
 
 SELECT *
 	FROM `<#= Vars.DatabaseName #>`.`<#= Vars.TableName #>`

@@ -150,76 +150,17 @@ namespace TixFactory.Database.MySql
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildCreateStoredProcedureQuery"/>
 		public ISqlQuery BuildCreateStoredProcedureQuery(string databaseName, string storedProcedureName, ISqlQuery query, bool useDelimiter)
 		{
-			var queryParameters = new StringBuilder();
-			foreach (var parameter in query.Parameters)
+			var templateVariables = new CreateProcedureVariables
 			{
-				string direction;
-				switch (parameter.ParameterDirection)
-				{
-					case ParameterDirection.Output:
-						direction = "OUT";
-						break;
-					case ParameterDirection.InputOutput:
-						direction = "INOUT";
-						break;
-					case ParameterDirection.Input:
-					default:
-						direction = "IN";
-						break;
-				}
+				DatabaseName = databaseName,
+				StoredProcedureName = storedProcedureName,
+				Query = query.Query,
+				Parameters = query.Parameters,
+				Delimiter = useDelimiter ? "$$" : ";"
+			};
 
-				var parameterName = $"_{parameter.Name}"; // Prefix variables with underscores to prevent issues where the the column names match the variable names.
-				var parameterLine = $"{direction} {parameterName} {parameter.DatabaseTypeName}";
-				if (parameter.Length.HasValue)
-				{
-					parameterLine += $"({parameter.Length})";
-				}
-
-				if (queryParameters.Length > 0)
-				{
-					queryParameters.AppendLine(",");
-				}
-
-				queryParameters.Append($"\t{parameterLine}");
-			}
-
-			if (queryParameters.Length > 0)
-			{
-				queryParameters.Insert(0, "\n");
-				queryParameters.AppendLine();
-			}
-
-			var strippedQuery = query.Query
-				.Replace("@", "_");
-
-			var createQuery = new StringBuilder();
-
-			if (useDelimiter)
-			{
-				createQuery.AppendLine("DELIMITER $$");
-				createQuery.AppendLine($"USE `{databaseName}`$$");
-			}
-			else
-			{
-				createQuery.AppendLine($"USE `{databaseName}`;");
-			}
-
-			createQuery.AppendLine($"CREATE PROCEDURE `{storedProcedureName}`({queryParameters})");
-			createQuery.AppendLine("BEGIN");
-			createQuery.AppendLine($"\t{string.Join("\n\t", strippedQuery.Split('\n'))}");
-
-			if (useDelimiter)
-			{
-				createQuery.AppendLine("END$$");
-				createQuery.AppendLine();
-				createQuery.AppendLine("DELIMITER ;");
-			}
-			else
-			{
-				createQuery.AppendLine("END;");
-			}
-
-			return new SqlQuery(createQuery.ToString(), Array.Empty<SqlQueryParameter>());
+			var createQuery = CompileTemplate<CreateProcedureQuery>(templateVariables);
+			return new SqlQuery(createQuery, Array.Empty<SqlQueryParameter>());
 		}
 
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildDropStoredProcedureQuery"/>
@@ -251,7 +192,7 @@ namespace TixFactory.Database.MySql
 
 			parameters.Add(new SqlQueryParameter(_CountParameterName, _DatabaseTypeParser.GetDatabaseTypeName(MySqlDbType.Int32), length: null, parameterDirection: ParameterDirection.Input));
 
-			return new SqlQuery($"{query};", parameters);
+			return new SqlQuery(query, parameters);
 		}
 
 		private string ParseOrderBy<TRow>(OrderBy<TRow> orderBy, IDictionary<string, string> entityColumnAliases)

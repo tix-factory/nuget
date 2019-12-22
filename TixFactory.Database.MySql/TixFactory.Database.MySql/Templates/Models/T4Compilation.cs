@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace TixFactory.Database.MySql
+namespace TixFactory.Database.MySql.Templates
 {
 	internal static class T4Extensions
 	{

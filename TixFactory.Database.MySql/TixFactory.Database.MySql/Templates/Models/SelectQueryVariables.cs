@@ -1,4 +1,4 @@
-﻿namespace TixFactory.Database.MySql
+﻿namespace TixFactory.Database.MySql.Templates
 {
 	internal class SelectQueryVariables : QueryTemplateVariables
 	{
