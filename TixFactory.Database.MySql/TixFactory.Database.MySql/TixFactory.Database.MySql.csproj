@@ -18,6 +18,11 @@
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>CreateProcedureQuery.tt</DependentUpon>
 	  </Compile>
+	  <Compile Update="Templates\SelectPagedQuery.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>SelectPagedQuery.tt</DependentUpon>
+	  </Compile>
 	  <Compile Update="Templates\SelectTopQuery.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
@@ -29,6 +34,10 @@
 	  <None Update="Templates\CreateProcedureQuery.tt">
 	    <Generator>TextTemplatingFilePreprocessor</Generator>
 	    <LastGenOutput>CreateProcedureQuery.cs</LastGenOutput>
+	  </None>
+	  <None Update="Templates\SelectPagedQuery.tt">
+	    <Generator>TextTemplatingFilePreprocessor</Generator>
+	    <LastGenOutput>SelectPagedQuery.cs</LastGenOutput>
 	  </None>
 	  <None Update="Templates\SelectTopQuery.tt">
 	    <Generator>TextTemplatingFilePreprocessor</Generator>

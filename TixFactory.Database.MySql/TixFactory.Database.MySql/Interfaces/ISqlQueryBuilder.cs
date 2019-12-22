@@ -107,6 +107,125 @@ namespace TixFactory.Database.MySql
 			where TRow : class;
 
 		/// <summary>
+		/// Builds a paged select query.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <param name="databaseName">The database name to select in.</param>
+		/// <param name="tableName">The table name to select in.</param>
+		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> containing the column that the paged results should be ordered by.</param>
+		/// <returns>The <see cref="ISqlQuery"/>.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// - <paramref name="orderBy"/>
+		/// </exception>
+		ISqlQuery BuildSelectPagedQuery<TRow>(string databaseName, string tableName, OrderBy<TRow> orderBy)
+			where TRow : class;
+
+		/// <summary>
+		/// Builds a paged select query with an additional WHERE clause and no query parameters.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <param name="databaseName">The database name to select in.</param>
+		/// <param name="tableName">The table name to select in.</param>
+		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
+		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> containing the column that the paged results should be ordered by.</param>
+		/// <returns>The <see cref="ISqlQuery"/>.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// - <paramref name="orderBy"/>
+		/// </exception>
+		ISqlQuery BuildSelectPagedQuery<TRow>(string databaseName, string tableName, Expression<Func<TRow, bool>> whereExpression, OrderBy<TRow> orderBy)
+			where TRow : class;
+
+		/// <summary>
+		/// Builds a paged select query with an additional WHERE clause and 1 query parameter.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <typeparam name="TP1">The first query parameter.</typeparam>
+		/// <param name="databaseName">The database name to select in.</param>
+		/// <param name="tableName">The table name to select in.</param>
+		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
+		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
+		/// <returns>The <see cref="ISqlQuery"/>.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// - <paramref name="orderBy"/>
+		/// </exception>
+		ISqlQuery BuildSelectPagedQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression, OrderBy<TRow> orderBy)
+			where TRow : class;
+
+		/// <summary>
+		/// Builds a paged select query with an additional WHERE clause and 2 query parameters.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <typeparam name="TP1">The first query parameter.</typeparam>
+		/// <typeparam name="TP2">The second query parameter.</typeparam>
+		/// <param name="databaseName">The database name to select in.</param>
+		/// <param name="tableName">The table name to select in.</param>
+		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
+		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
+		/// <returns>The <see cref="ISqlQuery"/>.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// - <paramref name="orderBy"/>
+		/// </exception>
+		ISqlQuery BuildSelectPagedQuery<TRow, TP1, TP2>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, bool>> whereExpression, OrderBy<TRow> orderBy)
+			where TRow : class;
+
+		/// <summary>
+		/// Builds a paged select query with an additional WHERE clause and 3 query parameters.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <typeparam name="TP1">The first query parameter.</typeparam>
+		/// <typeparam name="TP2">The second query parameter.</typeparam>
+		/// <typeparam name="TP3">The third query parameter.</typeparam>
+		/// <param name="databaseName">The database name to select in.</param>
+		/// <param name="tableName">The table name to select in.</param>
+		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
+		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
+		/// <returns>The <see cref="ISqlQuery"/>.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// - <paramref name="orderBy"/>
+		/// </exception>
+		ISqlQuery BuildSelectPagedQuery<TRow, TP1, TP2, TP3>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, bool>> whereExpression, OrderBy<TRow> orderBy)
+			where TRow : class;
+
+		/// <summary>
+		/// Builds a paged select query with an additional WHERE clause and 4 query parameters.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <typeparam name="TP1">The first query parameter.</typeparam>
+		/// <typeparam name="TP2">The second query parameter.</typeparam>
+		/// <typeparam name="TP3">The third query parameter.</typeparam>
+		/// <typeparam name="TP4">The fourth query parameter.</typeparam>
+		/// <param name="databaseName">The database name to select in.</param>
+		/// <param name="tableName">The table name to select in.</param>
+		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
+		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
+		/// <returns>The <see cref="ISqlQuery"/>.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// - <paramref name="orderBy"/>
+		/// </exception>
+		ISqlQuery BuildSelectPagedQuery<TRow, TP1, TP2, TP3, TP4>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, bool>> whereExpression, OrderBy<TRow> orderBy)
+			where TRow : class;
+
+		/// <summary>
+		/// Builds a paged select query with an additional WHERE clause and 5 query parameters.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <typeparam name="TP1">The first query parameter.</typeparam>
+		/// <typeparam name="TP2">The second query parameter.</typeparam>
+		/// <typeparam name="TP3">The third query parameter.</typeparam>
+		/// <typeparam name="TP4">The fourth query parameter.</typeparam>
+		/// <typeparam name="TP5">The fifth query parameter.</typeparam>
+		/// <param name="databaseName">The database name to select in.</param>
+		/// <param name="tableName">The table name to select in.</param>
+		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
+		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
+		/// <returns>The <see cref="ISqlQuery"/>.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// - <paramref name="orderBy"/>
+		/// </exception>
+		ISqlQuery BuildSelectPagedQuery<TRow, TP1, TP2, TP3, TP4, TP5>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, TP5, bool>> whereExpression, OrderBy<TRow> orderBy)
+			where TRow : class;
+
+		/// <summary>
 		/// Builds a query that can be executed to create a new stored procedure.
 		/// </summary>
 		/// <remarks>

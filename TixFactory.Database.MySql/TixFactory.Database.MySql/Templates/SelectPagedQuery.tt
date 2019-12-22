@@ -1,0 +1,32 @@
+﻿<#@ template language="C#" debug="true" hostspecific="false" visibility="internal" #>
+<#@ output extension=".sql" #>
+<#@ assembly name="System.Core" #>
+<#@ parameter type="TixFactory.Database.MySql.Templates.SelectQueryVariables" name="Vars" #>
+
+IF (@<#= SqlQueryBuilder._IsAscendingParameterName #> = 1) THEN
+    IF (@<#= SqlQueryBuilder._ExclusiveStartParameterName #> IS NULL) THEN
+        SELECT *
+            FROM `<#= Vars.DatabaseName #>`.`<#= Vars.TableName #>`
+            ORDER BY `<#= Vars.OrderBy #>` ASC
+            LIMIT @<#= SqlQueryBuilder._CountParameterName #>;
+    ELSE
+        SELECT *
+            FROM `<#= Vars.DatabaseName #>`.`<#= Vars.TableName #>`
+            WHERE (`<#= Vars.OrderBy #>` > @<#= SqlQueryBuilder._ExclusiveStartParameterName #>) <#= string.IsNullOrWhiteSpace(Vars.WhereClause) ? "" : "AND " + Vars.WhereClause #>
+            ORDER BY `<#= Vars.OrderBy #>` ASC
+            LIMIT @<#= SqlQueryBuilder._CountParameterName #>;
+    END IF;
+ELSE
+    IF (@<#= SqlQueryBuilder._ExclusiveStartParameterName #> IS NULL) THEN
+        SELECT *
+            FROM `<#= Vars.DatabaseName #>`.`<#= Vars.TableName #>`
+            ORDER BY `<#= Vars.OrderBy #>` DESC
+            LIMIT @<#= SqlQueryBuilder._CountParameterName #>;
+    ELSE
+        SELECT *
+            FROM `<#= Vars.DatabaseName #>`.`<#= Vars.TableName #>`
+            WHERE (`<#= Vars.OrderBy #>` < @<#= SqlQueryBuilder._ExclusiveStartParameterName #>) <#= string.IsNullOrWhiteSpace(Vars.WhereClause) ? "" : "AND " + Vars.WhereClause #>
+            ORDER BY `<#= Vars.OrderBy #>` DESC
+            LIMIT @<#= SqlQueryBuilder._CountParameterName #>;
+    END IF;
+END IF;

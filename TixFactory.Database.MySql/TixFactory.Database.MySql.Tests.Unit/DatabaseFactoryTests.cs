@@ -1,4 +1,5 @@
-﻿using FakeItEasy;
+﻿using System;
+using FakeItEasy;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -43,19 +44,21 @@ namespace TixFactory.Database.MySql.Tests.Unit
 
 			var sqlQueryBuilder = new SqlQueryBuilder(new DatabaseTypeParser());
 			var selectAllQuery = sqlQueryBuilder.BuildSelectTopQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id > id, new OrderBy<TestTable>(nameof(TestTable.Id), SortOrder.Ascending));
+			var selectedPagedQuery = sqlQueryBuilder.BuildSelectPagedQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id < id, new OrderBy<TestTable>(nameof(TestTable.Id)));
 
-			var registered = testDatabase.RegisterStoredProcedure("test_stored_procedure", selectAllQuery);
+			var registered = testDatabase.RegisterStoredProcedure("test_paged_procedure", selectedPagedQuery);
+			//var registered = testDatabase.RegisterStoredProcedure("test_stored_procedure", selectAllQuery);
 			//var dropped = testDatabase.DropStoredProcedure("test_stored_procedure");
 
 			var mySqlParameters = new Dictionary<string, object>
 			{
-				{ "_id", 0 },
+				{ "_id", int.MaxValue },
+				{ "_ExclusiveStart", 2 },
+				{ "_IsAscending", false },
 				{ "_Count", 1 }
 			};
 
-			var result = databaseServerConnection.ExecuteStoredProcedure<object>("test_stored_procedure", mySqlParameters);
-
-			var query = databaseServerConnection.ExecuteQuery<object>("SELECT @_id, @_Count;", mySqlParameters);
+			var result = databaseServerConnection.ExecuteStoredProcedure<object>("test_paged_procedure", mySqlParameters);
 
 		}
 	}

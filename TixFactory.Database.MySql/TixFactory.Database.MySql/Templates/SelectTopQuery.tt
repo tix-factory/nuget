@@ -11,4 +11,4 @@ SELECT *
 <# if (!string.IsNullOrWhiteSpace(Vars.OrderBy)) { #>
 	ORDER BY <#= Vars.OrderBy #>
 <# } #>
-	LIMIT @Count;
+	LIMIT @<#= SqlQueryBuilder._CountParameterName #>;

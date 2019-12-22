@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Reflection;
 using TixFactory.Configuration;
 
 namespace TixFactory.Database.MySql
@@ -14,7 +15,7 @@ namespace TixFactory.Database.MySql
 		/// <summary>
 		/// The property of the row model to order by.
 		/// </summary>
-		public string PropertyName { get; }
+		public PropertyInfo Property { get; }
 
 		/// <summary>
 		/// The <see cref="SortOrder"/>.
@@ -24,14 +25,14 @@ namespace TixFactory.Database.MySql
 		/// <summary>
 		/// Initializes a new <see cref="OrderBy{TRow}"/>.
 		/// </summary>
-		/// <param name="propertyName">The <see cref="PropertyName"/>.</param>
+		/// <param name="propertyName">The <see cref="Property"/>.</param>
 		/// <param name="sortOrder">The <see cref="SortOrder"/>.</param>
 		/// <exception cref="ArgumentException">
 		/// - <paramref name="propertyName"/> is <c>null</c> or whitespace.
 		/// - <paramref name="propertyName"/> is not a property of <typeparamref name="TRow"/>.
 		/// - <paramref name="sortOrder"/> not valid.
 		/// </exception>
-		public OrderBy(string propertyName, SortOrder sortOrder)
+		public OrderBy(string propertyName, SortOrder sortOrder = SortOrder.Ascending)
 		{
 			if (string.IsNullOrWhiteSpace(propertyName))
 			{
@@ -45,12 +46,8 @@ namespace TixFactory.Database.MySql
 
 			var rowType = typeof(TRow);
 			var orderByProperty = rowType.GetProperty(propertyName);
-			if (orderByProperty == null)
-			{
-				throw new ArgumentException($"'{propertyName}' is not a valid property on '{rowType.Name}'", nameof(propertyName));
-			}
 
-			PropertyName = propertyName;
+			Property = orderByProperty ?? throw new ArgumentException($"'{propertyName}' is not a valid property on '{rowType.Name}'", nameof(propertyName));
 			SortOrder = sortOrder;
 		}
 	}
