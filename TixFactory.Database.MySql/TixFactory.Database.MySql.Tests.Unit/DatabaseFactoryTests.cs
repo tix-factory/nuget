@@ -26,7 +26,7 @@ namespace TixFactory.Database.MySql.Tests.Unit
 		}
 
 		[Test]
-		//[Ignore("TODO: Implement real tests.")]
+		[Ignore("TODO: Implement real tests.")]
 		public void FakeTest()
 		{
 			var connectionString = File.ReadAllText("testconnectionstring.txt");
