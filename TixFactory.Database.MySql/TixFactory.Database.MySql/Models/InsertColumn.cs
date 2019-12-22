@@ -15,14 +15,24 @@ namespace TixFactory.Database.MySql
 
 		public string InsertValue { get; }
 
-		public InsertColumn(PropertyInfo property)
+		public InsertColumn(PropertyInfo property, bool isUpdate)
 		{
 			Property = property ?? throw new ArgumentNullException(nameof(property));
 			ColumnName = GetColumnName(property);
 
-			if (HasAttribute<AutoIncrementColumnAttribute>(property))
+			if (isUpdate)
 			{
-				return;
+				if (HasAttribute<ImmutableColumnAttribute>(property))
+				{
+					return;
+				}
+			}
+			else
+			{
+				if (HasAttribute<AutoIncrementColumnAttribute>(property))
+				{
+					return;
+				}
 			}
 
 			if (HasAttribute<CreatedColumnAttribute>(property))
@@ -43,7 +53,7 @@ namespace TixFactory.Database.MySql
 		private bool HasAttribute<T>(PropertyInfo property)
 			where T : Attribute
 		{
-			return property.GetCustomAttributes<T>().Any();
+			return property.GetCustomAttributes<T>(inherit: true).Any();
 		}
 
 		private string GetColumnName(PropertyInfo property)

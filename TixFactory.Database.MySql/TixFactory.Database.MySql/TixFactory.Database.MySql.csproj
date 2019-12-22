@@ -38,6 +38,11 @@
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>SelectTopQuery.tt</DependentUpon>
 	  </Compile>
+	  <Compile Update="Templates\UpdateQuery.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>UpdateQuery.tt</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -61,6 +66,14 @@
 	    <Generator>TextTemplatingFilePreprocessor</Generator>
 	    <LastGenOutput>SelectTopQuery.cs</LastGenOutput>
 	  </None>
+	  <None Update="Templates\UpdateQuery.tt">
+	    <Generator>TextTemplatingFilePreprocessor</Generator>
+	    <LastGenOutput>UpdateQuery.cs</LastGenOutput>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
 	</ItemGroup>
 
 	<Import Project="$(RootPath)build/build.targets" />

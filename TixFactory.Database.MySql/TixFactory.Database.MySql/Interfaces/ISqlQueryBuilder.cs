@@ -31,6 +31,18 @@ namespace TixFactory.Database.MySql
 			where TRow : class;
 
 		/// <summary>
+		/// Builds an update query.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <typeparam name="TP1">The first query parameter.</typeparam>
+		/// <param name="databaseName">The database name to insert into.</param>
+		/// <param name="tableName">The table name to insert into.</param>
+		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
+		/// <returns>The <see cref="ISqlQuery"/>.</returns>
+		ISqlQuery BuildUpdateQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression)
+			where TRow : class;
+
+		/// <summary>
 		/// Builds a select query without a WHERE clause.
 		/// </summary>
 		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>

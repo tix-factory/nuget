@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -244,6 +245,13 @@ namespace TixFactory.Database.MySql
 
 			var compiledTemplate = (string)compileMethod.Invoke(template, Array.Empty<object>());
 			return compiledTemplate.Trim();
+		}
+
+		private SqlQueryParameter TranslateParameter(ParameterExpression parameter)
+		{
+			var mySqlType = _DatabaseTypeParser.GetMySqlType(parameter.Type);
+			var databaseTypeName = _DatabaseTypeParser.GetDatabaseTypeName(mySqlType);
+			return new SqlQueryParameter(parameter.Name, databaseTypeName, length: null, parameterDirection: ParameterDirection.Input);
 		}
 	}
 }

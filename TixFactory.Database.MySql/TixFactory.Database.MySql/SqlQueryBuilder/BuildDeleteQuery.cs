@@ -34,15 +34,7 @@ namespace TixFactory.Database.MySql
 			};
 
 			var query = CompileTemplate<DeleteQuery>(templateVariables);
-
-			var parameters = expressionParameters.Skip(1).Select(p =>
-			{
-				var mySqlType = _DatabaseTypeParser.GetMySqlType(p.Type);
-				var databaseTypeName = _DatabaseTypeParser.GetDatabaseTypeName(mySqlType);
-				var parameter = new SqlQueryParameter(p.Name, databaseTypeName, length: null, parameterDirection: ParameterDirection.Input);
-
-				return parameter;
-			}).ToList();
+			var parameters = expressionParameters.Skip(1).Select(TranslateParameter).ToList();
 
 			return new SqlQuery(query, parameters);
 		}

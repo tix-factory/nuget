@@ -26,7 +26,7 @@ namespace TixFactory.Database.MySql.Tests.Unit
 		}
 
 		[Test]
-		[Ignore("TODO: Implement real tests.")]
+		//[Ignore("TODO: Implement real tests.")]
 		public void FakeTest()
 		{
 			var connectionString = File.ReadAllText("testconnectionstring.txt");
@@ -47,6 +47,7 @@ namespace TixFactory.Database.MySql.Tests.Unit
 			var selectedPagedQuery = sqlQueryBuilder.BuildSelectPagedQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id < id, new OrderBy<TestTable>(nameof(TestTable.Id)));
 			var deleteQuery = sqlQueryBuilder.BuildDeleteQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id == id);
 			var insertQuery = sqlQueryBuilder.BuildInsertQuery<TestTable>(testDatabase.Name, testTable.Name);
+			var updateQuery = sqlQueryBuilder.BuildUpdateQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id == id);
 
 			var registered = testDatabase.RegisterStoredProcedure("test_paged_procedure", selectedPagedQuery);
 			//var registered = testDatabase.RegisterStoredProcedure("test_stored_procedure", selectAllQuery);

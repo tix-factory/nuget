@@ -168,18 +168,9 @@ namespace TixFactory.Database.MySql
 			};
 
 			var query = CompileTemplate<SelectPagedQuery>(templateVariables);
-
-			var parameters = expressionParameters.Skip(1).Select(p =>
-			{
-				var mySqlType = _DatabaseTypeParser.GetMySqlType(p.Type);
-				var databaseTypeName = _DatabaseTypeParser.GetDatabaseTypeName(mySqlType);
-				var parameter = new SqlQueryParameter(p.Name, databaseTypeName, length: null, parameterDirection: ParameterDirection.Input);
-
-				return parameter;
-			}).ToList();
+			var parameters = expressionParameters.Skip(1).Select(TranslateParameter).ToList();
 
 			var exclusiveStartDatabaseType = _DatabaseTypeParser.GetMySqlType(orderBy.Property.PropertyType);
-
 			parameters.Add(new SqlQueryParameter(_IsAscendingParameterName, _DatabaseTypeParser.GetDatabaseTypeName(MySqlDbType.Bit), length: null, parameterDirection: ParameterDirection.Input));
 			parameters.Add(new SqlQueryParameter(_ExclusiveStartParameterName, _DatabaseTypeParser.GetDatabaseTypeName(exclusiveStartDatabaseType), length: null, parameterDirection: ParameterDirection.Input));
 			parameters.Add(new SqlQueryParameter(_CountParameterName, _DatabaseTypeParser.GetDatabaseTypeName(MySqlDbType.Int32), length: null, parameterDirection: ParameterDirection.Input));

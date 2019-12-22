@@ -52,6 +52,9 @@ namespace TixFactory.Database.MySql
 		/// </summary>
 		public DatabaseTypeParser()
 		{
+			// ADD/REMOVE VALUES CAREFULLY.
+			// The order of this array also decides the output GetMySqlType
+			// e.g. string currently outputs VarBinary as the MySqlDbType because _VarBinary is the last item in this array that represents strings.
 			var parseableTypes = new[]
 			{
 				_Bit,

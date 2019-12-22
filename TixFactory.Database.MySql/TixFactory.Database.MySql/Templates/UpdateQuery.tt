@@ -1,0 +1,13 @@
+<#@ template language="C#" debug="true" hostspecific="false" visibility="internal" #>
+<#@ output extension=".sql" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ parameter type="TixFactory.Database.MySql.Templates.UpdateQueryVariables" name="Vars" #>
+
+UPDATE `<#= Vars.DatabaseName #>`.`<#= Vars.TableName #>`
+SET
+<# foreach (var column in Vars.Columns) { #>
+	`<#= column.ColumnName #>` = <#= column.InsertValue #><#= column == Vars.Columns.ElementAt(Vars.Columns.Count - 1) ? "" : "," #>
+<# } #>
+WHERE <#= Vars.WhereClause #>
+LIMIT 1;
