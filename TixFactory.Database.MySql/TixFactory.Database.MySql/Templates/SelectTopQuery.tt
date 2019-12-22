@@ -1,0 +1,14 @@
+﻿<#@ template language="C#" debug="true" hostspecific="false" visibility="internal" #>
+<#@ output extension=".sql" #>
+<#@ assembly name="System.Core" #>
+<#@ parameter type="TixFactory.Database.MySql.SelectQueryVariables" name="Vars" #>
+
+SELECT *
+	FROM `<#= Vars.DatabaseName #>`.`<#= Vars.TableName #>`
+<# if (!string.IsNullOrWhiteSpace(Vars.WhereClause)) { #>
+	WHERE <#= Vars.WhereClause #>
+<# } #>
+<# if (!string.IsNullOrWhiteSpace(Vars.OrderBy)) { #>
+	ORDER BY <#= Vars.OrderBy #>
+<# } #>
+	LIMIT @Count;

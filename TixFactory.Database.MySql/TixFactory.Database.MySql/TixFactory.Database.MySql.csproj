@@ -12,5 +12,20 @@
 		<PackageReference Include="TixFactory.Configuration" Version="$(PackageVersion)" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Update="Templates\SelectTopQuery.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>SelectTopQuery.tt</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Templates\SelectTopQuery.tt">
+	    <Generator>TextTemplatingFilePreprocessor</Generator>
+	    <LastGenOutput>SelectTopQuery.cs</LastGenOutput>
+	  </None>
+	</ItemGroup>
+
 	<Import Project="$(RootPath)build/build.targets" />
 </Project>

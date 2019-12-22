@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
 using TixFactory.Configuration;
+using TixFactory.Database.MySql.Templates;
 
 namespace TixFactory.Database.MySql
 {
@@ -229,19 +230,15 @@ namespace TixFactory.Database.MySql
 
 		private ISqlQuery BuildSelectAllQuery(string databaseName, string tableName, string whereClause, string orderByStatement, IReadOnlyCollection<ParameterExpression> expressionParameters)
 		{
-			var query = $"SELECT *\n\tFROM `{databaseName}`.`{tableName}`";
-
-			if (!string.IsNullOrWhiteSpace(whereClause))
+			var templateVariables = new SelectQueryVariables
 			{
-				query += $"\n\tWHERE {whereClause}";
-			}
+				DatabaseName = databaseName,
+				TableName = tableName,
+				WhereClause = whereClause,
+				OrderBy = orderByStatement
+			};
 
-			if (!string.IsNullOrWhiteSpace(orderByStatement))
-			{
-				query += $"\n\tORDER BY {orderByStatement}";
-			}
-
-			query += $"\n\tLIMIT @{_CountParameterName}";
+			var query = CompileTemplate<SelectTopQuery>(templateVariables);
 			
 			var parameters = expressionParameters.Skip(1).Select(p =>
 			{
@@ -442,6 +439,26 @@ namespace TixFactory.Database.MySql
 			}
 
 			return aliases;
+		}
+
+		private string CompileTemplate<T>(QueryTemplateVariables templateVariables)
+			where T : new()
+		{
+			var sessionProperty = typeof(T).GetProperty("Session");
+			var initializeMethod = typeof(T).GetMethod("Initialize");
+			var compileMethod = typeof(T).GetMethod("TransformText");
+
+			var template = new T();
+
+			sessionProperty.SetValue(template, new Dictionary<string, object>
+			{
+				{ "Vars", templateVariables }
+			});
+
+			initializeMethod.Invoke(template, Array.Empty<object>());
+			
+			var compiledTemplate = (string)compileMethod.Invoke(template, Array.Empty<object>());
+			return compiledTemplate.Trim();
 		}
 	}
 }
