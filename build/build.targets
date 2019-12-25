@@ -2,6 +2,7 @@
 	<!-- Build properties -->
 	<PropertyGroup>
 		<DocumentationFile Condition="'$(DocumentationFile)' == ''">bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+		<IsPackable Condition="'$(IsTests)' == 'true'">false</IsPackable>
 		<LangVersion>7.1</LangVersion>
 	</PropertyGroup>
 
@@ -19,6 +20,13 @@
 		<None Include="$(RootPath)$(PackageLicenseFile)" Pack="true" PackagePath="$(PackageLicenseFile)">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+	</ItemGroup>
+
+	<!-- Tests -->
+	<ItemGroup Condition="'$(IsTests)' == 'true'">
+		<PackageReference Include="nunit" Version="3.12.0" />
+		<PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
 	</ItemGroup>
 
 	<!-- Build Agent Properties -->

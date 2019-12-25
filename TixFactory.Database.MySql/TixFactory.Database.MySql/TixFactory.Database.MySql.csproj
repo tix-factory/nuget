@@ -8,9 +8,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="MySql.Data" Version="8.0.18" />
-		<PackageReference Include="Newtonsoft.Json" Version="11.*" />
 		<PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
 		<PackageReference Include="TixFactory.Configuration" Version="$(PackageVersion)" />
+		<PackageReference Include="TixFactory.Serialization.Json" Version="$(PackageVersion)" />
 	</ItemGroup>
 
 	<ItemGroup>

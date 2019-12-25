@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using TixFactory.Serialization.Json;
 
 namespace TixFactory.Database.MySql.Tests.Unit
 {
@@ -13,7 +15,11 @@ namespace TixFactory.Database.MySql.Tests.Unit
 
 		[DataMember(Name = "Name")]
 		[MaxLength(50)]
+		[JsonConverter(typeof(Base64Converter))]
 		public string Name { get; set; }
+
+		[DataMember(Name = "Value")]
+		public int? Value { get; set; }
 
 		[DataMember(Name = "Created")]
 		[CreatedColumn]

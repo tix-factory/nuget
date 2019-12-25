@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using Newtonsoft.Json;
 using TixFactory.Configuration;
 
 namespace TixFactory.Database.MySql.Tests.Unit
@@ -39,7 +40,7 @@ namespace TixFactory.Database.MySql.Tests.Unit
 			var indexes = usersTable.GetAllIndexes();*/
 
 			var testDatabase = databaseServerConnection.GetConnectedDatabase();
-			var testTable = testDatabase.GetTable("new_table");
+			var testTable = testDatabase.GetTable("test_table");
 			var storedProcedures = testDatabase.GetStoredProcedureNames();
 
 			var sqlQueryBuilder = new SqlQueryBuilder(new DatabaseTypeParser());
@@ -52,12 +53,20 @@ namespace TixFactory.Database.MySql.Tests.Unit
 			var countQuery = sqlQueryBuilder.BuildCountQuery(testDatabase.Name, testTable.Name);
 			var countWhereQuery = sqlQueryBuilder.BuildCountQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id > id);
 
-			var indexColumns = new[]
+			/*var indexColumns = new[]
 			{
 				testTable.GetColumn("name"),
 				testTable.GetColumn("otherName")
 			};
-			var createIndexResult = testTable.CreateIndex("test_unique_index", unique: true, columns: indexColumns);
+			var createIndexResult = testTable.CreateIndex("test_unique_index", unique: true, columns: indexColumns);*/
+
+			var queryResult = databaseServerConnection.ExecuteQuery<TestTable>(selectAllQuery.Query, new Dictionary<string, object>
+			{
+				{ "id", 0 },
+				{ "Count", int.MaxValue }
+			});
+
+			var serializedResult = JsonConvert.SerializeObject(queryResult);
 
 			var registered = testDatabase.RegisterStoredProcedure("test_paged_procedure", selectedPagedQuery);
 			//var registered = testDatabase.RegisterStoredProcedure("test_stored_procedure", selectAllQuery);

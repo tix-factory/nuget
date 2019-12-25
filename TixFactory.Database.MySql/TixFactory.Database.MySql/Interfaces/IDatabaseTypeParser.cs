@@ -34,7 +34,7 @@ namespace TixFactory.Database.MySql
 		/// Gets a database type name from a <see cref="MySqlDbType"/>.
 		/// </summary>
 		/// <example>
-		/// BIGINT -> <see cref="MySqlDbType.Int64"/>
+		/// <see cref="MySqlDbType.Int64"/> -> BIGINT
 		/// </example>
 		/// <param name="mySqlType">The <see cref="MySqlDbType"/>.</param>
 		/// <returns>The database type name.</returns>
@@ -44,9 +44,29 @@ namespace TixFactory.Database.MySql
 		string GetDatabaseTypeName(MySqlDbType mySqlType);
 
 		/// <summary>
+		/// Gets a database type name from a <see cref="MySqlDbType"/>.
+		/// </summary>
+		/// <example>
+		/// - <see cref="long"/> -> BIGINT
+		/// - <see cref="Nullable{long}"/> -> BIGINT NULL
+		/// - <see cref="ulong"/> -> BIGINT UNSIGNED
+		/// - <see cref="Nullable{ulong}"/> -> BIGINT UNSIGNED NULL
+		/// </example>
+		/// <param name="type">The <see cref="Type"/>.</param>
+		/// <param name="length">The type length.</param>
+		/// <returns>The database type name.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// - <paramref name="type"/>
+		/// </exception>
+		/// <exception cref="ArgumentException">
+		/// - <paramref name="type"/> does not map to <see cref="MySqlDbType"/>.
+		/// </exception>
+		string GetDatabaseTypeName(Type type, long? length);
+
+		/// <summary>
 		/// Gets a <see cref="MySqlDbType"/> from a <see cref="Type"/>.
 		/// </summary>
-		/// <param name="type">The <see cref="MySqlDbType"/>.</param>
+		/// <param name="type">The <see cref="Type"/>.</param>
 		/// <returns>The <see cref="MySqlDbType"/>.</returns>
 		/// <exception cref="ArgumentNullException">
 		/// - <paramref name="type"/>

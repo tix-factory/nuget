@@ -40,15 +40,9 @@ namespace TixFactory.Database.MySql
 
 		private string GetDatabaseType(PropertyInfo property, IDatabaseTypeParser databaseTypeParser)
 		{
-			var mySqlType = databaseTypeParser.GetMySqlType(property.PropertyType);
-			var databaseType = databaseTypeParser.GetDatabaseTypeName(mySqlType);
-
 			var maxLengthAttribute = property.GetCustomAttribute<MaxLengthAttribute>();
-			if (maxLengthAttribute != null)
-			{
-				databaseType += $"({maxLengthAttribute.Length})";
-			}
-
+			var databaseType = databaseTypeParser.GetDatabaseTypeName(property.PropertyType, maxLengthAttribute?.Length);
+			
 			if (HasAttribute<AutoIncrementColumnAttribute>(property))
 			{
 				databaseType += " AUTO_INCREMENT";

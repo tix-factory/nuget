@@ -344,12 +344,36 @@ namespace TixFactory.Database.MySql
 			return new TypeDbTypeParseResult(name, nullable, length, type, mySqlType, nullable);
 		}
 
-		/// <inheritdoc cref="IDatabaseTypeParser.GetDatabaseTypeName"/>
+		/// <inheritdoc cref="IDatabaseTypeParser.GetDatabaseTypeName(MySqlDbType)"/>
 		public string GetDatabaseTypeName(MySqlDbType mySqlType)
 		{
 			if (!_DatabaseTypeNamesByMySqlType.TryGetValue(mySqlType, out var databaseTypeName))
 			{
 				throw new InvalidEnumArgumentException(nameof(mySqlType), (int) mySqlType, typeof(MySqlDbType));
+			}
+
+			return databaseTypeName;
+		}
+
+		/// <inheritdoc cref="IDatabaseTypeParser.GetDatabaseTypeName(Type, long?)"/>
+		public string GetDatabaseTypeName(Type type, long? length)
+		{
+			var mySqlType = GetMySqlType(type);
+			var databaseTypeName = GetDatabaseTypeName(mySqlType);
+
+			if (length.HasValue)
+			{
+				databaseTypeName += $"({length})";
+			}
+
+			if (IsUnsigned(type))
+			{
+				databaseTypeName += " UNSIGNED";
+			}
+
+			if (Nullable.GetUnderlyingType(type) != null)
+			{
+				databaseTypeName += " NULL";
 			}
 
 			return databaseTypeName;
@@ -369,6 +393,14 @@ namespace TixFactory.Database.MySql
 			}
 
 			return mySqlType;
+		}
+
+		private bool IsUnsigned(Type type)
+		{
+			return type == typeof(byte)
+				|| type == typeof(ushort)
+				|| type == typeof(uint)
+				|| type == typeof(ulong);
 		}
 	}
 }
