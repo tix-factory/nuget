@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Runtime.Serialization;
 
 namespace TixFactory.Database.MySql
 {
@@ -368,5 +369,17 @@ namespace TixFactory.Database.MySql
 		/// <param name="storedProcedureName">The name of the stored procedure being dropped.</param>
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
 		ISqlQuery BuildDropStoredProcedureQuery(string databaseName, string storedProcedureName);
+
+		/// <summary>
+		/// Builds a query for creating a table in a database.
+		/// </summary>
+		/// <remarks>
+		/// The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.
+		/// </remarks>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <param name="databaseName">The name of the database to create the table in.</param>
+		/// <returns>The <see cref="ISqlQuery"/>.</returns>
+		ISqlQuery BuildCreateTableQuery<TRow>(string databaseName)
+			where TRow : class;
 	}
 }

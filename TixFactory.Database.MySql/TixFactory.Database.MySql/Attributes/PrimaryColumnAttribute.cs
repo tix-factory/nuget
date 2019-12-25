@@ -3,10 +3,10 @@
 namespace TixFactory.Database.MySql
 {
 	/// <summary>
-	/// An attribute that signals this column is auto-incrementing.
+	/// An attribute that signals this column is primary column for the table.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property)]
-	public class AutoIncrementColumnAttribute : PrimaryColumnAttribute
+	public class PrimaryColumnAttribute : ImmutableColumnAttribute
 	{
 	}
 }

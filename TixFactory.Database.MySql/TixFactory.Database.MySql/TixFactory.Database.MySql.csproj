@@ -9,6 +9,7 @@
 	<ItemGroup>
 		<PackageReference Include="MySql.Data" Version="8.0.18" />
 		<PackageReference Include="Newtonsoft.Json" Version="11.*" />
+		<PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
 		<PackageReference Include="TixFactory.Configuration" Version="$(PackageVersion)" />
 	</ItemGroup>
 
@@ -22,6 +23,11 @@
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>CreateProcedureQuery.tt</DependentUpon>
+	  </Compile>
+	  <Compile Update="Templates\CreateTableQuery.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>CreateTableQuery.tt</DependentUpon>
 	  </Compile>
 	  <Compile Update="Templates\DeleteQuery.cs">
 	    <DesignTime>True</DesignTime>
@@ -58,6 +64,10 @@
 	  <None Update="Templates\CreateProcedureQuery.tt">
 	    <Generator>TextTemplatingFilePreprocessor</Generator>
 	    <LastGenOutput>CreateProcedureQuery.cs</LastGenOutput>
+	  </None>
+	  <None Update="Templates\CreateTableQuery.tt">
+	    <Generator>TextTemplatingFilePreprocessor</Generator>
+	    <LastGenOutput>CreateTableQuery.cs</LastGenOutput>
 	  </None>
 	  <None Update="Templates\DeleteQuery.tt">
 	    <Generator>TextTemplatingFilePreprocessor</Generator>

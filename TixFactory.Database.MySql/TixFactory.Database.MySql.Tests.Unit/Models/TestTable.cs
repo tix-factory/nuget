@@ -1,9 +1,10 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace TixFactory.Database.MySql.Tests.Unit
 {
-	[DataContract]
+	[DataContract(Name = "test_table")]
 	public class TestTable
 	{
 		[DataMember(Name = "ID")]
@@ -11,6 +12,7 @@ namespace TixFactory.Database.MySql.Tests.Unit
 		public long Id { get; set; }
 
 		[DataMember(Name = "Name")]
+		[MaxLength(50)]
 		public string Name { get; set; }
 
 		[DataMember(Name = "Created")]
