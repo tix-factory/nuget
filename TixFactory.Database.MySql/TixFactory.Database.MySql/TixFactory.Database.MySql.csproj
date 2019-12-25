@@ -13,6 +13,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Templates\CountQuery.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>CountQuery.tt</DependentUpon>
+	  </Compile>
 	  <Compile Update="Templates\CreateProcedureQuery.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
@@ -46,6 +51,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Update="Templates\CountQuery.tt">
+	    <Generator>TextTemplatingFilePreprocessor</Generator>
+	    <LastGenOutput>CountQuery.cs</LastGenOutput>
+	  </None>
 	  <None Update="Templates\CreateProcedureQuery.tt">
 	    <Generator>TextTemplatingFilePreprocessor</Generator>
 	    <LastGenOutput>CreateProcedureQuery.cs</LastGenOutput>
