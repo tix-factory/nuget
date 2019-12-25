@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 
 namespace TixFactory.Database.MySql
@@ -58,5 +59,33 @@ namespace TixFactory.Database.MySql
 		/// - Unexpected error reading database table indexes.
 		/// </exception>
 		IReadOnlyCollection<IDatabaseTableIndex> GetAllIndexes();
+
+		/// <summary>
+		/// Creates an index on the table.
+		/// </summary>
+		/// <param name="indexName">The index name.</param>
+		/// <param name="unique">Whether or not the index is unique.</param>
+		/// <param name="columns">The <see cref="IDatabaseTableColumn"/>s in the index.</param>
+		/// <returns><c>true</c> if the index did not already exist and was created (otherwise <c>false</c>).</returns>
+		/// <exception cref="ArgumentNullException">
+		/// - <paramref name="columns"/>
+		/// </exception>
+		/// <exception cref="ArgumentException">
+		/// - <paramref name="indexName"/> is invalid.
+		/// </exception>
+		/// <exception cref="MySqlException">
+		/// - Unexpected error creating index.
+		/// </exception>
+		bool CreateIndex(string indexName, bool unique, IReadOnlyCollection<IDatabaseTableColumn> columns);
+
+		/// <summary>
+		/// Drops an index with the given name from the table.
+		/// </summary>
+		/// <param name="indexName">The name of the index to drop.</param>
+		/// <returns><c>true</c> if the index existed and was dropped.</returns>
+		/// <exception cref="MySqlException">
+		/// - Unexpected error dropping index.
+		/// </exception>
+		bool DropIndex(string indexName);
 	}
 }

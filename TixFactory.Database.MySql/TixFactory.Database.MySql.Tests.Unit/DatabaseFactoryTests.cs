@@ -49,6 +49,13 @@ namespace TixFactory.Database.MySql.Tests.Unit
 			var insertQuery = sqlQueryBuilder.BuildInsertQuery<TestTable>(testDatabase.Name, testTable.Name);
 			var updateQuery = sqlQueryBuilder.BuildUpdateQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id == id);
 
+			var indexColumns = new[]
+			{
+				testTable.GetColumn("name"),
+				testTable.GetColumn("otherName")
+			};
+			var createIndexResult = testTable.CreateIndex("test_unique_index", unique: true, columns: indexColumns);
+
 			var registered = testDatabase.RegisterStoredProcedure("test_paged_procedure", selectedPagedQuery);
 			//var registered = testDatabase.RegisterStoredProcedure("test_stored_procedure", selectAllQuery);
 			//var dropped = testDatabase.DropStoredProcedure("test_stored_procedure");

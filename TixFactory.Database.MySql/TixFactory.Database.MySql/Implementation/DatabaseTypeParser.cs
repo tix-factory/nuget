@@ -121,15 +121,25 @@ namespace TixFactory.Database.MySql
 		/// <inheritdoc cref="IDatabaseTypeParser.ParseDatabaseType"/>
 		public TypeDbTypeParseResult ParseDatabaseType(string databaseType, bool nullable)
 		{
-			databaseType = databaseType?.Trim();
-			var typeParseMatch = _TypeParse.Match(databaseType ?? string.Empty);
+			if (string.IsNullOrWhiteSpace(databaseType))
+			{
+				throw new ArgumentException($"'{nameof(databaseType)}' must not be null or whitespace.", nameof(databaseType));
+			}
+
+			databaseType = databaseType.Trim();
+			var unsigned = databaseType.EndsWith(_UnsignedSuffix);
+			if (unsigned)
+			{
+				databaseType = databaseType.Substring(0, databaseType.Length - _UnsignedSuffix.Length);
+			}
+
+			var typeParseMatch = _TypeParse.Match(databaseType);
 			if (!typeParseMatch.Success)
 			{
 				throw new ArgumentException($"Could not parse type from '{nameof(databaseType)}': '{databaseType}'", nameof(databaseType));
 			}
 			
 			var name = typeParseMatch.Groups[1].ToString().ToUpper();
-			var unsigned = databaseType.EndsWith(_UnsignedSuffix);
 			int? length = null;
 			Type type;
 			MySqlDbType mySqlType;

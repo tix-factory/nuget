@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using MySql.Data.MySqlClient;
 
 namespace TixFactory.Database.MySql
 {
@@ -86,6 +87,49 @@ namespace TixFactory.Database.MySql
 		{
 			SyncIndexes();
 			return _DatabaseTableIndexes.Values.ToArray();
+		}
+
+		/// <inheritdoc cref="IDatabaseTable.CreateIndex"/>
+		public bool CreateIndex(string indexName, bool unique, IReadOnlyCollection<IDatabaseTableColumn> columns)
+		{
+			if (!_DatabaseNameValidator.IsIndexNameValid(indexName))
+			{
+				throw new ArgumentException("The index name is invalid.", nameof(indexName));
+			}
+
+			var indexes = GetAllIndexes();
+			if (indexes.Any(i => i.Name.Equals(indexName, StringComparison.OrdinalIgnoreCase)))
+			{
+				return false;
+			}
+			
+			var columnNames = columns.Select(c => $"`{c.Name}`").ToArray();
+			var query = $"CREATE {(unique ? "UNIQUE " : "")}INDEX `{indexName}`";
+			query += $"\n\tON `{_Database.Name}`.`{Name}` (\n\t\t{string.Join(",\n\t\t", columnNames)}\n\t);";
+
+			_DatabaseServerConnection.ExecuteQuery(query, queryParameters: null);
+			return true;
+		}
+
+		/// <inheritdoc cref="IDatabaseTable.DropIndex"/>
+		public bool DropIndex(string indexName)
+		{
+			var indexes = GetAllIndexes();
+			if (indexes.All(i => !i.Name.Equals(indexName, StringComparison.OrdinalIgnoreCase)))
+			{
+				return false;
+			}
+
+			try
+			{
+				_DatabaseServerConnection.ExecuteQuery($"DROP INDEX `{indexName}` ON `{_Database.Name}`.`{Name}`;", queryParameters: null);
+				return true;
+			}
+			catch (MySqlException e) when (e.Number == (int)MySqlErrorCode.NoSuchIndex)
+			{
+				// TODO: Verify this is the right error.
+				return false;
+			}
 		}
 
 		private void SyncColumns()
