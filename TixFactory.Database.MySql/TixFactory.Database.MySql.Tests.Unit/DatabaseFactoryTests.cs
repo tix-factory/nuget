@@ -52,6 +52,8 @@ namespace TixFactory.Database.MySql.Tests.Unit
 			var updateQuery = sqlQueryBuilder.BuildUpdateQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id == id);
 			var countQuery = sqlQueryBuilder.BuildCountQuery(testDatabase.Name, testTable.Name);
 			var countWhereQuery = sqlQueryBuilder.BuildCountQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id > id);
+			var addColumnQuery = sqlQueryBuilder.BuildAddColumnQuery<TestTable>(testDatabase.Name, nameof(TestTable.Name));
+			var dropColumnQuery = sqlQueryBuilder.BuildDropColumnQuery(testDatabase.Name, testTable.Name, "Name");
 
 			/*var indexColumns = new[]
 			{

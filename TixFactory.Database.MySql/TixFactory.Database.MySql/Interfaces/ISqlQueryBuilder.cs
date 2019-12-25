@@ -381,5 +381,30 @@ namespace TixFactory.Database.MySql
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
 		ISqlQuery BuildCreateTableQuery<TRow>(string databaseName)
 			where TRow : class;
+
+		/// <summary>
+		/// Builds a query for adding a column to a table.
+		/// </summary>
+		/// <remarks>
+		/// The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.
+		/// </remarks>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <param name="databaseName">The name of the database the table is in.</param>
+		/// <param name="propertyName">The name of the property in <typeparamref name="TRow"/> to create the column query from.</param>
+		/// <returns>The <see cref="ISqlQuery"/>.</returns>
+		/// <exception cref="ArgumentException">
+		/// - <paramref name="propertyName"/> is not a valid property on <typeparamref name="TRow"/>.
+		/// </exception>
+		ISqlQuery BuildAddColumnQuery<TRow>(string databaseName, string propertyName)
+			where TRow : class;
+
+		/// <summary>
+		/// Builds a query for dropping a column from a table.
+		/// </summary>
+		/// <param name="databaseName">The name of the database the table is in.</param>
+		/// <param name="tableName">The name of the table to drop the column from.</param>
+		/// <param name="columnName">The name of the column to drop.</param>
+		/// <returns>The <see cref="ISqlQuery"/>.</returns>
+		ISqlQuery BuildDropColumnQuery(string databaseName, string tableName, string columnName);
 	}
 }
