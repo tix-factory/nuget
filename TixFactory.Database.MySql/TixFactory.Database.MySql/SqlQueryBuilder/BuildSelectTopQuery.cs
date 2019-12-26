@@ -1,5 +1,4 @@
 ﻿using MySql.Data.MySqlClient;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -11,25 +10,13 @@ namespace TixFactory.Database.MySql
 	/// <inheritdoc cref="ISqlQueryBuilder"/>
 	public partial class SqlQueryBuilder
 	{
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow}(string,string,OrderBy{TRow})"/>
-		public ISqlQuery BuildSelectTopQuery<TRow>(string databaseName, string tableName, OrderBy<TRow> orderBy = null)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow}"/>
+		public ISqlQuery BuildSelectTopQuery<TRow>(LambdaExpression whereExpression = null, OrderBy<TRow> orderBy = null)
 			where TRow : class
 		{
+			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			return BuildSelectAllQuery(
-				databaseName,
-				tableName,
-				whereClause: null,
-				orderByStatement: ParseOrderBy(orderBy, entityColumnAliases),
-				expressionParameters: Array.Empty<ParameterExpression>());
-		}
-
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow}(string,string,System.Linq.Expressions.Expression{System.Func{TRow,bool}},OrderBy{TRow})"/>
-		public ISqlQuery BuildSelectTopQuery<TRow>(string databaseName, string tableName, Expression<Func<TRow, bool>> whereExpression, OrderBy<TRow> orderBy = null)
-			where TRow : class
-		{
-			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
+			var (whereClause, expressionParameters) = ParseWhereExpression<TRow>(whereExpression, nameof(whereExpression), entityColumnAliases);
 			var orderByStatement = ParseOrderBy(orderBy, entityColumnAliases);
 
 			return BuildSelectAllQuery(
@@ -37,87 +24,7 @@ namespace TixFactory.Database.MySql
 				tableName,
 				whereClause,
 				orderByStatement,
-				whereExpression.Parameters);
-		}
-
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1}"/>
-		public ISqlQuery BuildSelectTopQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression, OrderBy<TRow> orderBy = null)
-			where TRow : class
-		{
-			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
-			var orderByStatement = ParseOrderBy(orderBy, entityColumnAliases);
-
-			return BuildSelectAllQuery(
-				databaseName,
-				tableName,
-				whereClause,
-				orderByStatement,
-				whereExpression.Parameters);
-		}
-
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2}"/>
-		public ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, bool>> whereExpression, OrderBy<TRow> orderBy = null)
-			where TRow : class
-		{
-			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
-			var orderByStatement = ParseOrderBy(orderBy, entityColumnAliases);
-
-			return BuildSelectAllQuery(
-				databaseName,
-				tableName,
-				whereClause,
-				orderByStatement,
-				whereExpression.Parameters);
-		}
-
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2,TP3}"/>
-		public ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2, TP3>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, bool>> whereExpression, OrderBy<TRow> orderBy = null)
-			where TRow : class
-		{
-			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
-			var orderByStatement = ParseOrderBy(orderBy, entityColumnAliases);
-
-			return BuildSelectAllQuery(
-				databaseName,
-				tableName,
-				whereClause,
-				orderByStatement,
-				whereExpression.Parameters);
-		}
-
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2,TP3,TP4}"/>
-		public ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2, TP3, TP4>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, bool>> whereExpression, OrderBy<TRow> orderBy = null)
-			where TRow : class
-		{
-			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
-			var orderByStatement = ParseOrderBy(orderBy, entityColumnAliases);
-
-			return BuildSelectAllQuery(
-				databaseName,
-				tableName,
-				whereClause,
-				orderByStatement,
-				whereExpression.Parameters);
-		}
-
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2,TP3,TP4,TP5}"/>
-		public ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2, TP3, TP4, TP5>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, TP5, bool>> whereExpression, OrderBy<TRow> orderBy = null)
-			where TRow : class
-		{
-			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
-			var orderByStatement = ParseOrderBy(orderBy, entityColumnAliases);
-
-			return BuildSelectAllQuery(
-				databaseName,
-				tableName,
-				whereClause,
-				orderByStatement,
-				whereExpression.Parameters);
+				expressionParameters);
 		}
 
 		private ISqlQuery BuildSelectAllQuery(string databaseName, string tableName, string whereClause, string orderByStatement, IReadOnlyCollection<ParameterExpression> expressionParameters)

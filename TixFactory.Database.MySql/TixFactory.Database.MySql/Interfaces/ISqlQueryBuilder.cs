@@ -44,105 +44,21 @@ namespace TixFactory.Database.MySql
 			where TRow : class;
 
 		/// <summary>
-		/// Builds a select query without a WHERE clause.
+		/// Builds a limited select query.
 		/// </summary>
+		/// <remarks>
+		/// - The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.
+		/// - The database name is derived from the <see cref="DataContractAttribute.Namespace"/> on the <typeparamref name="TRow"/>.
+		/// </remarks>
 		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <param name="databaseName">The database name to select in.</param>
-		/// <param name="tableName">The table name to select in.</param>
-		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
-		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildSelectTopQuery<TRow>(string databaseName, string tableName, OrderBy<TRow> orderBy = null)
-			where TRow : class;
-
-		/// <summary>
-		/// Builds a select query with a WHERE clause and no query parameters.
-		/// </summary>
-		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <param name="databaseName">The database name to select in.</param>
-		/// <param name="tableName">The table name to select in.</param>
 		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
 		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildSelectTopQuery<TRow>(string databaseName, string tableName, Expression<Func<TRow, bool>> whereExpression, OrderBy<TRow> orderBy = null)
+		ISqlQuery BuildSelectTopQuery<TRow>(LambdaExpression whereExpression = null, OrderBy<TRow> orderBy = null)
 			where TRow : class;
 
 		/// <summary>
-		/// Builds a select query with 1 query parameter.
-		/// </summary>
-		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <typeparam name="TP1">The first query parameter.</typeparam>
-		/// <param name="databaseName">The database name to select in.</param>
-		/// <param name="tableName">The table name to select in.</param>
-		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
-		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
-		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildSelectTopQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression, OrderBy<TRow> orderBy = null)
-			where TRow : class;
-
-		/// <summary>
-		/// Builds a select query with 2 query parameters.
-		/// </summary>
-		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <typeparam name="TP1">The first query parameter.</typeparam>
-		/// <typeparam name="TP2">The second query parameter.</typeparam>
-		/// <param name="databaseName">The database name to select in.</param>
-		/// <param name="tableName">The table name to select in.</param>
-		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
-		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
-		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, bool>> whereExpression, OrderBy<TRow> orderBy = null)
-			where TRow : class;
-
-		/// <summary>
-		/// Builds a select query with 3 query parameters.
-		/// </summary>
-		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <typeparam name="TP1">The first query parameter.</typeparam>
-		/// <typeparam name="TP2">The second query parameter.</typeparam>
-		/// <typeparam name="TP3">The third query parameter.</typeparam>
-		/// <param name="databaseName">The database name to select in.</param>
-		/// <param name="tableName">The table name to select in.</param>
-		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
-		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
-		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2, TP3>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, bool>> whereExpression, OrderBy<TRow> orderBy = null)
-			where TRow : class;
-
-		/// <summary>
-		/// Builds a select query with 4 query parameters.
-		/// </summary>
-		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <typeparam name="TP1">The first query parameter.</typeparam>
-		/// <typeparam name="TP2">The second query parameter.</typeparam>
-		/// <typeparam name="TP3">The third query parameter.</typeparam>
-		/// <typeparam name="TP4">The fourth query parameter.</typeparam>
-		/// <param name="databaseName">The database name to select in.</param>
-		/// <param name="tableName">The table name to select in.</param>
-		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
-		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
-		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2, TP3, TP4>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, bool>> whereExpression, OrderBy<TRow> orderBy = null)
-			where TRow : class;
-
-		/// <summary>
-		/// Builds a select query with 5 query parameters.
-		/// </summary>
-		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <typeparam name="TP1">The first query parameter.</typeparam>
-		/// <typeparam name="TP2">The second query parameter.</typeparam>
-		/// <typeparam name="TP3">The third query parameter.</typeparam>
-		/// <typeparam name="TP4">The fourth query parameter.</typeparam>
-		/// <typeparam name="TP5">The fifth query parameter.</typeparam>
-		/// <param name="databaseName">The database name to select in.</param>
-		/// <param name="tableName">The table name to select in.</param>
-		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
-		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
-		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2, TP3, TP4, TP5>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, TP5, bool>> whereExpression, OrderBy<TRow> orderBy = null)
-			where TRow : class;
-		
-		/// <summary>
-		/// Builds a paged select query with an additional WHERE clause and 5 query parameters.
+		/// Builds a paged select query.
 		/// </summary>
 		/// <remarks>
 		/// - The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.
@@ -158,9 +74,9 @@ namespace TixFactory.Database.MySql
 		/// </exception>
 		ISqlQuery BuildSelectPagedQuery<TRow>(OrderBy<TRow> orderBy, LambdaExpression whereExpression = null)
 			where TRow : class;
-		
+
 		/// <summary>
-		/// Builds a query to count rows in a table with a WHERE clause and 5 query parameters.
+		/// Builds a query to count rows in a table.
 		/// </summary>
 		/// <remarks>
 		/// - The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.

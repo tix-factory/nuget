@@ -46,7 +46,7 @@ namespace TixFactory.Database.MySql.Tests.Unit
 			
 			var sqlQueryBuilder = new SqlQueryBuilder(new DatabaseTypeParser());
 			var createTableQuery = sqlQueryBuilder.BuildCreateTableQuery<TestTable>();
-			var selectAllQuery = sqlQueryBuilder.BuildSelectTopQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id > id, new OrderBy<TestTable>(nameof(TestTable.Id), SortOrder.Ascending));
+			var selectAllQuery = sqlQueryBuilder.BuildSelectTopQuery(sqlQueryBuilder.BuildWhereClause((TestTable row, long id) => row.Id > id), new OrderBy<TestTable>(nameof(TestTable.Id), SortOrder.Ascending));
 			var selectedPagedQuery = sqlQueryBuilder.BuildSelectPagedQuery(new OrderBy<TestTable>(nameof(TestTable.Id)), sqlQueryBuilder.BuildWhereClause((TestTable row, long id) => row.Id < id));
 			var deleteQuery = sqlQueryBuilder.BuildDeleteQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id == id);
 			var insertQuery = sqlQueryBuilder.BuildInsertQuery<TestTable>(testDatabase.Name, testTable.Name);
