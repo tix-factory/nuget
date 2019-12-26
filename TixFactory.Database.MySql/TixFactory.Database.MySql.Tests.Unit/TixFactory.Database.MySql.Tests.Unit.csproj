@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>netcoreapp2.1</TargetFramework>
-		<IsTests>true</IsTests>
+		<IsTestProject>true</IsTestProject>
 		<RootPath>../../</RootPath>
 	</PropertyGroup>
 
