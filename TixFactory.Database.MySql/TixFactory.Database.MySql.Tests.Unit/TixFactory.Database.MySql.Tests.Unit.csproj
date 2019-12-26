@@ -15,6 +15,7 @@
 	  <EmbeddedResource Include="Queries\InsertStoredProcedure.sql" />
 	  <EmbeddedResource Include="Queries\SelectPagedQuery.sql" />
 	  <EmbeddedResource Include="Queries\SelectPagedQueryWithWhereClause.sql" />
+	  <EmbeddedResource Include="Queries\SelectPagedWithWhereClauseStoredProcedure.sql" />
 	  <EmbeddedResource Include="Queries\SelectTopQuery.sql" />
 	  <EmbeddedResource Include="Queries\SelectTopQueryWithWhereClause.sql" />
 	  <EmbeddedResource Include="Queries\UpdateQuery.sql" />

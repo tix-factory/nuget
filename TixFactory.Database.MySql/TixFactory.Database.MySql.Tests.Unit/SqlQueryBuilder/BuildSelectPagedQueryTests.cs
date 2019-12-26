@@ -38,5 +38,25 @@ namespace TixFactory.Database.MySql.Tests.Unit
 
 			return query.Query;
 		}
+
+		private static IEnumerable<TestCaseData> BuildSelectPagedStordProcedureTestCases
+		{
+			get
+			{
+				yield return new TestCaseData(_WhereExpression, false)
+					.SetName("{m}_WithWhereClause_ReturnsSelectQuery")
+					.Returns(GetQuery("SelectPagedWithWhereClauseStoredProcedure"));
+			}
+		}
+
+		[TestCaseSource(nameof(BuildSelectPagedStordProcedureTestCases))]
+		public string BuildSelectPagedStordProcedure(LambdaExpression whereExpression, bool useDelimiter)
+		{
+			var query = _SqlQueryBuilder.BuildSelectPagedQuery(new OrderBy<TestTable>(nameof(TestTable.Id)), whereExpression);
+			var storedProcedure = _SqlQueryBuilder.BuildCreateStoredProcedureQuery(_DatabaseName, "test_table_select_paged", query, useDelimiter);
+
+			Assert.That(storedProcedure.Parameters, Is.Empty);
+			return storedProcedure.Query;
+		}
 	}
 }
