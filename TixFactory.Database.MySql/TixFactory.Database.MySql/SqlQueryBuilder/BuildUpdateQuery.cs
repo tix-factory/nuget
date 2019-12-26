@@ -9,9 +9,14 @@ namespace TixFactory.Database.MySql
 	public partial class SqlQueryBuilder
 	{
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildUpdateQuery{TRow}"/>
-		public ISqlQuery BuildUpdateQuery<TRow>(LambdaExpression whereExpression = null)
+		public ISqlQuery BuildUpdateQuery<TRow>(LambdaExpression whereExpression)
 			where TRow : class
 		{
+			if (whereExpression == null)
+			{
+				throw new ArgumentNullException(nameof(whereExpression));
+			}
+
 			var updateColumns = GetInsertColumns<TRow>(isUpdate: true);
 			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
@@ -28,7 +33,7 @@ namespace TixFactory.Database.MySql
 			var query = CompileTemplate<UpdateQuery>(templateVariables);
 
 			var parameters = updateColumns.Where(c => !string.IsNullOrWhiteSpace(c.ParameterName)).Select(TranslateParameter).ToList();
-			var whereClauseParameters = whereExpression.Parameters.Skip(1).Where(p => parameters.All(existingParameter => !existingParameter.Name.Equals(p.Name, StringComparison.OrdinalIgnoreCase)));
+			var whereClauseParameters = expressionParameters.Skip(1).Where(p => parameters.All(existingParameter => !existingParameter.Name.Equals(p.Name, StringComparison.OrdinalIgnoreCase)));
 			parameters.AddRange(whereClauseParameters.Select(TranslateParameter));
 
 			return new SqlQuery(query, parameters);

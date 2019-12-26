@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using TixFactory.Database.MySql.Templates;
 
@@ -8,9 +9,14 @@ namespace TixFactory.Database.MySql
 	public partial class SqlQueryBuilder
 	{
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildDeleteQuery{TRow}"/>
-		public ISqlQuery BuildDeleteQuery<TRow>(LambdaExpression whereExpression = null)
+		public ISqlQuery BuildDeleteQuery<TRow>(LambdaExpression whereExpression)
 			where TRow : class
 		{
+			if (whereExpression == null)
+			{
+				throw new ArgumentNullException(nameof(whereExpression));
+			}
+
 			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
 			var (whereClause, expressionParameters) = ParseWhereExpression<TRow>(whereExpression, nameof(whereExpression), entityColumnAliases);
