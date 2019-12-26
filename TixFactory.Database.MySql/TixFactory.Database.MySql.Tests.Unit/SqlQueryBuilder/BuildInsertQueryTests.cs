@@ -26,5 +26,25 @@ namespace TixFactory.Database.MySql.Tests.Unit
 
 			return query.Query;
 		}
+
+		private static IEnumerable<TestCaseData> BuildInsertStoredProcedureTestCases
+		{
+			get
+			{
+				yield return new TestCaseData(false)
+					.SetName("{m}_ValidTableClass_ReturnsInsertStoredProcedure")
+					.Returns(GetQuery("InsertStoredProcedure"));
+			}
+		}
+
+		[TestCaseSource(nameof(BuildInsertStoredProcedureTestCases))]
+		public string BuildInsertStoredProcedure(bool useDelimiter)
+		{
+			var query = _SqlQueryBuilder.BuildInsertQuery<TestTable>();
+			var insertStoredProcedure = _SqlQueryBuilder.BuildCreateStoredProcedureQuery(_DatabaseName, "test_table_insert", query, useDelimiter);
+
+			Assert.That(insertStoredProcedure.Parameters, Is.Empty);
+			return insertStoredProcedure.Query;
+		}
 	}
 }

@@ -12,6 +12,7 @@
 	  <EmbeddedResource Include="Queries\CreateTableQuery.sql" />
 	  <EmbeddedResource Include="Queries\DeleteQuery.sql" />
 	  <EmbeddedResource Include="Queries\InsertQuery.sql" />
+	  <EmbeddedResource Include="Queries\InsertStoredProcedure.sql" />
 	  <EmbeddedResource Include="Queries\SelectPagedQuery.sql" />
 	  <EmbeddedResource Include="Queries\SelectPagedQueryWithWhereClause.sql" />
 	  <EmbeddedResource Include="Queries\SelectTopQuery.sql" />
