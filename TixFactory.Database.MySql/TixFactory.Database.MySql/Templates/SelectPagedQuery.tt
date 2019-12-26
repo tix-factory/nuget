@@ -12,7 +12,7 @@ IF (@<#= SqlQueryBuilder._IsAscendingParameterName #> = 1) THEN
     ELSE
         SELECT *
             FROM `<#= Vars.DatabaseName #>`.`<#= Vars.TableName #>`
-            WHERE (`<#= Vars.OrderBy #>` > @<#= SqlQueryBuilder._ExclusiveStartParameterName #>) <#= string.IsNullOrWhiteSpace(Vars.WhereClause) ? "" : "AND " + Vars.WhereClause #>
+            WHERE (`<#= Vars.OrderBy #>` > @<#= SqlQueryBuilder._ExclusiveStartParameterName #>)<#= string.IsNullOrWhiteSpace(Vars.WhereClause) ? "" : " AND " + Vars.WhereClause #>
             ORDER BY `<#= Vars.OrderBy #>` ASC
             LIMIT @<#= SqlQueryBuilder._CountParameterName #>;
     END IF;
@@ -25,7 +25,7 @@ ELSE
     ELSE
         SELECT *
             FROM `<#= Vars.DatabaseName #>`.`<#= Vars.TableName #>`
-            WHERE (`<#= Vars.OrderBy #>` < @<#= SqlQueryBuilder._ExclusiveStartParameterName #>) <#= string.IsNullOrWhiteSpace(Vars.WhereClause) ? "" : "AND " + Vars.WhereClause #>
+            WHERE (`<#= Vars.OrderBy #>` < @<#= SqlQueryBuilder._ExclusiveStartParameterName #>)<#= string.IsNullOrWhiteSpace(Vars.WhereClause) ? "" : " AND " + Vars.WhereClause #>
             ORDER BY `<#= Vars.OrderBy #>` DESC
             LIMIT @<#= SqlQueryBuilder._CountParameterName #>;
     END IF;

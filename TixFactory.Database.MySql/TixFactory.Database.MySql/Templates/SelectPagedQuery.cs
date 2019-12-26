@@ -95,10 +95,10 @@ namespace TixFactory.Database.MySql.Templates
             
             #line default
             #line hidden
-            this.Write(") ");
+            this.Write(")");
             
             #line 15 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(string.IsNullOrWhiteSpace(Vars.WhereClause) ? "" : "AND " + Vars.WhereClause));
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.IsNullOrWhiteSpace(Vars.WhereClause) ? "" : " AND " + Vars.WhereClause));
             
             #line default
             #line hidden
@@ -179,10 +179,10 @@ namespace TixFactory.Database.MySql.Templates
             
             #line default
             #line hidden
-            this.Write(") ");
+            this.Write(")");
             
             #line 28 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(string.IsNullOrWhiteSpace(Vars.WhereClause) ? "" : "AND " + Vars.WhereClause));
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.IsNullOrWhiteSpace(Vars.WhereClause) ? "" : " AND " + Vars.WhereClause));
             
             #line default
             #line hidden

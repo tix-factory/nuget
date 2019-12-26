@@ -59,9 +59,9 @@ namespace TixFactory.Database.MySql
 			// Prefer MySqlDbType.VarBinary for string: https://dev.mysql.com/doc/refman/8.0/en/binary-varbinary.html (stores in bytes rather than characters)
 			var parseableTypes = new[]
 			{
-				_Bit,
 				_Bool,
 				_Boolean,
+				_Bit,
 				_Date,
 				_Time,
 				_TimeStamp,
