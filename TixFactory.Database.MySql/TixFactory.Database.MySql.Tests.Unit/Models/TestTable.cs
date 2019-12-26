@@ -18,6 +18,10 @@ namespace TixFactory.Database.MySql.Tests.Unit
 		[JsonConverter(typeof(Base64Converter))]
 		public string Name { get; set; }
 
+		[DataMember(Name = "Description")]
+		[DataType("TEXT")]
+		public string Description { get; set; }
+
 		[DataMember(Name = "Value")]
 		public int? Value { get; set; }
 

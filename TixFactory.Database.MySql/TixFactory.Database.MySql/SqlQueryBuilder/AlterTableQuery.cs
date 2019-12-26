@@ -24,12 +24,12 @@ namespace TixFactory.Database.MySql
 
 			if (beforeProperty != null)
 			{
-				var beforeColumn = new CreateTableColumn(beforeProperty, _DatabaseTypeParser);
-				afterQuery += $"\n\tAFTER `{beforeColumn.ColumnName}`";
+				var beforeColumn = new TableColumn(beforeProperty, _DatabaseTypeParser);
+				afterQuery += $"\n\tAFTER `{beforeColumn.Name}`";
 			}
 
-			var createColumn = new CreateTableColumn(property, _DatabaseTypeParser);
-			var query = $"ALTER TABLE `{databaseName}`.`{tableName}`\n\tADD `{createColumn.ColumnName}` {createColumn.DatabaseType}";
+			var createColumn = new TableColumn(property, _DatabaseTypeParser);
+			var query = $"ALTER TABLE `{databaseName}`.`{tableName}`\n\tADD `{createColumn.Name}` {createColumn.DatabaseType}";
 			query += $"{afterQuery};";
 
 			return new SqlQuery(query, Array.Empty<SqlQueryParameter>());

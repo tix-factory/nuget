@@ -7,7 +7,7 @@
 UPDATE `<#= Vars.DatabaseName #>`.`<#= Vars.TableName #>`
 SET
 <# foreach (var column in Vars.Columns) { #>
-	`<#= column.ColumnName #>` = <#= column.InsertValue #><#= column == Vars.Columns.ElementAt(Vars.Columns.Count - 1) ? "" : "," #>
+	`<#= column.Name #>` = <#= column.InsertValue #><#= column == Vars.Columns.ElementAt(Vars.Columns.Count - 1) ? "" : "," #>
 <# } #>
 WHERE <#= Vars.WhereClause #>
 LIMIT 1;

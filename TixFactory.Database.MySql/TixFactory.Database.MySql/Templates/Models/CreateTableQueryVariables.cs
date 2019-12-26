@@ -6,6 +6,6 @@ namespace TixFactory.Database.MySql.Templates
 	{
 		public string TableName { get; set; }
 
-		public IReadOnlyCollection<CreateTableColumn> Columns { get; set; }
+		public IReadOnlyCollection<TableColumn> Columns { get; set; }
 	}
 }

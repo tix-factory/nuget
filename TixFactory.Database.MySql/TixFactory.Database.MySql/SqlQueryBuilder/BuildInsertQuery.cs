@@ -30,7 +30,7 @@ namespace TixFactory.Database.MySql
 			where TRow : class
 		{
 			var properties = typeof(TRow).GetProperties();
-			return properties.Select(p => new InsertColumn(p, isUpdate)).ToArray();
+			return properties.Select(p => new InsertColumn(p, isUpdate, _DatabaseTypeParser)).ToArray();
 		}
 
 		private SqlQueryParameter TranslateParameter(InsertColumn column)

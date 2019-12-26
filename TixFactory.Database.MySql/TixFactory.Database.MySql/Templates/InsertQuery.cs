@@ -50,7 +50,7 @@ namespace TixFactory.Database.MySql.Templates
             this.Write("\t`");
             
             #line 10 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\InsertQuery.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(column.ColumnName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(column.Name));
             
             #line default
             #line hidden

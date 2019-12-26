@@ -7,7 +7,7 @@
 INSERT INTO `<#= Vars.DatabaseName #>`.`<#= Vars.TableName #>`
 (
 <# foreach (var column in Vars.Columns) { #>
-	`<#= column.ColumnName #>`<#= column == Vars.Columns.ElementAt(Vars.Columns.Count - 1) ? "" : "," #>
+	`<#= column.Name #>`<#= column == Vars.Columns.ElementAt(Vars.Columns.Count - 1) ? "" : "," #>
 <# } #>
 )
 VALUES

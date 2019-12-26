@@ -213,15 +213,8 @@ namespace TixFactory.Database.MySql
 
 			foreach (var property in rowProperties)
 			{
-				var dataMember = property.GetCustomAttribute<DataMemberAttribute>();
-				if (string.IsNullOrWhiteSpace(dataMember?.Name))
-				{
-					aliases[property.Name] = property.Name;
-				}
-				else
-				{
-					aliases[property.Name] = dataMember.Name;
-				}
+				var column = new TableColumn(property, _DatabaseTypeParser);
+				aliases[property.Name] = column.Name;
 			}
 
 			return aliases;

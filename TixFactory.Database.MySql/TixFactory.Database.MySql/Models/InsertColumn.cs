@@ -1,24 +1,21 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 
 namespace TixFactory.Database.MySql
 {
-	internal class InsertColumn
+	internal class InsertColumn : TableColumn
 	{
 		public PropertyInfo Property { get; }
 
 		public string ParameterName { get; }
 
-		public string ColumnName { get; }
-
 		public string InsertValue { get; }
 
-		public InsertColumn(PropertyInfo property, bool isUpdate)
+		public InsertColumn(PropertyInfo property, bool isUpdate, IDatabaseTypeParser databaseTypeParser)
+			: base(property, databaseTypeParser)
 		{
 			Property = property ?? throw new ArgumentNullException(nameof(property));
-			ColumnName = GetColumnName(property);
 
 			if (isUpdate)
 			{
@@ -54,17 +51,6 @@ namespace TixFactory.Database.MySql
 			where T : Attribute
 		{
 			return property.GetCustomAttributes<T>(inherit: true).Any();
-		}
-
-		private string GetColumnName(PropertyInfo property)
-		{
-			var dataMemberAttribute = property.GetCustomAttribute<DataMemberAttribute>();
-			if (string.IsNullOrWhiteSpace(dataMemberAttribute?.Name))
-			{
-				return property.Name;
-			}
-
-			return dataMemberAttribute.Name;
 		}
 	}
 }

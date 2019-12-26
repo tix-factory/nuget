@@ -42,9 +42,9 @@ namespace TixFactory.Database.MySql
 			return null;
 		}
 
-		private CreateTableColumn TranslateToCreateTableColumn(PropertyInfo property)
+		private TableColumn TranslateToCreateTableColumn(PropertyInfo property)
 		{
-			return new CreateTableColumn(property, _DatabaseTypeParser);
+			return new TableColumn(property, _DatabaseTypeParser);
 		}
 	}
 }
