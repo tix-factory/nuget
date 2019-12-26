@@ -9,6 +9,7 @@
 	<ItemGroup>
 	  <EmbeddedResource Include="Queries\CountQuery.sql" />
 	  <EmbeddedResource Include="Queries\CountQueryWithWhereClause.sql" />
+	  <EmbeddedResource Include="Queries\DeleteQuery.sql" />
 	  <EmbeddedResource Include="Queries\InsertQuery.sql" />
 	  <EmbeddedResource Include="Queries\UpdateQuery.sql" />
 	</ItemGroup>
