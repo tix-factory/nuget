@@ -6,42 +6,17 @@ namespace TixFactory.Database.MySql.Tests.Unit
 {
 	public partial class SqlQueryBuilderTests
 	{
-		[TestCase(ExpectedResult = "SELECT COUNT(*) as `Count`\r\n\tFROM `" + _DatabaseName + "`.`" + _TableName + "`;")]
-		public string BuildCountQuery_NoParameters_ReturnsCountQuery()
-		{
-			var query = _SqlQueryBuilder.BuildCountQuery<TestTable>();
-
-			Assert.That(query.Parameters, Is.Empty, "Expected COUNT query to not have parameters.");
-			return query.Query;
-		}
-
 		private static IEnumerable<TestCaseData> BuildCountQueryTestCases
 		{
 			get
 			{
-				yield return new TestCaseData(_WhereExpressionWithoutParameters)
-					.SetName("{m}_WhereWithNoParameters_ReturnsCountQuery")
-					.Returns("SELECT COUNT(*) as `Count`\r\n\tFROM `" + _DatabaseName + "`.`" + _TableName + "`\r\n\tWHERE " + _NoParameterWhereClause + ";");
+				yield return new TestCaseData(null)
+					.SetName("{m}_NullWhereClause_ReturnsCountQuery")
+					.Returns(GetQuery("CountQuery"));
 
-				yield return new TestCaseData(_WhereExpressionWithOneParameter)
-					.SetName("{m}_WhereWithOneParameter_ReturnsCountQuery")
-					.Returns("SELECT COUNT(*) as `Count`\r\n\tFROM `" + _DatabaseName + "`.`" + _TableName + "`\r\n\tWHERE " + _OneParameterWhereClause + ";");
-
-				yield return new TestCaseData(_WhereExpressionWithTwoParameters)
-					.SetName("{m}_WhereWithTwoParameters_ReturnsCountQuery")
-					.Returns("SELECT COUNT(*) as `Count`\r\n\tFROM `" + _DatabaseName + "`.`" + _TableName + "`\r\n\tWHERE " + _TwoParameterWhereClause + ";");
-
-				yield return new TestCaseData(_WhereExpressionWithThreeParameters)
-					.SetName("{m}_WhereWithThreeParameters_ReturnsCountQuery")
-					.Returns("SELECT COUNT(*) as `Count`\r\n\tFROM `" + _DatabaseName + "`.`" + _TableName + "`\r\n\tWHERE " + _ThreeParameterWhereClause + ";");
-
-				yield return new TestCaseData(_WhereExpressionWithFourParameters)
-					.SetName("{m}_WhereWithFourParameters_ReturnsCountQuery")
-					.Returns("SELECT COUNT(*) as `Count`\r\n\tFROM `" + _DatabaseName + "`.`" + _TableName + "`\r\n\tWHERE " + _FourParameterWhereClause + ";");
-
-				yield return new TestCaseData(_WhereExpressionWithFiveParameters)
-					.SetName("{m}_WhereWithFiveParameters_ReturnsCountQuery")
-					.Returns("SELECT COUNT(*) as `Count`\r\n\tFROM `" + _DatabaseName + "`.`" + _TableName + "`\r\n\tWHERE " + _FiveParameterWhereClause + ";");
+				yield return new TestCaseData(_WhereExpression)
+					.SetName("{m}_WithWhereClause_ReturnsCountQuery")
+					.Returns(GetQuery("CountQueryWithWhereClause"));
 			}
 		}
 
@@ -50,7 +25,15 @@ namespace TixFactory.Database.MySql.Tests.Unit
 		{
 			var query = _SqlQueryBuilder.BuildCountQuery<TestTable>(whereExpression);
 
-			Assert.That(query.Parameters.Count, Is.EqualTo(whereExpression.Parameters.Count - 1));
+			if (whereExpression == null)
+			{
+				Assert.That(query.Parameters, Is.Empty, "Expected no parameters for query without WHERE clause.");
+			}
+			else
+			{
+				Assert.That(query.Parameters.Count, Is.EqualTo(whereExpression.Parameters.Count - 1));
+			}
+
 			return query.Query;
 		}
 	}

@@ -1,7 +1,9 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace TixFactory.Database.MySql.Tests.Unit
 {
@@ -11,20 +13,8 @@ namespace TixFactory.Database.MySql.Tests.Unit
 		private const string _DatabaseName = TestTable._DatabaseName;
 		private const string _TableName = TestTable._TableName;
 		private const string _ColumnName = "test_column";
-
-		private const string _NoParameterWhereClause = "(`ID` > 0)";
-		private const string _OneParameterWhereClause = "(`ID` > @id)";
-		private const string _TwoParameterWhereClause = "((`ID` > @id) AND (`Value` = @value))";
-		private const string _ThreeParameterWhereClause = "(((`ID` > @id) AND (`Value` = @value)) AND LOWER(`Name`) LIKE CONCAT(LOWER(@name), '%'))";
-		private const string _FourParameterWhereClause = "((((`ID` > @id) AND (`Value` = @value)) AND LOWER(`Name`) LIKE CONCAT(LOWER(@name), '%')) AND LOWER(`Description`) LIKE CONCAT('%', LOWER(@description), '%'))";
-		private const string _FiveParameterWhereClause = "(((((`ID` > @id) AND (`Value` = @value)) AND LOWER(`Name`) LIKE CONCAT(LOWER(@name), '%')) AND LOWER(`Description`) LIKE CONCAT('%', LOWER(@description), '%')) AND (`Created` > @created))";
-
-		private static readonly Expression<Func<TestTable, bool>> _WhereExpressionWithoutParameters = (row) => row.Id > 0;
-		private static readonly Expression<Func<TestTable, long, bool>> _WhereExpressionWithOneParameter = (row, id) => row.Id > id;
-		private static readonly Expression<Func<TestTable, long, int?, bool>> _WhereExpressionWithTwoParameters = (row, id, value) => row.Id > id && row.Value == value;
-		private static readonly Expression<Func<TestTable, long, int?, string, bool>> _WhereExpressionWithThreeParameters = (row, id, value, name) => row.Id > id && row.Value == value && row.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase);
-		private static readonly Expression<Func<TestTable, long, int?, string, string, bool>> _WhereExpressionWithFourParameters = (row, id, value, name, description) => row.Id > id && row.Value == value && row.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase) && row.Description.Contains(description, StringComparison.OrdinalIgnoreCase);
-		private static readonly Expression<Func<TestTable, long, int?, string, string, DateTime, bool>> _WhereExpressionWithFiveParameters = (row, id, value, name, description, created) => row.Id > id && row.Value == value && row.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase) && row.Description.Contains(description, StringComparison.OrdinalIgnoreCase) && row.Created > created;
+		
+		private static readonly Expression<Func<TestTable, long, bool>> _WhereExpression = (row, id) => row.Id > id;
 
 		private IDatabaseTypeParser _DatabaseTypeParser;
 		private SqlQueryBuilder _SqlQueryBuilder;
@@ -34,6 +24,18 @@ namespace TixFactory.Database.MySql.Tests.Unit
 		{
 			_DatabaseTypeParser = new DatabaseTypeParser();
 			_SqlQueryBuilder = new SqlQueryBuilder(_DatabaseTypeParser);
+		}
+
+		private static string GetQuery(string queryName)
+		{
+			var assembly = Assembly.GetExecutingAssembly();
+			var resourceName = $"{typeof(SqlQueryBuilderTests).Namespace}.Queries.{queryName}.sql";
+
+			using (var stream = assembly.GetManifestResourceStream(resourceName))
+			using (var reader = new StreamReader(stream))
+			{
+				return reader.ReadToEnd();
+			}
 		}
 	}
 }
