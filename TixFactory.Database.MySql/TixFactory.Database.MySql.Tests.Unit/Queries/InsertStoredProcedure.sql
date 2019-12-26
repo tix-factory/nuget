@@ -2,7 +2,7 @@ USE `test_database`;
 CREATE PROCEDURE `test_table_insert`(
 	IN _Name VARBINARY(50),
 	IN _Description TEXT,
-	IN _Value INTEGER NULL
+	IN _Value INTEGER
 )
 BEGIN
 	INSERT INTO `test_database`.`test_table`

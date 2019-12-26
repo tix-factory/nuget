@@ -10,6 +10,7 @@ BEGIN
 	    IF (_ExclusiveStart IS NULL) THEN
 	        SELECT *
 	            FROM `test_database`.`test_table`
+				WHERE (`ID` = _id)
 	            ORDER BY `ID` ASC
 	            LIMIT _Count;
 	    ELSE
@@ -23,6 +24,7 @@ BEGIN
 	    IF (_ExclusiveStart IS NULL) THEN
 	        SELECT *
 	            FROM `test_database`.`test_table`
+				WHERE (`ID` = _id)
 	            ORDER BY `ID` DESC
 	            LIMIT _Count;
 	    ELSE

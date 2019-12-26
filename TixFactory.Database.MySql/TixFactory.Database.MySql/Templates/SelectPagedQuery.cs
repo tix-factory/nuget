@@ -53,140 +53,133 @@ namespace TixFactory.Database.MySql.Templates
             
             #line default
             #line hidden
-            this.Write("`\r\n            ORDER BY `");
+            this.Write("`\r\n");
             
             #line 10 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+ if (!string.IsNullOrWhiteSpace(Vars.WhereClause)) { 
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\tWHERE ");
+            
+            #line 11 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.WhereClause));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n");
+            
+            #line 12 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("            ORDER BY `");
+            
+            #line 13 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Vars.OrderBy));
             
             #line default
             #line hidden
             this.Write("` ASC\r\n            LIMIT @");
             
-            #line 11 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            #line 14 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(SqlQueryBuilder._CountParameterName));
             
             #line default
             #line hidden
             this.Write(";\r\n    ELSE\r\n        SELECT *\r\n            FROM `");
             
-            #line 14 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            #line 17 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Vars.DatabaseName));
             
             #line default
             #line hidden
             this.Write("`.`");
             
-            #line 14 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            #line 17 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Vars.TableName));
             
             #line default
             #line hidden
             this.Write("`\r\n            WHERE (`");
             
-            #line 15 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            #line 18 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Vars.OrderBy));
             
             #line default
             #line hidden
             this.Write("` > @");
             
-            #line 15 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            #line 18 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(SqlQueryBuilder._ExclusiveStartParameterName));
             
             #line default
             #line hidden
             this.Write(")");
             
-            #line 15 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            #line 18 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(string.IsNullOrWhiteSpace(Vars.WhereClause) ? "" : " AND " + Vars.WhereClause));
             
             #line default
             #line hidden
             this.Write("\r\n            ORDER BY `");
             
-            #line 16 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            #line 19 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Vars.OrderBy));
             
             #line default
             #line hidden
             this.Write("` ASC\r\n            LIMIT @");
             
-            #line 17 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            #line 20 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(SqlQueryBuilder._CountParameterName));
             
             #line default
             #line hidden
             this.Write(";\r\n    END IF;\r\nELSE\r\n    IF (@");
             
-            #line 20 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            #line 23 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(SqlQueryBuilder._ExclusiveStartParameterName));
             
             #line default
             #line hidden
             this.Write(" IS NULL) THEN\r\n        SELECT *\r\n            FROM `");
             
-            #line 22 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            #line 25 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Vars.DatabaseName));
             
             #line default
             #line hidden
             this.Write("`.`");
             
-            #line 22 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            #line 25 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Vars.TableName));
             
             #line default
             #line hidden
-            this.Write("`\r\n            ORDER BY `");
+            this.Write("`\r\n");
             
-            #line 23 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.OrderBy));
-            
-            #line default
-            #line hidden
-            this.Write("` DESC\r\n            LIMIT @");
-            
-            #line 24 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(SqlQueryBuilder._CountParameterName));
+            #line 26 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+ if (!string.IsNullOrWhiteSpace(Vars.WhereClause)) { 
             
             #line default
             #line hidden
-            this.Write(";\r\n    ELSE\r\n        SELECT *\r\n            FROM `");
+            this.Write("\t\t\tWHERE ");
             
             #line 27 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.DatabaseName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.WhereClause));
             
             #line default
             #line hidden
-            this.Write("`.`");
-            
-            #line 27 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.TableName));
-            
-            #line default
-            #line hidden
-            this.Write("`\r\n            WHERE (`");
+            this.Write("\r\n");
             
             #line 28 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.OrderBy));
+ } 
             
             #line default
             #line hidden
-            this.Write("` < @");
-            
-            #line 28 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(SqlQueryBuilder._ExclusiveStartParameterName));
-            
-            #line default
-            #line hidden
-            this.Write(")");
-            
-            #line 28 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(string.IsNullOrWhiteSpace(Vars.WhereClause) ? "" : " AND " + Vars.WhereClause));
-            
-            #line default
-            #line hidden
-            this.Write("\r\n            ORDER BY `");
+            this.Write("            ORDER BY `");
             
             #line 29 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Vars.OrderBy));
@@ -196,6 +189,55 @@ namespace TixFactory.Database.MySql.Templates
             this.Write("` DESC\r\n            LIMIT @");
             
             #line 30 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(SqlQueryBuilder._CountParameterName));
+            
+            #line default
+            #line hidden
+            this.Write(";\r\n    ELSE\r\n        SELECT *\r\n            FROM `");
+            
+            #line 33 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.DatabaseName));
+            
+            #line default
+            #line hidden
+            this.Write("`.`");
+            
+            #line 33 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.TableName));
+            
+            #line default
+            #line hidden
+            this.Write("`\r\n            WHERE (`");
+            
+            #line 34 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.OrderBy));
+            
+            #line default
+            #line hidden
+            this.Write("` < @");
+            
+            #line 34 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(SqlQueryBuilder._ExclusiveStartParameterName));
+            
+            #line default
+            #line hidden
+            this.Write(")");
+            
+            #line 34 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.IsNullOrWhiteSpace(Vars.WhereClause) ? "" : " AND " + Vars.WhereClause));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n            ORDER BY `");
+            
+            #line 35 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.OrderBy));
+            
+            #line default
+            #line hidden
+            this.Write("` DESC\r\n            LIMIT @");
+            
+            #line 36 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\SelectPagedQuery.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(SqlQueryBuilder._CountParameterName));
             
             #line default

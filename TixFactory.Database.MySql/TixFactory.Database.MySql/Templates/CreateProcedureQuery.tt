@@ -12,7 +12,7 @@ USE `<#= Vars.DatabaseName #>`<#= Vars.Delimiter #>
 CREATE PROCEDURE `<#= Vars.StoredProcedureName #>`(
 <# foreach (var parameter in Vars.Parameters) { #>
 <# // // Prefix variables with underscores to prevent issues where the the column names match the variable names. #>
-	<#= GetParameterDirectionText(parameter.ParameterDirection) #> _<#= parameter.Name #> <#= parameter.DatabaseTypeName + (parameter == Vars.Parameters.ElementAt(Vars.Parameters.Count - 1) ? "" : ",") #>
+	<#= GetParameterDirectionText(parameter.ParameterDirection) #> _<#= parameter.Name #> <#= StripParameterInputType(parameter.DatabaseTypeName) + (parameter == Vars.Parameters.ElementAt(Vars.Parameters.Count - 1) ? "" : ",") #>
 <# } #>)
 BEGIN
 	<#= string.Join("\n\t", StripQuery(Vars.Query).Split('\n')) #>
@@ -25,6 +25,10 @@ DELIMITER ;
 <#+
 private string StripQuery(string query) {
 	return query.Replace("@", "_");
+}
+
+private string StripParameterInputType(string inputType) {
+	return inputType.Replace(" NULL", "");
 }
 
 private string GetParameterDirectionText(ParameterDirection direction) {

@@ -99,7 +99,7 @@ namespace TixFactory.Database.MySql.Templates
             this.Write(" ");
             
             #line 15 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\CreateProcedureQuery.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(parameter.DatabaseTypeName + (parameter == Vars.Parameters.ElementAt(Vars.Parameters.Count - 1) ? "" : ",")));
+            this.Write(this.ToStringHelper.ToStringWithCulture(StripParameterInputType(parameter.DatabaseTypeName) + (parameter == Vars.Parameters.ElementAt(Vars.Parameters.Count - 1) ? "" : ",")));
             
             #line default
             #line hidden
@@ -146,6 +146,10 @@ namespace TixFactory.Database.MySql.Templates
 
 private string StripQuery(string query) {
 	return query.Replace("@", "_");
+}
+
+private string StripParameterInputType(string inputType) {
+	return inputType.Replace(" NULL", "");
 }
 
 private string GetParameterDirectionText(ParameterDirection direction) {

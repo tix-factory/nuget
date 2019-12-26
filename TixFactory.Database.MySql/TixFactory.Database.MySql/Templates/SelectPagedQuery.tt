@@ -7,6 +7,9 @@ IF (@<#= SqlQueryBuilder._IsAscendingParameterName #> = 1) THEN
     IF (@<#= SqlQueryBuilder._ExclusiveStartParameterName #> IS NULL) THEN
         SELECT *
             FROM `<#= Vars.DatabaseName #>`.`<#= Vars.TableName #>`
+<# if (!string.IsNullOrWhiteSpace(Vars.WhereClause)) { #>
+			WHERE <#= Vars.WhereClause #>
+<# } #>
             ORDER BY `<#= Vars.OrderBy #>` ASC
             LIMIT @<#= SqlQueryBuilder._CountParameterName #>;
     ELSE
@@ -20,6 +23,9 @@ ELSE
     IF (@<#= SqlQueryBuilder._ExclusiveStartParameterName #> IS NULL) THEN
         SELECT *
             FROM `<#= Vars.DatabaseName #>`.`<#= Vars.TableName #>`
+<# if (!string.IsNullOrWhiteSpace(Vars.WhereClause)) { #>
+			WHERE <#= Vars.WhereClause #>
+<# } #>
             ORDER BY `<#= Vars.OrderBy #>` DESC
             LIMIT @<#= SqlQueryBuilder._CountParameterName #>;
     ELSE

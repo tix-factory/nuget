@@ -2,6 +2,7 @@
     IF (@ExclusiveStart IS NULL) THEN
         SELECT *
             FROM `test_database`.`test_table`
+			WHERE (`ID` = @id)
             ORDER BY `ID` ASC
             LIMIT @Count;
     ELSE
@@ -15,6 +16,7 @@ ELSE
     IF (@ExclusiveStart IS NULL) THEN
         SELECT *
             FROM `test_database`.`test_table`
+			WHERE (`ID` = @id)
             ORDER BY `ID` DESC
             LIMIT @Count;
     ELSE
