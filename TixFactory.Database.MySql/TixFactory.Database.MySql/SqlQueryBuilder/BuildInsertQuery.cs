@@ -37,9 +37,7 @@ namespace TixFactory.Database.MySql
 
 		private SqlQueryParameter TranslateParameter(InsertColumn column)
 		{
-			var mySqlType = _DatabaseTypeParser.GetMySqlType(column.Property.PropertyType);
-			var databaseTypeName = _DatabaseTypeParser.GetDatabaseTypeName(mySqlType);
-			return new SqlQueryParameter(column.ParameterName, databaseTypeName, length: null, parameterDirection: ParameterDirection.Input);
+			return new SqlQueryParameter(column.ParameterName, column.DatabaseType, length: null, parameterDirection: ParameterDirection.Input);
 		}
 	}
 }

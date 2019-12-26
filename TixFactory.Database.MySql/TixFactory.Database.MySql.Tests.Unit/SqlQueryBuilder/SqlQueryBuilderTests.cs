@@ -14,7 +14,7 @@ namespace TixFactory.Database.MySql.Tests.Unit
 		private const string _TableName = TestTable._TableName;
 		private const string _ColumnName = "test_column";
 		
-		private static readonly Expression<Func<TestTable, long, bool>> _WhereExpression = (row, id) => row.Id > id;
+		private static readonly Expression<Func<TestTable, long, bool>> _WhereExpression = (row, id) => row.Id == id;
 
 		private IDatabaseTypeParser _DatabaseTypeParser;
 		private SqlQueryBuilder _SqlQueryBuilder;
