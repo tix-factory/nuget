@@ -15,7 +15,7 @@ namespace TixFactory.Database.MySql
 			where TRow : class
 		{
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
+			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
 
 			return BuildDeleteQuery(
 				databaseName,

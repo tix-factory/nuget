@@ -14,7 +14,7 @@ namespace TixFactory.Database.MySql
 		{
 			var updateColumns = GetInsertColumns<TRow>(isUpdate: true);
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
+			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
 
 			var templateVariables = new UpdateQueryVariables
 			{

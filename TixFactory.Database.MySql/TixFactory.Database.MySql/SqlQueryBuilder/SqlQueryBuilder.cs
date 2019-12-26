@@ -38,7 +38,31 @@ namespace TixFactory.Database.MySql
 			_DatabaseTypeParser = databaseTypeParser ?? throw new ArgumentNullException(nameof(databaseTypeParser));
 		}
 
-		internal string ParseWhereClause(Expression queryExpression, IReadOnlyCollection<ParameterExpression> expressionParameters, IDictionary<string, string> entityColumnAliases)
+		/// <summary>
+		/// Parses the entity column aliases from a <typeparamref name="TRow"/>.
+		/// </summary>
+		/// <typeparam name="TRow">The model class representing the row of a the table the query is being built for.</typeparam>
+		/// <remarks>
+		/// An entity column alias dictionary is the mapping a model property name -> table column name.
+		/// Represented by the <see cref="DataMemberAttribute"/> on the property if the property name doesn't match the table column name.
+		/// </remarks>
+		/// <returns>The dictionary mapping property name -> table column name.</returns>
+		internal IDictionary<string, string> GetEntityColumnAliases<TRow>()
+			where TRow : class
+		{
+			var aliases = new Dictionary<string, string>();
+			var rowProperties = typeof(TRow).GetProperties();
+
+			foreach (var property in rowProperties)
+			{
+				var column = new TableColumn(property, _DatabaseTypeParser);
+				aliases[property.Name] = column.Name;
+			}
+
+			return aliases;
+		}
+
+		internal string ParseWhereClause(LambdaExpression queryExpression, IDictionary<string, string> entityColumnAliases)
 		{
 			var expression = queryExpression?.ToString();
 			if (string.IsNullOrWhiteSpace(expression))
@@ -59,6 +83,7 @@ namespace TixFactory.Database.MySql
 				throw new ArgumentException($"Restricted character found in {nameof(queryExpression)}", nameof(queryExpression));
 			}
 
+			var expressionParameters = queryExpression.Parameters;
 			var entityName = expressionParameters.First().Name;
 			var parameterNames = expressionParameters.Skip(1).Select(p => p.Name).ToArray();
 
@@ -211,30 +236,6 @@ namespace TixFactory.Database.MySql
 			}
 
 			return $"{expressionMatch.Groups[1]} = {expressionMatch.Groups[2]}";
-		}
-
-		/// <summary>
-		/// Parses the entity column aliases from a <typeparamref name="TRow"/>.
-		/// </summary>
-		/// <typeparam name="TRow">The model class representing the row of a the table the query is being built for.</typeparam>
-		/// <remarks>
-		/// An entity column alias dictionary is the mapping a model property name -> table column name.
-		/// Represented by the <see cref="DataMemberAttribute"/> on the property if the property name doesn't match the table column name.
-		/// </remarks>
-		/// <returns>The dictionary mapping property name -> table column name.</returns>
-		private IDictionary<string, string> GetEntityColumnAliases<TRow>()
-			where TRow : class
-		{
-			var aliases = new Dictionary<string, string>();
-			var rowProperties = typeof(TRow).GetProperties();
-
-			foreach (var property in rowProperties)
-			{
-				var column = new TableColumn(property, _DatabaseTypeParser);
-				aliases[property.Name] = column.Name;
-			}
-
-			return aliases;
 		}
 
 		private string CompileTemplate<T>(QueryTemplateVariables templateVariables)

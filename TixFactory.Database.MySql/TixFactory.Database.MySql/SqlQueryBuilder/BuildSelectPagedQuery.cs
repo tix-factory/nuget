@@ -40,7 +40,7 @@ namespace TixFactory.Database.MySql
 			}
 
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
+			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
 
 			return BuildSelectPagedQuery(
 				databaseName,
@@ -61,7 +61,7 @@ namespace TixFactory.Database.MySql
 			}
 
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
+			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
 
 			return BuildSelectPagedQuery(
 				databaseName,
@@ -82,7 +82,7 @@ namespace TixFactory.Database.MySql
 			}
 
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
+			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
 
 			return BuildSelectPagedQuery(
 				databaseName,
@@ -103,7 +103,7 @@ namespace TixFactory.Database.MySql
 			}
 
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
+			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
 
 			return BuildSelectPagedQuery(
 				databaseName,
@@ -124,7 +124,7 @@ namespace TixFactory.Database.MySql
 			}
 
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
+			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
 
 			return BuildSelectPagedQuery(
 				databaseName,
@@ -145,7 +145,7 @@ namespace TixFactory.Database.MySql
 			}
 
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, whereExpression.Parameters, entityColumnAliases);
+			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
 
 			return BuildSelectPagedQuery(
 				databaseName,
