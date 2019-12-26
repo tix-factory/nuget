@@ -10,9 +10,5 @@
 		<ProjectReference Include="..\TixFactory.Database.MySql\TixFactory.Database.MySql.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="SqlQueryBuilder\" />
-	</ItemGroup>
-
 	<Import Project="$(RootPath)build/build.targets" />
 </Project>

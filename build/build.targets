@@ -1,7 +1,7 @@
 <Project>
 	<!-- Build properties -->
 	<PropertyGroup>
-		<DocumentationFile Condition="'$(DocumentationFile)' == ''">bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+		<DocumentationFile Condition="'$(DocumentationFile)' == '' AND $(IsTests) != 'true'">bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
 		<IsPackable Condition="'$(IsTests)' == 'true'">false</IsPackable>
 		<LangVersion>7.1</LangVersion>
 	</PropertyGroup>
