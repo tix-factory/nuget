@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using TixFactory.Configuration;
 
@@ -239,6 +240,25 @@ namespace TixFactory.Database.MySql
 			where T : class
 		{
 			var rows = new List<T>();
+			var dateTimeKinds = new List<(PropertyInfo, DateTimeKind)>();
+
+			var rowProperties = typeof(T).GetProperties();
+			foreach (var property in rowProperties)
+			{
+				var updatedColumnAttribute = property.GetCustomAttribute<UpdatedColumnAttribute>();
+				if (updatedColumnAttribute != null)
+				{
+					dateTimeKinds.Add((property, updatedColumnAttribute.DateTimeKind));
+					continue;
+				}
+
+				var createdColumnAttribute = property.GetCustomAttribute<CreatedColumnAttribute>();
+				if (createdColumnAttribute != null)
+				{
+					dateTimeKinds.Add((property, createdColumnAttribute.DateTimeKind));
+					continue;
+				}
+			}
 
 			using (var reader = command.ExecuteReader())
 			{
@@ -252,7 +272,7 @@ namespace TixFactory.Database.MySql
 
 					// TODO: Is there a better way to convert reader object -> T?
 					var serializedRow = JsonConvert.SerializeObject(row);
-					var deserializedRow = JsonConvert.DeserializeObject<T>(serializedRow);
+					var deserializedRow = DeserializeRow<T>(serializedRow, dateTimeKinds);
 
 					if (deserializedRow != default(T))
 					{
@@ -262,6 +282,33 @@ namespace TixFactory.Database.MySql
 			}
 
 			return rows;
+		}
+
+		private T DeserializeRow<T>(string serializedRow, IReadOnlyCollection<(PropertyInfo, DateTimeKind)> dateTimeKinds)
+			where T : class
+		{
+			var deserializedRow = JsonConvert.DeserializeObject<T>(serializedRow);
+			if (deserializedRow == default(T))
+			{
+				return default;
+			}
+
+			if (dateTimeKinds.Any())
+			{
+				foreach (var property in dateTimeKinds)
+				{
+					if (property.Item2 != DateTimeKind.Unspecified)
+					{
+						var currentValue = property.Item1.GetValue(deserializedRow);
+						if (currentValue is DateTime currentDate)
+						{
+							property.Item1.SetValue(deserializedRow, DateTime.SpecifyKind(currentDate, property.Item2));
+						}
+					}
+				}
+			}
+
+			return deserializedRow;
 		}
 
 		private IReadOnlyCollection<MySqlParameter> GetMySqlParameters(IDictionary<string, object> queryParameters)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace TixFactory.Database.MySql
 {
@@ -8,5 +9,26 @@ namespace TixFactory.Database.MySql
 	[AttributeUsage(AttributeTargets.Property)]
 	public class UpdatedColumnAttribute : Attribute
 	{
+		/// <summary>
+		/// The <see cref="DateTimeKind"/> for the updated date.
+		/// </summary>
+		public DateTimeKind DateTimeKind { get; }
+
+		/// <summary>
+		/// Initializes a new <see cref="CreatedColumnAttribute"/>.
+		/// </summary>
+		/// <param name="dateTimeKind">The <see cref="DateTimeKind"/>.</param>
+		/// <exception cref="InvalidEnumArgumentException">
+		/// - <paramref name="dateTimeKind"/>
+		/// </exception>
+		public UpdatedColumnAttribute(DateTimeKind dateTimeKind = DateTimeKind.Utc)
+		{
+			if (!Enum.IsDefined(typeof(DateTimeKind), dateTimeKind))
+			{
+				throw new InvalidEnumArgumentException(nameof(dateTimeKind), (int)dateTimeKind, typeof(DateTimeKind));
+			}
+
+			DateTimeKind = dateTimeKind;
+		}
 	}
 }

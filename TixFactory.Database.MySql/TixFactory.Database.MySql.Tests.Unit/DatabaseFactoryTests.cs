@@ -32,7 +32,7 @@ namespace TixFactory.Database.MySql.Tests.Unit
 		public void FakeTest()
 		{
 			var connectionString = File.ReadAllText("testconnectionstring.txt");
-			var databaseServerConnection = new DatabaseServerConnection(new Setting<string>($"{connectionString};database=test1234"));
+			var databaseServerConnection = new DatabaseServerConnection(new Setting<string>($"{connectionString};database=test_database"));
 			var databaseFactory = databaseServerConnection.BuildDatabaseFactory();
 
 			/*var testDatabase = databaseFactory.GetOrCreateDatabase("teamcity");
@@ -72,11 +72,11 @@ namespace TixFactory.Database.MySql.Tests.Unit
 
 			var serializedResult = JsonConvert.SerializeObject(queryResult);
 
-			var registered = testDatabase.RegisterStoredProcedure("test_paged_procedure", selectedPagedQuery);
+			//var registered = testDatabase.RegisterStoredProcedure("test_paged_procedure", selectedPagedQuery);
 			//var registered = testDatabase.RegisterStoredProcedure("test_stored_procedure", selectAllQuery);
 			//var dropped = testDatabase.DropStoredProcedure("test_stored_procedure");
 
-			var mySqlParameters = new Dictionary<string, object>
+			/*var mySqlParameters = new Dictionary<string, object>
 			{
 				{ "_id", int.MaxValue },
 				{ "_ExclusiveStart", 2 },
@@ -84,7 +84,7 @@ namespace TixFactory.Database.MySql.Tests.Unit
 				{ "_Count", 1 }
 			};
 
-			var result = databaseServerConnection.ExecuteStoredProcedure<object>("test_paged_procedure", mySqlParameters);
+			var result = databaseServerConnection.ExecuteStoredProcedure<object>("test_paged_procedure", mySqlParameters);*/
 
 		}
 	}
