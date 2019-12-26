@@ -9,9 +9,12 @@ namespace TixFactory.Database.MySql
 	/// <inheritdoc cref="ISqlQueryBuilder"/>
 	public partial class SqlQueryBuilder
 	{
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildCountQuery"/>
-		public ISqlQuery BuildCountQuery(string databaseName, string tableName)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildCountQuery{TRow}()"/>
+		public ISqlQuery BuildCountQuery<TRow>()
+			where TRow : class
 		{
+			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
+
 			return BuildCountQuery(
 				databaseName,
 				tableName,
@@ -19,12 +22,13 @@ namespace TixFactory.Database.MySql
 				expressionParameters: Array.Empty<ParameterExpression>());
 		}
 
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildCountQuery{TRow}"/>
-		public ISqlQuery BuildCountQuery<TRow>(string databaseName, string tableName, LambdaExpression whereExpression)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildCountQuery{TRow}(LambdaExpression)"/>
+		public ISqlQuery BuildCountQuery<TRow>(LambdaExpression whereExpression)
 			where TRow : class
 		{
 			ValidateWhereExpression<TRow>(whereExpression, nameof(whereExpression));
-
+			
+			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
 			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using TixFactory.Database.MySql.Templates;
 
 namespace TixFactory.Database.MySql
@@ -10,15 +9,10 @@ namespace TixFactory.Database.MySql
 	public partial class SqlQueryBuilder
 	{
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildCreateTableQuery{TRow}"/>
-		public ISqlQuery BuildCreateTableQuery<TRow>(string databaseName)
+		public ISqlQuery BuildCreateTableQuery<TRow>()
 			where TRow : class
 		{
-			var tableName = GetTableName<TRow>();
-			if (string.IsNullOrWhiteSpace(tableName))
-			{
-				throw new ArgumentException($"'{nameof(TRow)}' must have '{nameof(DataContractAttribute)}' with '{nameof(DataContractAttribute.Name)}' set.", nameof(TRow));
-			}
-
+			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
 			var columns = typeof(TRow).GetProperties().Select(TranslateToCreateTableColumn).ToArray();
 			var variables = new CreateTableQueryVariables
 			{
@@ -29,17 +23,6 @@ namespace TixFactory.Database.MySql
 
 			var query = CompileTemplate<CreateTableQuery>(variables);
 			return new SqlQuery(query, Array.Empty<SqlQueryParameter>());
-		}
-
-		private string GetTableName<TRow>()
-		{
-			var tableRowType = typeof(TRow);
-			if (tableRowType.GetCustomAttribute(typeof(DataContractAttribute)) is DataContractAttribute dataContractAttribute)
-			{
-				return dataContractAttribute.Name;
-			}
-
-			return null;
 		}
 
 		private TableColumn TranslateToCreateTableColumn(PropertyInfo property)

@@ -45,16 +45,16 @@ namespace TixFactory.Database.MySql.Tests.Unit
 			var storedProcedures = testDatabase.GetStoredProcedureNames();
 			
 			var sqlQueryBuilder = new SqlQueryBuilder(new DatabaseTypeParser());
-			var createTableQuery = sqlQueryBuilder.BuildCreateTableQuery<TestTable>(testDatabase.Name);
+			var createTableQuery = sqlQueryBuilder.BuildCreateTableQuery<TestTable>();
 			var selectAllQuery = sqlQueryBuilder.BuildSelectTopQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id > id, new OrderBy<TestTable>(nameof(TestTable.Id), SortOrder.Ascending));
 			var selectedPagedQuery = sqlQueryBuilder.BuildSelectPagedQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id < id, new OrderBy<TestTable>(nameof(TestTable.Id)));
 			var deleteQuery = sqlQueryBuilder.BuildDeleteQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id == id);
 			var insertQuery = sqlQueryBuilder.BuildInsertQuery<TestTable>(testDatabase.Name, testTable.Name);
 			var updateQuery = sqlQueryBuilder.BuildUpdateQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id == id);
-			var countQuery = sqlQueryBuilder.BuildCountQuery(testDatabase.Name, testTable.Name);
-			var countWhereQuery = sqlQueryBuilder.BuildCountQuery<TestTable>(testDatabase.Name, testTable.Name, (Expression<Func<TestTable, long, bool>>)((row, id) => row.Id > id));
-			var countWhereQuery2 = sqlQueryBuilder.BuildCountQuery<TestTable>(testDatabase.Name, testTable.Name, sqlQueryBuilder.BuildWhereClause((TestTable row, long id) => row.Id > id));
-			var addColumnQuery = sqlQueryBuilder.BuildAddColumnQuery<TestTable>(testDatabase.Name, nameof(TestTable.Name));
+			var countQuery = sqlQueryBuilder.BuildCountQuery<TestTable>();
+			var countWhereQuery = sqlQueryBuilder.BuildCountQuery<TestTable>((Expression<Func<TestTable, long, bool>>)((row, id) => row.Id > id));
+			var countWhereQuery2 = sqlQueryBuilder.BuildCountQuery<TestTable>(sqlQueryBuilder.BuildWhereClause((TestTable row, long id) => row.Id > id));
+			var addColumnQuery = sqlQueryBuilder.BuildAddColumnQuery<TestTable>(nameof(TestTable.Name));
 			var dropColumnQuery = sqlQueryBuilder.BuildDropColumnQuery(testDatabase.Name, testTable.Name, "Name");
 
 			/*var indexColumns = new[]

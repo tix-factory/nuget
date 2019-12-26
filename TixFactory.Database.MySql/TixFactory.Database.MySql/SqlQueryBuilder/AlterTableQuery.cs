@@ -8,7 +8,7 @@ namespace TixFactory.Database.MySql
 	public partial class SqlQueryBuilder
 	{
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildAddColumnQuery{TRow}"/>
-		public ISqlQuery BuildAddColumnQuery<TRow>(string databaseName, string propertyName)
+		public ISqlQuery BuildAddColumnQuery<TRow>(string propertyName)
 			where TRow : class
 		{
 			var tableType = typeof(TRow);
@@ -18,7 +18,7 @@ namespace TixFactory.Database.MySql
 				throw new ArgumentException($"'{propertyName}' is not valid property on '{tableType.Name}' ({nameof(TRow)})", nameof(propertyName));
 			}
 
-			var tableName = GetTableName<TRow>();
+			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
 			var beforeProperty = GetPropertyBefore<TRow>(property);
 			var afterQuery = string.Empty;
 

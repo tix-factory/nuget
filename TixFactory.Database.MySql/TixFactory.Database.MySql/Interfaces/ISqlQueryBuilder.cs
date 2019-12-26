@@ -263,20 +263,26 @@ namespace TixFactory.Database.MySql
 		/// <summary>
 		/// Builds a query to count rows in a table.
 		/// </summary>
-		/// <param name="databaseName">The database name to select in.</param>
-		/// <param name="tableName">The table name to select in.</param>
+		/// <remarks>
+		/// - The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.
+		/// - The database name is derived from the <see cref="DataContractAttribute.Namespace"/> on the <typeparamref name="TRow"/>.
+		/// </remarks>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildCountQuery(string databaseName, string tableName);
-		
+		ISqlQuery BuildCountQuery<TRow>()
+			where TRow : class;
+
 		/// <summary>
 		/// Builds a query to count rows in a table with a WHERE clause and 5 query parameters.
 		/// </summary>
+		/// <remarks>
+		/// - The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.
+		/// - The database name is derived from the <see cref="DataContractAttribute.Namespace"/> on the <typeparamref name="TRow"/>.
+		/// </remarks>
 		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <param name="databaseName">The database name to select in.</param>
-		/// <param name="tableName">The table name to select in.</param>
 		/// <param name="whereExpression">The <see cref="LambdaExpression"/> to parse into the WHERE clause.</param>
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildCountQuery<TRow>(string databaseName, string tableName, LambdaExpression whereExpression)
+		ISqlQuery BuildCountQuery<TRow>(LambdaExpression whereExpression)
 			where TRow : class;
 
 		/// <summary>
@@ -304,28 +310,28 @@ namespace TixFactory.Database.MySql
 		/// Builds a query for creating a table in a database.
 		/// </summary>
 		/// <remarks>
-		/// The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.
+		/// - The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.
+		/// - The database name is derived from the <see cref="DataContractAttribute.Namespace"/> on the <typeparamref name="TRow"/>.
 		/// </remarks>
 		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <param name="databaseName">The name of the database to create the table in.</param>
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildCreateTableQuery<TRow>(string databaseName)
+		ISqlQuery BuildCreateTableQuery<TRow>()
 			where TRow : class;
 
 		/// <summary>
 		/// Builds a query for adding a column to a table.
 		/// </summary>
 		/// <remarks>
-		/// The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.
+		/// - The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.
+		/// - The database name is derived from the <see cref="DataContractAttribute.Namespace"/> on the <typeparamref name="TRow"/>.
 		/// </remarks>
 		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <param name="databaseName">The name of the database the table is in.</param>
 		/// <param name="propertyName">The name of the property in <typeparamref name="TRow"/> to create the column query from.</param>
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
 		/// <exception cref="ArgumentException">
 		/// - <paramref name="propertyName"/> is not a valid property on <typeparamref name="TRow"/>.
 		/// </exception>
-		ISqlQuery BuildAddColumnQuery<TRow>(string databaseName, string propertyName)
+		ISqlQuery BuildAddColumnQuery<TRow>(string propertyName)
 			where TRow : class;
 
 		/// <summary>

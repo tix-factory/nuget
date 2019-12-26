@@ -7,7 +7,7 @@ namespace TixFactory.Database.MySql.Tests.Unit
 		[TestCase("NOT A PROPERTY NAME")]
 		public void BuildAddColumnQuery_InvalidPropertyName_Throws(string propertyName)
 		{
-			Assert.That(() => _SqlQueryBuilder.BuildAddColumnQuery<TestTable>(_DatabaseName, propertyName),
+			Assert.That(() => _SqlQueryBuilder.BuildAddColumnQuery<TestTable>(propertyName),
 				Throws.ArgumentException.With.Property("ParamName").EqualTo(nameof(propertyName)));
 		}
 
@@ -19,7 +19,7 @@ namespace TixFactory.Database.MySql.Tests.Unit
 		[TestCase(nameof(TestTable.Updated), ExpectedResult = "ALTER TABLE `" + _DatabaseName + "`.`" + _TableName + "`\n\tADD `Updated` DATETIME\n\tAFTER `Created`;")]
 		public string BuildAddColumnQuery_ValidPropertyName_ReturnsAddColumnQuery(string propertyName)
 		{
-			var query = _SqlQueryBuilder.BuildAddColumnQuery<TestTable>(_DatabaseName, propertyName);
+			var query = _SqlQueryBuilder.BuildAddColumnQuery<TestTable>(propertyName);
 
 			Assert.That(query.Parameters, Is.Empty, "Expected ADD COLUMN query to not have parameters.");
 			return query.Query;

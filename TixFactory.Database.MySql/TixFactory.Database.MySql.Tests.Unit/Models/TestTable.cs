@@ -7,10 +7,13 @@ using TixFactory.Serialization.Json;
 
 namespace TixFactory.Database.MySql.Tests.Unit
 {
-	[DataContract(Name = "test_table")]
+	[DataContract(Name = TestTable._TableName, Namespace = TestTable._DatabaseName)]
 	[ExcludeFromCodeCoverage]
 	public class TestTable
 	{
+		internal const string _TableName = "test_table";
+		internal const string _DatabaseName = "test_database";
+
 		[DataMember(Name = "ID")]
 		[AutoIncrementColumn]
 		public long Id { get; set; }

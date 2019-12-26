@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using TixFactory.Configuration;
@@ -114,6 +115,11 @@ namespace TixFactory.Database.MySql
 		private void ValidateWhereExpression<TRow>(LambdaExpression whereExpression, string parameterName)
 			where TRow : class
 		{
+			if (whereExpression == null)
+			{
+				throw new ArgumentNullException(parameterName);
+			}
+
 			if (whereExpression.ReturnType != typeof(bool))
 			{
 				throw new ArgumentException($"Return type of '{parameterName}' expected to be 'bool'.", parameterName);
@@ -283,6 +289,31 @@ namespace TixFactory.Database.MySql
 			var mySqlType = _DatabaseTypeParser.GetMySqlType(parameter.Type);
 			var databaseTypeName = _DatabaseTypeParser.GetDatabaseTypeName(mySqlType);
 			return new SqlQueryParameter(parameter.Name, databaseTypeName, length: null, parameterDirection: ParameterDirection.Input);
+		}
+
+		private (string TableName, string DatabaseName) GetTableNameAndDatabaseName<TRow>(string parameterName)
+		{
+			var tableRowType = typeof(TRow);
+			string tableName = null;
+			string databaseName = null;
+
+			if (tableRowType.GetCustomAttribute(typeof(DataContractAttribute)) is DataContractAttribute dataContractAttribute)
+			{
+				tableName = dataContractAttribute.Name;
+				databaseName = dataContractAttribute.Namespace;
+			}
+
+			if (string.IsNullOrWhiteSpace(tableName))
+			{
+				throw new ArgumentException($"'{parameterName}' ({tableRowType.Name}) must have '{nameof(DataContractAttribute)}' with '{nameof(DataContractAttribute.Name)}' set to the table name.", parameterName);
+			}
+
+			if (string.IsNullOrWhiteSpace(databaseName))
+			{
+				throw new ArgumentException($"'{parameterName}' ({tableRowType.Name}) must have '{nameof(DataContractAttribute)}' with '{nameof(DataContractAttribute.Namespace)}' set to the database name.", parameterName);
+			}
+
+			return (tableName, databaseName);
 		}
 	}
 }

@@ -8,8 +8,8 @@ namespace TixFactory.Database.MySql.Tests.Unit
 	[TestFixture, ExcludeFromCodeCoverage]
 	public partial class SqlQueryBuilderTests
 	{
-		private const string _DatabaseName = "test_database";
-		private const string _TableName = "test_table";
+		private const string _DatabaseName = TestTable._DatabaseName;
+		private const string _TableName = TestTable._TableName;
 		private const string _ColumnName = "test_column";
 
 		private const string _NoParameterWhereClause = "(`ID` > 0)";
