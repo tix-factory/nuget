@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using TixFactory.Configuration;
@@ -22,9 +21,9 @@ namespace TixFactory.Database.MySql
 		private readonly Regex _ExpressionCutRegex = new Regex(@"^.*=>\s*");
 		private readonly Regex _CaseInsensitiveReplacementRegex = new Regex(@"(`\w+`|@\w+)\.To(Lower|Upper)\(\)");
 		private readonly Regex _EqualReplacementRegex = new Regex(@"(`\w+`|@\w+)\.Equals\((`\w+`|@\w+),?\s*(\w*)\)");
-		private readonly Regex _ContainsReplacementRegex = new Regex(@"(`\w+`|@\w+)\.Contains\((`\w+`|@\w+)\)");
-		private readonly Regex _StartsWithReplacementRegex = new Regex(@"(`\w+`|@\w+)\.StartsWith\((`\w+`|@\w+)\)");
-		private readonly Regex _EndsWithReplacementRegex = new Regex(@"(`\w+`|@\w+)\.EndsWith\((`\w+`|@\w+)\)");
+		private readonly Regex _ContainsReplacementRegex = new Regex(@"(`\w+`|@\w+)\.Contains\((`\w+`|@\w+),?\s*(\w*)\)");
+		private readonly Regex _StartsWithReplacementRegex = new Regex(@"(`\w+`|@\w+)\.StartsWith\((`\w+`|@\w+),?\s*(\w*)\)");
+		private readonly Regex _EndsWithReplacementRegex = new Regex(@"(`\w+`|@\w+)\.EndsWith\((`\w+`|@\w+),?\s*(\w*)\)");
 		private readonly Regex _NullSwapRegex = new Regex(@"null\s*([!=]=)\s*(`\w+`|@\w+)");
 
 		/// <summary>
@@ -39,19 +38,7 @@ namespace TixFactory.Database.MySql
 			_DatabaseTypeParser = databaseTypeParser ?? throw new ArgumentNullException(nameof(databaseTypeParser));
 		}
 
-		private string ParseOrderBy<TRow>(OrderBy<TRow> orderBy, IDictionary<string, string> entityColumnAliases)
-			where TRow : class
-		{
-			if (orderBy == null)
-			{
-				return null;
-			}
-
-			var sort = orderBy.SortOrder == SortOrder.Ascending ? "ASC" : "DESC";
-			return $"`{entityColumnAliases[orderBy.Property.Name]}` {sort}";
-		}
-
-		private string ParseWhereClause(Expression queryExpression, IReadOnlyCollection<ParameterExpression> expressionParameters, IDictionary<string, string> entityColumnAliases)
+		internal string ParseWhereClause(Expression queryExpression, IReadOnlyCollection<ParameterExpression> expressionParameters, IDictionary<string, string> entityColumnAliases)
 		{
 			var expression = queryExpression?.ToString();
 			if (string.IsNullOrWhiteSpace(expression))
@@ -66,7 +53,7 @@ namespace TixFactory.Database.MySql
 
 			// TODO: Regex example
 			expression = _ExpressionCutRegex.Replace(queryExpression.ToString(), "");
-			
+
 			if (expression.Contains("\"") || expression.Contains("'") || expression.Contains("`"))
 			{
 				throw new ArgumentException($"Restricted character found in {nameof(queryExpression)}", nameof(queryExpression));
@@ -97,6 +84,18 @@ namespace TixFactory.Database.MySql
 				.Replace("DateTime.UtcNow", "UTC_Timestamp()");
 
 			return expression;
+		}
+
+		private string ParseOrderBy<TRow>(OrderBy<TRow> orderBy, IDictionary<string, string> entityColumnAliases)
+			where TRow : class
+		{
+			if (orderBy == null)
+			{
+				return null;
+			}
+
+			var sort = orderBy.SortOrder == SortOrder.Ascending ? "ASC" : "DESC";
+			return $"`{entityColumnAliases[orderBy.Property.Name]}` {sort}";
 		}
 
 		/// <example>
@@ -154,7 +153,13 @@ namespace TixFactory.Database.MySql
 		/// </example>
 		private string StartsWithReplacement(Match expressionMatch)
 		{
-			return $"{expressionMatch.Groups[1]} LIKE CONCAT({expressionMatch.Groups[2]}, \"%\")";
+			var comparer = expressionMatch.Groups[3].ToString();
+			if (comparer.Contains("IgnoreCase"))
+			{
+				return $"LOWER({expressionMatch.Groups[1]}) LIKE CONCAT(LOWER({expressionMatch.Groups[2]}), '%')";
+			}
+
+			return $"{expressionMatch.Groups[1]} LIKE CONCAT({expressionMatch.Groups[2]}, '%')";
 		}
 
 		/// <example>
@@ -162,7 +167,13 @@ namespace TixFactory.Database.MySql
 		/// </example>
 		private string EndsWithReplacement(Match expressionMatch)
 		{
-			return $"{expressionMatch.Groups[1]} LIKE CONCAT(\"%\", {expressionMatch.Groups[2]})";
+			var comparer = expressionMatch.Groups[3].ToString();
+			if (comparer.Contains("IgnoreCase"))
+			{
+				return $"LOWER({expressionMatch.Groups[1]}) LIKE CONCAT('%', LOWER({expressionMatch.Groups[2]}))";
+			}
+
+			return $"{expressionMatch.Groups[1]} LIKE CONCAT('%', {expressionMatch.Groups[2]})";
 		}
 
 		/// <example>
@@ -170,7 +181,13 @@ namespace TixFactory.Database.MySql
 		/// </example>
 		private string ContainsReplacement(Match expressionMatch)
 		{
-			return $"{expressionMatch.Groups[1]} LIKE CONCAT(\"%\", {expressionMatch.Groups[2]}, \"%\")";
+			var comparer = expressionMatch.Groups[3].ToString();
+			if (comparer.Contains("IgnoreCase"))
+			{
+				return $"LOWER({expressionMatch.Groups[1]}) LIKE CONCAT('%', LOWER({expressionMatch.Groups[2]}), '%')";
+			}
+
+			return $"{expressionMatch.Groups[1]} LIKE CONCAT('%', {expressionMatch.Groups[2]}, '%')";
 		}
 
 		/// <example>

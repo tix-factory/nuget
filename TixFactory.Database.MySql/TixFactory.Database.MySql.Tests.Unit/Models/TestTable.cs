@@ -1,12 +1,14 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 using TixFactory.Serialization.Json;
 
 namespace TixFactory.Database.MySql.Tests.Unit
 {
 	[DataContract(Name = "test_table")]
+	[ExcludeFromCodeCoverage]
 	public class TestTable
 	{
 		[DataMember(Name = "ID")]

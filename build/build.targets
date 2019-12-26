@@ -16,7 +16,7 @@
 		<SERVER_BUILD>false</SERVER_BUILD>
 	</PropertyGroup>
 
-	<ItemGroup>
+	<ItemGroup Condition="'$(IsPackable)' != 'false'">
 		<None Include="$(RootPath)$(PackageLicenseFile)" Pack="true" PackagePath="$(PackageLicenseFile)">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
