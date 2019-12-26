@@ -12,6 +12,8 @@ namespace TixFactory.Database.MySql
 
 		public string InsertValue { get; }
 
+		public bool Primary { get; }
+
 		public InsertColumn(PropertyInfo property, bool isUpdate, IDatabaseTypeParser databaseTypeParser)
 			: base(property, databaseTypeParser)
 		{
@@ -28,6 +30,7 @@ namespace TixFactory.Database.MySql
 			{
 				if (HasAttribute<AutoIncrementColumnAttribute>(property))
 				{
+					Primary = true;
 					return;
 				}
 			}

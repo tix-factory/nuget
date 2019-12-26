@@ -16,3 +16,7 @@ VALUES
 	<#= column.InsertValue #><#= column == Vars.Columns.ElementAt(Vars.Columns.Count - 1) ? "" : "," #>
 <# } #>
 );
+
+<# if (!string.IsNullOrWhiteSpace(Vars.PrimaryColumnName)) { #>
+SELECT LAST_INSERT_ID() as `<#= Vars.PrimaryColumnName #>`;
+<# } #>

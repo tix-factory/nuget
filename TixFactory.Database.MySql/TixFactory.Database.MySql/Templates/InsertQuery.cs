@@ -95,7 +95,27 @@ namespace TixFactory.Database.MySql.Templates
             
             #line default
             #line hidden
-            this.Write(");\r\n");
+            this.Write(");\r\n\r\n");
+            
+            #line 20 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\InsertQuery.tt"
+ if (!string.IsNullOrWhiteSpace(Vars.PrimaryColumnName)) { 
+            
+            #line default
+            #line hidden
+            this.Write("SELECT LAST_INSERT_ID() as `");
+            
+            #line 21 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\InsertQuery.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Vars.PrimaryColumnName));
+            
+            #line default
+            #line hidden
+            this.Write("`;\r\n");
+            
+            #line 22 "E:\Git\tix-factory\nuget\TixFactory.Database.MySql\TixFactory.Database.MySql\Templates\InsertQuery.tt"
+ } 
+            
+            #line default
+            #line hidden
             return this.GenerationEnvironment.ToString();
         }
         

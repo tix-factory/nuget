@@ -22,6 +22,12 @@ namespace TixFactory.Database.MySql
 				Columns = insertColumns.Where(c => !string.IsNullOrWhiteSpace(c.InsertValue)).ToArray()
 			};
 
+			var primaryColumn = insertColumns.FirstOrDefault(c => c.Primary);
+			if (primaryColumn != null)
+			{
+				templateVariables.PrimaryColumnName = primaryColumn.Name;
+			}
+
 			var query = CompileTemplate<InsertQuery>(templateVariables);
 			var parameters = insertColumns.Where(c => !string.IsNullOrWhiteSpace(c.ParameterName)).Select(TranslateParameter).ToList();
 
