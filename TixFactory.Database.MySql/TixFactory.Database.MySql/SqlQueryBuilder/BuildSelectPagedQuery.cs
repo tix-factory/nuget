@@ -11,8 +11,8 @@ namespace TixFactory.Database.MySql
 	/// <inheritdoc cref="ISqlQueryBuilder"/>
 	public partial class SqlQueryBuilder
 	{
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectPagedQuery{TRow}(OrderBy{TRow})"/>
-		public ISqlQuery BuildSelectPagedQuery<TRow>(OrderBy<TRow> orderBy)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectPagedQuery{TRow}"/>
+		public ISqlQuery BuildSelectPagedQuery<TRow>(OrderBy<TRow> orderBy, LambdaExpression whereExpression = null)
 			where TRow : class
 		{
 			if (orderBy == null)
@@ -22,28 +22,7 @@ namespace TixFactory.Database.MySql
 
 			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-
-			return BuildSelectPagedQuery(
-				databaseName,
-				tableName,
-				whereClause: null,
-				orderBy: orderBy,
-				entityColumnAliases: entityColumnAliases,
-				expressionParameters: Array.Empty<ParameterExpression>());
-		}
-
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectPagedQuery{TRow}(LambdaExpression,OrderBy{TRow})"/>
-		public ISqlQuery BuildSelectPagedQuery<TRow>(LambdaExpression whereExpression, OrderBy<TRow> orderBy)
-			where TRow : class
-		{
-			if (orderBy == null)
-			{
-				throw new ArgumentNullException(nameof(orderBy));
-			}
-
-			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
-			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
+			var (whereClause, expressionParameters) = ParseWhereExpression<TRow>(whereExpression, nameof(whereExpression), entityColumnAliases);
 
 			return BuildSelectPagedQuery(
 				databaseName,
@@ -51,7 +30,7 @@ namespace TixFactory.Database.MySql
 				whereClause,
 				orderBy,
 				entityColumnAliases,
-				whereExpression.Parameters);
+				expressionParameters);
 		}
 
 		private ISqlQuery BuildSelectPagedQuery<TRow>(string databaseName, string tableName, string whereClause, OrderBy<TRow> orderBy, IDictionary<string, string> entityColumnAliases, IReadOnlyCollection<ParameterExpression> expressionParameters)

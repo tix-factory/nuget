@@ -140,23 +140,6 @@ namespace TixFactory.Database.MySql
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
 		ISqlQuery BuildSelectTopQuery<TRow, TP1, TP2, TP3, TP4, TP5>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, TP5, bool>> whereExpression, OrderBy<TRow> orderBy = null)
 			where TRow : class;
-
-		/// <summary>
-		/// Builds a paged select query.
-		/// </summary>
-		/// <remarks>
-		/// - The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.
-		/// - The database name is derived from the <see cref="DataContractAttribute.Namespace"/> on the <typeparamref name="TRow"/>.
-		/// - <see cref="OrderBy{TRow}.SortOrder"/> is ignored for this query creation (query parameter decides sort order).
-		/// </remarks>
-		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> containing the column that the paged results should be ordered by.</param>
-		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		/// <exception cref="ArgumentNullException">
-		/// - <paramref name="orderBy"/>
-		/// </exception>
-		ISqlQuery BuildSelectPagedQuery<TRow>(OrderBy<TRow> orderBy)
-			where TRow : class;
 		
 		/// <summary>
 		/// Builds a paged select query with an additional WHERE clause and 5 query parameters.
@@ -167,27 +150,15 @@ namespace TixFactory.Database.MySql
 		/// - <see cref="OrderBy{TRow}.SortOrder"/> is ignored for this query creation (query parameter decides sort order).
 		/// </remarks>
 		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <param name="whereExpression">The <see cref="LambdaExpression"/> to parse into the WHERE clause.</param>
 		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
+		/// <param name="whereExpression">The <see cref="LambdaExpression"/> to parse into the WHERE clause (or <c>null</c> if there isn't one).</param>
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
 		/// <exception cref="ArgumentNullException">
 		/// - <paramref name="orderBy"/>
 		/// </exception>
-		ISqlQuery BuildSelectPagedQuery<TRow>(LambdaExpression whereExpression, OrderBy<TRow> orderBy)
+		ISqlQuery BuildSelectPagedQuery<TRow>(OrderBy<TRow> orderBy, LambdaExpression whereExpression = null)
 			where TRow : class;
-
-		/// <summary>
-		/// Builds a query to count rows in a table.
-		/// </summary>
-		/// <remarks>
-		/// - The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.
-		/// - The database name is derived from the <see cref="DataContractAttribute.Namespace"/> on the <typeparamref name="TRow"/>.
-		/// </remarks>
-		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildCountQuery<TRow>()
-			where TRow : class;
-
+		
 		/// <summary>
 		/// Builds a query to count rows in a table with a WHERE clause and 5 query parameters.
 		/// </summary>
@@ -196,9 +167,9 @@ namespace TixFactory.Database.MySql
 		/// - The database name is derived from the <see cref="DataContractAttribute.Namespace"/> on the <typeparamref name="TRow"/>.
 		/// </remarks>
 		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <param name="whereExpression">The <see cref="LambdaExpression"/> to parse into the WHERE clause.</param>
+		/// <param name="whereExpression">The <see cref="LambdaExpression"/> to parse into the WHERE clause (or <c>null</c> if there isn't one).</param>
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildCountQuery<TRow>(LambdaExpression whereExpression)
+		ISqlQuery BuildCountQuery<TRow>(LambdaExpression whereExpression = null)
 			where TRow : class;
 
 		/// <summary>

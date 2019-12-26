@@ -137,6 +137,20 @@ namespace TixFactory.Database.MySql
 			}
 		}
 
+		private (string WhereClause, IReadOnlyCollection<ParameterExpression> Parameters) ParseWhereExpression<TRow>(LambdaExpression expression, string parameterName, IDictionary<string, string> entityColumnAliases)
+			where TRow : class
+		{
+			if (expression == null)
+			{
+				return (null, Array.Empty<ParameterExpression>());
+			}
+
+			ValidateWhereExpression<TRow>(expression, parameterName);
+
+			var whereClause = ParseWhereClause(expression, entityColumnAliases);
+			return (whereClause, expression.Parameters);
+		}
+
 		private string ParseOrderBy<TRow>(OrderBy<TRow> orderBy, IDictionary<string, string> entityColumnAliases)
 			where TRow : class
 		{

@@ -9,34 +9,19 @@ namespace TixFactory.Database.MySql
 	/// <inheritdoc cref="ISqlQueryBuilder"/>
 	public partial class SqlQueryBuilder
 	{
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildCountQuery{TRow}()"/>
-		public ISqlQuery BuildCountQuery<TRow>()
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildCountQuery{TRow}"/>
+		public ISqlQuery BuildCountQuery<TRow>(LambdaExpression whereExpression = null)
 			where TRow : class
 		{
-			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
-
-			return BuildCountQuery(
-				databaseName,
-				tableName,
-				whereClause: null,
-				expressionParameters: Array.Empty<ParameterExpression>());
-		}
-
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildCountQuery{TRow}(LambdaExpression)"/>
-		public ISqlQuery BuildCountQuery<TRow>(LambdaExpression whereExpression)
-			where TRow : class
-		{
-			ValidateWhereExpression<TRow>(whereExpression, nameof(whereExpression));
-			
 			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
-
+			var (whereClause, expressionParameters) = ParseWhereExpression<TRow>(whereExpression, nameof(whereExpression), entityColumnAliases);
+			
 			return BuildCountQuery(
 				databaseName,
 				tableName,
 				whereClause,
-				whereExpression.Parameters);
+				expressionParameters);
 		}
 
 		private ISqlQuery BuildCountQuery(string databaseName, string tableName, string whereClause, IReadOnlyCollection<ParameterExpression> expressionParameters)
