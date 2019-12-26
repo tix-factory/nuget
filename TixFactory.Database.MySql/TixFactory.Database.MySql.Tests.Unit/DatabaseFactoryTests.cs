@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq.Expressions;
 using Newtonsoft.Json;
 using TixFactory.Configuration;
 
@@ -42,7 +43,7 @@ namespace TixFactory.Database.MySql.Tests.Unit
 			var testDatabase = databaseServerConnection.GetConnectedDatabase();
 			var testTable = testDatabase.GetTable("test_table");
 			var storedProcedures = testDatabase.GetStoredProcedureNames();
-
+			
 			var sqlQueryBuilder = new SqlQueryBuilder(new DatabaseTypeParser());
 			var createTableQuery = sqlQueryBuilder.BuildCreateTableQuery<TestTable>(testDatabase.Name);
 			var selectAllQuery = sqlQueryBuilder.BuildSelectTopQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id > id, new OrderBy<TestTable>(nameof(TestTable.Id), SortOrder.Ascending));
@@ -51,7 +52,8 @@ namespace TixFactory.Database.MySql.Tests.Unit
 			var insertQuery = sqlQueryBuilder.BuildInsertQuery<TestTable>(testDatabase.Name, testTable.Name);
 			var updateQuery = sqlQueryBuilder.BuildUpdateQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id == id);
 			var countQuery = sqlQueryBuilder.BuildCountQuery(testDatabase.Name, testTable.Name);
-			var countWhereQuery = sqlQueryBuilder.BuildCountQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id > id);
+			var countWhereQuery = sqlQueryBuilder.BuildCountQuery<TestTable>(testDatabase.Name, testTable.Name, (Expression<Func<TestTable, long, bool>>)((row, id) => row.Id > id));
+			var countWhereQuery2 = sqlQueryBuilder.BuildCountQuery<TestTable>(testDatabase.Name, testTable.Name, sqlQueryBuilder.BuildWhereClause((TestTable row, long id) => row.Id > id));
 			var addColumnQuery = sqlQueryBuilder.BuildAddColumnQuery<TestTable>(testDatabase.Name, nameof(TestTable.Name));
 			var dropColumnQuery = sqlQueryBuilder.BuildDropColumnQuery(testDatabase.Name, testTable.Name, "Name");
 

@@ -19,27 +19,27 @@ namespace TixFactory.Database.MySql.Tests.Unit
 		{
 			get
 			{
-				yield return new TestCaseData((Func<ISqlQueryBuilder, ISqlQuery>)(sqlQueryBuilder => sqlQueryBuilder.BuildCountQuery(_DatabaseName, _TableName, _WhereExpressionWithoutParameters)))
+				yield return new TestCaseData((Func<ISqlQueryBuilder, ISqlQuery>)(sqlQueryBuilder => sqlQueryBuilder.BuildCountQuery<TestTable>(_DatabaseName, _TableName, _WhereExpressionWithoutParameters)))
 					.SetName("BuildCountQuery_WhereWithNoParameters_ReturnsCountQuery")
 					.Returns("SELECT COUNT(*) as `Count`\r\n\tFROM `" + _DatabaseName + "`.`" + _TableName + "`\r\n\tWHERE " + _NoParameterWhereClause + ";");
 
-				yield return new TestCaseData((Func<ISqlQueryBuilder, ISqlQuery>)(sqlQueryBuilder => sqlQueryBuilder.BuildCountQuery(_DatabaseName, _TableName, _WhereExpressionWithOneParameter)))
+				yield return new TestCaseData((Func<ISqlQueryBuilder, ISqlQuery>)(sqlQueryBuilder => sqlQueryBuilder.BuildCountQuery<TestTable>(_DatabaseName, _TableName, _WhereExpressionWithOneParameter)))
 					.SetName("BuildCountQuery_WhereWithOneParameter_ReturnsCountQuery")
 					.Returns("SELECT COUNT(*) as `Count`\r\n\tFROM `" + _DatabaseName + "`.`" + _TableName + "`\r\n\tWHERE " + _OneParameterWhereClause + ";");
 
-				yield return new TestCaseData((Func<ISqlQueryBuilder, ISqlQuery>)(sqlQueryBuilder => sqlQueryBuilder.BuildCountQuery(_DatabaseName, _TableName, _WhereExpressionWithTwoParameters)))
+				yield return new TestCaseData((Func<ISqlQueryBuilder, ISqlQuery>)(sqlQueryBuilder => sqlQueryBuilder.BuildCountQuery<TestTable>(_DatabaseName, _TableName, _WhereExpressionWithTwoParameters)))
 					.SetName("BuildCountQuery_WhereWithTwoParameters_ReturnsCountQuery")
 					.Returns("SELECT COUNT(*) as `Count`\r\n\tFROM `" + _DatabaseName + "`.`" + _TableName + "`\r\n\tWHERE " + _TwoParameterWhereClause + ";");
 
-				yield return new TestCaseData((Func<ISqlQueryBuilder, ISqlQuery>)(sqlQueryBuilder => sqlQueryBuilder.BuildCountQuery(_DatabaseName, _TableName, _WhereExpressionWithThreeParameters)))
+				yield return new TestCaseData((Func<ISqlQueryBuilder, ISqlQuery>)(sqlQueryBuilder => sqlQueryBuilder.BuildCountQuery<TestTable>(_DatabaseName, _TableName, _WhereExpressionWithThreeParameters)))
 					.SetName("BuildCountQuery_WhereWithThreeParameters_ReturnsCountQuery")
 					.Returns("SELECT COUNT(*) as `Count`\r\n\tFROM `" + _DatabaseName + "`.`" + _TableName + "`\r\n\tWHERE " + _ThreeParameterWhereClause + ";");
 
-				yield return new TestCaseData((Func<ISqlQueryBuilder, ISqlQuery>)(sqlQueryBuilder => sqlQueryBuilder.BuildCountQuery(_DatabaseName, _TableName, _WhereExpressionWithFourParameters)))
+				yield return new TestCaseData((Func<ISqlQueryBuilder, ISqlQuery>)(sqlQueryBuilder => sqlQueryBuilder.BuildCountQuery<TestTable>(_DatabaseName, _TableName, _WhereExpressionWithFourParameters)))
 					.SetName("BuildCountQuery_WhereWithFourParameters_ReturnsCountQuery")
 					.Returns("SELECT COUNT(*) as `Count`\r\n\tFROM `" + _DatabaseName + "`.`" + _TableName + "`\r\n\tWHERE " + _FourParameterWhereClause + ";");
 
-				yield return new TestCaseData((Func<ISqlQueryBuilder, ISqlQuery>)(sqlQueryBuilder => sqlQueryBuilder.BuildCountQuery(_DatabaseName, _TableName, _WhereExpressionWithFiveParameters)))
+				yield return new TestCaseData((Func<ISqlQueryBuilder, ISqlQuery>)(sqlQueryBuilder => sqlQueryBuilder.BuildCountQuery<TestTable>(_DatabaseName, _TableName, _WhereExpressionWithFiveParameters)))
 					.SetName("BuildCountQuery_WhereWithFiveParameters_ReturnsCountQuery")
 					.Returns("SELECT COUNT(*) as `Count`\r\n\tFROM `" + _DatabaseName + "`.`" + _TableName + "`\r\n\tWHERE " + _FiveParameterWhereClause + ";");
 			}

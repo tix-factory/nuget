@@ -267,86 +267,16 @@ namespace TixFactory.Database.MySql
 		/// <param name="tableName">The table name to select in.</param>
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
 		ISqlQuery BuildCountQuery(string databaseName, string tableName);
-
-		/// <summary>
-		/// Builds a query to count rows in a table with a WHERE clause and no query parameters.
-		/// </summary>
-		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <param name="databaseName">The database name to select in.</param>
-		/// <param name="tableName">The table name to select in.</param>
-		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
-		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildCountQuery<TRow>(string databaseName, string tableName, Expression<Func<TRow, bool>> whereExpression)
-			where TRow : class;
-
-		/// <summary>
-		/// Builds a query to count rows in a table with a WHERE clause and 1 query parameter.
-		/// </summary>
-		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <typeparam name="TP1">The first query parameter.</typeparam>
-		/// <param name="databaseName">The database name to select in.</param>
-		/// <param name="tableName">The table name to select in.</param>
-		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
-		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildCountQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression)
-			where TRow : class;
-
-		/// <summary>
-		/// Builds a query to count rows in a table with a WHERE clause and 2 query parameters.
-		/// </summary>
-		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <typeparam name="TP1">The first query parameter.</typeparam>
-		/// <typeparam name="TP2">The second query parameter.</typeparam>
-		/// <param name="databaseName">The database name to select in.</param>
-		/// <param name="tableName">The table name to select in.</param>
-		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
-		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildCountQuery<TRow, TP1, TP2>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, bool>> whereExpression)
-			where TRow : class;
-
-		/// <summary>
-		/// Builds a query to count rows in a table with a WHERE clause and 3 query parameters.
-		/// </summary>
-		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <typeparam name="TP1">The first query parameter.</typeparam>
-		/// <typeparam name="TP2">The second query parameter.</typeparam>
-		/// <typeparam name="TP3">The third query parameter.</typeparam>
-		/// <param name="databaseName">The database name to select in.</param>
-		/// <param name="tableName">The table name to select in.</param>
-		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
-		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildCountQuery<TRow, TP1, TP2, TP3>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, bool>> whereExpression)
-			where TRow : class;
-
-		/// <summary>
-		/// Builds a query to count rows in a table with a WHERE clause and 4 query parameters.
-		/// </summary>
-		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <typeparam name="TP1">The first query parameter.</typeparam>
-		/// <typeparam name="TP2">The second query parameter.</typeparam>
-		/// <typeparam name="TP3">The third query parameter.</typeparam>
-		/// <typeparam name="TP4">The fourth query parameter.</typeparam>
-		/// <param name="databaseName">The database name to select in.</param>
-		/// <param name="tableName">The table name to select in.</param>
-		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
-		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildCountQuery<TRow, TP1, TP2, TP3, TP4>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, bool>> whereExpression)
-			where TRow : class;
-
+		
 		/// <summary>
 		/// Builds a query to count rows in a table with a WHERE clause and 5 query parameters.
 		/// </summary>
 		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <typeparam name="TP1">The first query parameter.</typeparam>
-		/// <typeparam name="TP2">The second query parameter.</typeparam>
-		/// <typeparam name="TP3">The third query parameter.</typeparam>
-		/// <typeparam name="TP4">The fourth query parameter.</typeparam>
-		/// <typeparam name="TP5">The fifth query parameter.</typeparam>
 		/// <param name="databaseName">The database name to select in.</param>
 		/// <param name="tableName">The table name to select in.</param>
-		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
+		/// <param name="whereExpression">The <see cref="LambdaExpression"/> to parse into the WHERE clause.</param>
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildCountQuery<TRow, TP1, TP2, TP3, TP4, TP5>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, TP5, bool>> whereExpression)
+		ISqlQuery BuildCountQuery<TRow>(string databaseName, string tableName, LambdaExpression whereExpression)
 			where TRow : class;
 
 		/// <summary>
@@ -406,5 +336,68 @@ namespace TixFactory.Database.MySql
 		/// <param name="columnName">The name of the column to drop.</param>
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
 		ISqlQuery BuildDropColumnQuery(string databaseName, string tableName, string columnName);
+
+		/// <summary>
+		/// Builds a <see cref="LambdaExpression"/> for a where clause from an <see cref="Expression{TDelegate}"/>.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <returns>The <see cref="LambdaExpression"/>.</returns>
+		LambdaExpression BuildWhereClause<TRow>(Expression<Func<TRow, bool>> expression)
+			where TRow : class;
+
+		/// <summary>
+		/// Builds a <see cref="LambdaExpression"/> for a where clause from an <see cref="Expression{TDelegate}"/>.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <typeparam name="TP1">The first query parameter.</typeparam>
+		/// <returns>The <see cref="LambdaExpression"/>.</returns>
+		LambdaExpression BuildWhereClause<TRow, TP1>(Expression<Func<TRow, TP1, bool>> expression)
+			where TRow : class;
+
+		/// <summary>
+		/// Builds a <see cref="LambdaExpression"/> for a where clause from an <see cref="Expression{TDelegate}"/>.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <typeparam name="TP1">The first query parameter.</typeparam>
+		/// <typeparam name="TP2">The second query parameter.</typeparam>
+		/// <returns>The <see cref="LambdaExpression"/>.</returns>
+		LambdaExpression BuildWhereClause<TRow, TP1, TP2>(Expression<Func<TRow, TP1, TP2, bool>> expression)
+			where TRow : class;
+
+		/// <summary>
+		/// Builds a <see cref="LambdaExpression"/> for a where clause from an <see cref="Expression{TDelegate}"/>.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <typeparam name="TP1">The first query parameter.</typeparam>
+		/// <typeparam name="TP2">The second query parameter.</typeparam>
+		/// <typeparam name="TP3">The third query parameter.</typeparam>
+		/// <returns>The <see cref="LambdaExpression"/>.</returns>
+		LambdaExpression BuildWhereClause<TRow, TP1, TP2, TP3>(Expression<Func<TRow, TP1, TP2, TP3, bool>> expression)
+			where TRow : class;
+
+		/// <summary>
+		/// Builds a <see cref="LambdaExpression"/> for a where clause from an <see cref="Expression{TDelegate}"/>.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <typeparam name="TP1">The first query parameter.</typeparam>
+		/// <typeparam name="TP2">The second query parameter.</typeparam>
+		/// <typeparam name="TP3">The third query parameter.</typeparam>
+		/// <typeparam name="TP4">The fourth query parameter.</typeparam>
+		/// <returns>The <see cref="LambdaExpression"/>.</returns>
+		LambdaExpression BuildWhereClause<TRow, TP1, TP2, TP3, TP4>(Expression<Func<TRow, TP1, TP2, TP3, TP4, bool>> expression)
+			where TRow : class;
+
+		/// <summary>
+		/// Builds a <see cref="LambdaExpression"/> for a where clause from an <see cref="Expression{TDelegate}"/>.
+		/// </summary>
+		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
+		/// <typeparam name="TP1">The first query parameter.</typeparam>
+		/// <typeparam name="TP2">The second query parameter.</typeparam>
+		/// <typeparam name="TP3">The third query parameter.</typeparam>
+		/// <typeparam name="TP4">The fourth query parameter.</typeparam>
+		/// <typeparam name="TP5">The fifth query parameter.</typeparam>
+		/// <returns>The <see cref="LambdaExpression"/>.</returns>
+		LambdaExpression BuildWhereClause<TRow, TP1, TP2, TP3, TP4, TP5>(Expression<Func<TRow, TP1, TP2, TP3, TP4, TP5, bool>> expression)
+			where TRow : class;
 	}
 }

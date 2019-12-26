@@ -111,6 +111,26 @@ namespace TixFactory.Database.MySql
 			return expression;
 		}
 
+		private void ValidateWhereExpression<TRow>(LambdaExpression whereExpression, string parameterName)
+			where TRow : class
+		{
+			if (whereExpression.ReturnType != typeof(bool))
+			{
+				throw new ArgumentException($"Return type of '{parameterName}' expected to be 'bool'.", parameterName);
+			}
+
+			if (!whereExpression.Parameters.Any())
+			{
+				throw new ArgumentException($"'{parameterName}' to have at least one parameter (the '{nameof(TRow)}', '{typeof(TRow).Name}').", parameterName);
+			}
+
+			var entityParameterCount = whereExpression.Parameters.Count(p => p.Type == typeof(TRow));
+			if (entityParameterCount != 1)
+			{
+				throw new ArgumentException($"Exactly one '{nameof(TRow)}' ('{typeof(TRow).Name}') parameter expected in the '{parameterName}' (got {entityParameterCount}).", parameterName);
+			}
+		}
+
 		private string ParseOrderBy<TRow>(OrderBy<TRow> orderBy, IDictionary<string, string> entityColumnAliases)
 			where TRow : class
 		{
