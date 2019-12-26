@@ -11,8 +11,8 @@ namespace TixFactory.Database.MySql
 	/// <inheritdoc cref="ISqlQueryBuilder"/>
 	public partial class SqlQueryBuilder
 	{
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectPagedQuery{TRow}(string,string,OrderBy{TRow})"/>
-		public ISqlQuery BuildSelectPagedQuery<TRow>(string databaseName, string tableName, OrderBy<TRow> orderBy)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectPagedQuery{TRow}(OrderBy{TRow})"/>
+		public ISqlQuery BuildSelectPagedQuery<TRow>(OrderBy<TRow> orderBy)
 			where TRow : class
 		{
 			if (orderBy == null)
@@ -20,7 +20,9 @@ namespace TixFactory.Database.MySql
 				throw new ArgumentNullException(nameof(orderBy));
 			}
 
+			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
+
 			return BuildSelectPagedQuery(
 				databaseName,
 				tableName,
@@ -30,8 +32,8 @@ namespace TixFactory.Database.MySql
 				expressionParameters: Array.Empty<ParameterExpression>());
 		}
 
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectPagedQuery{TRow}(string,string,System.Linq.Expressions.Expression{System.Func{TRow,bool}},OrderBy{TRow})"/>
-		public ISqlQuery BuildSelectPagedQuery<TRow>(string databaseName, string tableName, Expression<Func<TRow, bool>> whereExpression, OrderBy<TRow> orderBy)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectPagedQuery{TRow}(LambdaExpression,OrderBy{TRow})"/>
+		public ISqlQuery BuildSelectPagedQuery<TRow>(LambdaExpression whereExpression, OrderBy<TRow> orderBy)
 			where TRow : class
 		{
 			if (orderBy == null)
@@ -39,111 +41,7 @@ namespace TixFactory.Database.MySql
 				throw new ArgumentNullException(nameof(orderBy));
 			}
 
-			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
-
-			return BuildSelectPagedQuery(
-				databaseName,
-				tableName,
-				whereClause,
-				orderBy,
-				entityColumnAliases,
-				whereExpression.Parameters);
-		}
-
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1}"/>
-		public ISqlQuery BuildSelectPagedQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression, OrderBy<TRow> orderBy)
-			where TRow : class
-		{
-			if (orderBy == null)
-			{
-				throw new ArgumentNullException(nameof(orderBy));
-			}
-
-			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
-
-			return BuildSelectPagedQuery(
-				databaseName,
-				tableName,
-				whereClause,
-				orderBy,
-				entityColumnAliases,
-				whereExpression.Parameters);
-		}
-
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2}"/>
-		public ISqlQuery BuildSelectPagedQuery<TRow, TP1, TP2>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, bool>> whereExpression, OrderBy<TRow> orderBy)
-			where TRow : class
-		{
-			if (orderBy == null)
-			{
-				throw new ArgumentNullException(nameof(orderBy));
-			}
-
-			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
-
-			return BuildSelectPagedQuery(
-				databaseName,
-				tableName,
-				whereClause,
-				orderBy,
-				entityColumnAliases,
-				whereExpression.Parameters);
-		}
-
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2,TP3}"/>
-		public ISqlQuery BuildSelectPagedQuery<TRow, TP1, TP2, TP3>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, bool>> whereExpression, OrderBy<TRow> orderBy)
-			where TRow : class
-		{
-			if (orderBy == null)
-			{
-				throw new ArgumentNullException(nameof(orderBy));
-			}
-
-			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
-
-			return BuildSelectPagedQuery(
-				databaseName,
-				tableName,
-				whereClause,
-				orderBy,
-				entityColumnAliases,
-				whereExpression.Parameters);
-		}
-
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2,TP3,TP4}"/>
-		public ISqlQuery BuildSelectPagedQuery<TRow, TP1, TP2, TP3, TP4>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, bool>> whereExpression, OrderBy<TRow> orderBy)
-			where TRow : class
-		{
-			if (orderBy == null)
-			{
-				throw new ArgumentNullException(nameof(orderBy));
-			}
-
-			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
-
-			return BuildSelectPagedQuery(
-				databaseName,
-				tableName,
-				whereClause,
-				orderBy,
-				entityColumnAliases,
-				whereExpression.Parameters);
-		}
-
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildSelectTopQuery{TRow,TP1,TP2,TP3,TP4,TP5}"/>
-		public ISqlQuery BuildSelectPagedQuery<TRow, TP1, TP2, TP3, TP4, TP5>(string databaseName, string tableName, Expression<Func<TRow, TP1, TP2, TP3, TP4, TP5, bool>> whereExpression, OrderBy<TRow> orderBy)
-			where TRow : class
-		{
-			if (orderBy == null)
-			{
-				throw new ArgumentNullException(nameof(orderBy));
-			}
-
+			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
 			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
 
