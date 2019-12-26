@@ -135,6 +135,13 @@ namespace TixFactory.Database.MySql
 			{
 				throw new ArgumentException($"Exactly one '{nameof(TRow)}' ('{typeof(TRow).Name}') parameter expected in the '{parameterName}' (got {entityParameterCount}).", parameterName);
 			}
+
+			// TODO: Allow TRow to be specified at any index.
+			var entityParameter = whereExpression.Parameters.First();
+			if (entityParameter.Type != typeof(TRow))
+			{
+				throw new ArgumentException($"First parameter in expression expected to be '{nameof(TRow)}' ('{typeof(TRow).Name}') (got {entityParameter.Type.Name}).", parameterName);
+			}
 		}
 
 		private (string WhereClause, IReadOnlyCollection<ParameterExpression> Parameters) ParseWhereExpression<TRow>(LambdaExpression expression, string parameterName, IDictionary<string, string> entityColumnAliases)

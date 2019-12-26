@@ -1,6 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
@@ -24,18 +23,6 @@ namespace TixFactory.Database.MySql
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
 			var (whereClause, expressionParameters) = ParseWhereExpression<TRow>(whereExpression, nameof(whereExpression), entityColumnAliases);
 
-			return BuildSelectPagedQuery(
-				databaseName,
-				tableName,
-				whereClause,
-				orderBy,
-				entityColumnAliases,
-				expressionParameters);
-		}
-
-		private ISqlQuery BuildSelectPagedQuery<TRow>(string databaseName, string tableName, string whereClause, OrderBy<TRow> orderBy, IDictionary<string, string> entityColumnAliases, IReadOnlyCollection<ParameterExpression> expressionParameters)
-			where TRow : class
-		{
 			var templateVariables = new SelectQueryVariables
 			{
 				DatabaseName = databaseName,

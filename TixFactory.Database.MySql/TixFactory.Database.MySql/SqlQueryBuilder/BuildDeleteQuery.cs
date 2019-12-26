@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+﻿using System.Linq;
 using System.Linq.Expressions;
 using TixFactory.Database.MySql.Templates;
 
@@ -10,22 +7,14 @@ namespace TixFactory.Database.MySql
 	/// <inheritdoc cref="ISqlQueryBuilder"/>
 	public partial class SqlQueryBuilder
 	{
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildDeleteQuery{TRow,TP1}"/>
-		public ISqlQuery BuildDeleteQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildDeleteQuery{TRow}"/>
+		public ISqlQuery BuildDeleteQuery<TRow>(LambdaExpression whereExpression = null)
 			where TRow : class
 		{
+			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
+			var (whereClause, expressionParameters) = ParseWhereExpression<TRow>(whereExpression, nameof(whereExpression), entityColumnAliases);
 
-			return BuildDeleteQuery(
-				databaseName,
-				tableName,
-				whereClause,
-				whereExpression.Parameters);
-		}
-
-		private ISqlQuery BuildDeleteQuery(string databaseName, string tableName, string whereClause, IReadOnlyCollection<ParameterExpression> expressionParameters)
-		{
 			var templateVariables = new DeleteQueryVariables
 			{
 				DatabaseName = databaseName,

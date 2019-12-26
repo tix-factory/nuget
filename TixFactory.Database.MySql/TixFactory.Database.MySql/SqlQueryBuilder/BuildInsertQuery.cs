@@ -9,10 +9,12 @@ namespace TixFactory.Database.MySql
 	public partial class SqlQueryBuilder
 	{
 		/// <inheritdoc cref="ISqlQueryBuilder.BuildInsertQuery{TRow}"/>
-		public ISqlQuery BuildInsertQuery<TRow>(string databaseName, string tableName)
+		public ISqlQuery BuildInsertQuery<TRow>()
 			where TRow : class
 		{
 			var insertColumns = GetInsertColumns<TRow>(isUpdate: false);
+			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
+
 			var templateVariables = new InsertQueryVariables
 			{
 				DatabaseName = databaseName,

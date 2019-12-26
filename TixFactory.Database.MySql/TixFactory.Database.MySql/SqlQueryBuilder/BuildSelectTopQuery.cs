@@ -1,5 +1,4 @@
 ﻿using MySql.Data.MySqlClient;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
@@ -19,16 +18,6 @@ namespace TixFactory.Database.MySql
 			var (whereClause, expressionParameters) = ParseWhereExpression<TRow>(whereExpression, nameof(whereExpression), entityColumnAliases);
 			var orderByStatement = ParseOrderBy(orderBy, entityColumnAliases);
 
-			return BuildSelectAllQuery(
-				databaseName,
-				tableName,
-				whereClause,
-				orderByStatement,
-				expressionParameters);
-		}
-
-		private ISqlQuery BuildSelectAllQuery(string databaseName, string tableName, string whereClause, string orderByStatement, IReadOnlyCollection<ParameterExpression> expressionParameters)
-		{
 			var templateVariables = new SelectQueryVariables
 			{
 				DatabaseName = databaseName,

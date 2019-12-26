@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Linq.Expressions;
 using TixFactory.Database.MySql.Templates;
 
@@ -16,16 +14,7 @@ namespace TixFactory.Database.MySql
 			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
 			var (whereClause, expressionParameters) = ParseWhereExpression<TRow>(whereExpression, nameof(whereExpression), entityColumnAliases);
-			
-			return BuildCountQuery(
-				databaseName,
-				tableName,
-				whereClause,
-				expressionParameters);
-		}
 
-		private ISqlQuery BuildCountQuery(string databaseName, string tableName, string whereClause, IReadOnlyCollection<ParameterExpression> expressionParameters)
-		{
 			var templateVariables = new CountQueryVariables
 			{
 				DatabaseName = databaseName,

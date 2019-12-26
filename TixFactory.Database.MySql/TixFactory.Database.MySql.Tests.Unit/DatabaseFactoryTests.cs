@@ -48,9 +48,9 @@ namespace TixFactory.Database.MySql.Tests.Unit
 			var createTableQuery = sqlQueryBuilder.BuildCreateTableQuery<TestTable>();
 			var selectAllQuery = sqlQueryBuilder.BuildSelectTopQuery(sqlQueryBuilder.BuildWhereClause((TestTable row, long id) => row.Id > id), new OrderBy<TestTable>(nameof(TestTable.Id), SortOrder.Ascending));
 			var selectedPagedQuery = sqlQueryBuilder.BuildSelectPagedQuery(new OrderBy<TestTable>(nameof(TestTable.Id)), sqlQueryBuilder.BuildWhereClause((TestTable row, long id) => row.Id < id));
-			var deleteQuery = sqlQueryBuilder.BuildDeleteQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id == id);
-			var insertQuery = sqlQueryBuilder.BuildInsertQuery<TestTable>(testDatabase.Name, testTable.Name);
-			var updateQuery = sqlQueryBuilder.BuildUpdateQuery(testDatabase.Name, testTable.Name, (TestTable row, long id) => row.Id == id);
+			var deleteQuery = sqlQueryBuilder.BuildDeleteQuery<TestTable>(sqlQueryBuilder.BuildWhereClause((TestTable row, long id) => row.Id == id));
+			var insertQuery = sqlQueryBuilder.BuildInsertQuery<TestTable>();
+			var updateQuery = sqlQueryBuilder.BuildUpdateQuery<TestTable>(sqlQueryBuilder.BuildWhereClause((TestTable row, long id) => row.Id == id));
 			var countQuery = sqlQueryBuilder.BuildCountQuery<TestTable>();
 			var countWhereQuery = sqlQueryBuilder.BuildCountQuery<TestTable>((Expression<Func<TestTable, long, bool>>)((row, id) => row.Id > id));
 			var countWhereQuery2 = sqlQueryBuilder.BuildCountQuery<TestTable>(sqlQueryBuilder.BuildWhereClause((TestTable row, long id) => row.Id > id));

@@ -8,13 +8,14 @@ namespace TixFactory.Database.MySql
 	/// <inheritdoc cref="ISqlQueryBuilder"/>
 	public partial class SqlQueryBuilder
 	{
-		/// <inheritdoc cref="ISqlQueryBuilder.BuildUpdateQuery{TRow,TP1}"/>
-		public ISqlQuery BuildUpdateQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression)
+		/// <inheritdoc cref="ISqlQueryBuilder.BuildUpdateQuery{TRow}"/>
+		public ISqlQuery BuildUpdateQuery<TRow>(LambdaExpression whereExpression = null)
 			where TRow : class
 		{
 			var updateColumns = GetInsertColumns<TRow>(isUpdate: true);
+			var (tableName, databaseName) = GetTableNameAndDatabaseName<TRow>(nameof(TRow));
 			var entityColumnAliases = GetEntityColumnAliases<TRow>();
-			var whereClause = ParseWhereClause(whereExpression, entityColumnAliases);
+			var (whereClause, expressionParameters) = ParseWhereExpression<TRow>(whereExpression, nameof(whereExpression), entityColumnAliases);
 
 			var templateVariables = new UpdateQueryVariables
 			{

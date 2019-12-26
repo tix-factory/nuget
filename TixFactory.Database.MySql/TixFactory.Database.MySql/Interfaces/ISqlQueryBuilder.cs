@@ -12,35 +12,39 @@ namespace TixFactory.Database.MySql
 		/// <summary>
 		/// Builds a delete query.
 		/// </summary>
+		/// <remarks>
+		/// - The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.
+		/// - The database name is derived from the <see cref="DataContractAttribute.Namespace"/> on the <typeparamref name="TRow"/>.
+		/// </remarks>
 		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <typeparam name="TP1">The first query parameter.</typeparam>
-		/// <param name="databaseName">The database name to delete in.</param>
-		/// <param name="tableName">The table name to delete in.</param>
-		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
+		/// <param name="whereExpression">The <see cref="LambdaExpression"/> to parse into the WHERE clause (or <c>null</c> if there isn't one).</param>
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildDeleteQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression)
+		ISqlQuery BuildDeleteQuery<TRow>(LambdaExpression whereExpression = null)
 			where TRow : class;
 
 		/// <summary>
 		/// Builds an insert query.
 		/// </summary>
+		/// <remarks>
+		/// - The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.
+		/// - The database name is derived from the <see cref="DataContractAttribute.Namespace"/> on the <typeparamref name="TRow"/>.
+		/// </remarks>
 		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <param name="databaseName">The database name to insert into.</param>
-		/// <param name="tableName">The table name to insert into.</param>
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildInsertQuery<TRow>(string databaseName, string tableName)
+		ISqlQuery BuildInsertQuery<TRow>()
 			where TRow : class;
 
 		/// <summary>
 		/// Builds an update query.
 		/// </summary>
+		/// <remarks>
+		/// - The table name is derived from the <see cref="DataContractAttribute.Name"/> on the <typeparamref name="TRow"/>.
+		/// - The database name is derived from the <see cref="DataContractAttribute.Namespace"/> on the <typeparamref name="TRow"/>.
+		/// </remarks>
 		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <typeparam name="TP1">The first query parameter.</typeparam>
-		/// <param name="databaseName">The database name to insert into.</param>
-		/// <param name="tableName">The table name to insert into.</param>
-		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
+		/// <param name="whereExpression">The <see cref="LambdaExpression"/> to parse into the WHERE clause (or <c>null</c> if there isn't one).</param>
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
-		ISqlQuery BuildUpdateQuery<TRow, TP1>(string databaseName, string tableName, Expression<Func<TRow, TP1, bool>> whereExpression)
+		ISqlQuery BuildUpdateQuery<TRow>(LambdaExpression whereExpression = null)
 			where TRow : class;
 
 		/// <summary>
@@ -51,7 +55,7 @@ namespace TixFactory.Database.MySql
 		/// - The database name is derived from the <see cref="DataContractAttribute.Namespace"/> on the <typeparamref name="TRow"/>.
 		/// </remarks>
 		/// <typeparam name="TRow">The a model of the expected table row.</typeparam>
-		/// <param name="whereExpression">The <see cref="Expression"/> to parse into the WHERE clause.</param>
+		/// <param name="whereExpression">The <see cref="LambdaExpression"/> to parse into the WHERE clause (or <c>null</c> if there isn't one).</param>
 		/// <param name="orderBy">The <see cref="OrderBy{TRow}"/> (or <c>null</c> if the results are unordered).</param>
 		/// <returns>The <see cref="ISqlQuery"/>.</returns>
 		ISqlQuery BuildSelectTopQuery<TRow>(LambdaExpression whereExpression = null, OrderBy<TRow> orderBy = null)
