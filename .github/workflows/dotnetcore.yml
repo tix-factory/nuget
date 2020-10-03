@@ -15,7 +15,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 2.2.108
+        dotnet-version: 3.1.x
     - name: Setup NuGet.exe
       uses: NuGet/setup-nuget@v1.0.2
     - name: Build Number Generator
