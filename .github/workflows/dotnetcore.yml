@@ -22,11 +22,6 @@ jobs:
       uses: einaregilsson/build-number@v2
       with:
         token: ${{ secrets.github_token }}
-    - name: Generate msbuild project file
-      uses: tix-factory/msbuild-project-generator@v1
-      with:
-        directory: ./
-        projectFile: ./build/build.proj
     - name: Build with dotnet
       run: sh build.sh
       shell: bash
