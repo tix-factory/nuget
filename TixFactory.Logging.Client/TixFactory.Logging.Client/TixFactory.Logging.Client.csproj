@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootPath>../../</RootPath>
+    <PackageTags>logging</PackageTags>
+  </PropertyGroup>
+  <Import Project="$(RootPath)build/build.targets" />
+  <ItemGroup>
+    <PackageReference Include="TixFactory.Logging" Version="$(PackageVersion)" />
+    <PackageReference Include="TixFactory.Http.Client" Version="$(PackageVersion)" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+</Project>
