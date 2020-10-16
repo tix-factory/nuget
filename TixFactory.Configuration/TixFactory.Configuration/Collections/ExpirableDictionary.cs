@@ -35,8 +35,20 @@ namespace TixFactory.Collections
 		/// <inheritdoc cref="IDictionary{TKey,TValue}.this[TKey]"/>
 		public TValue this[TKey key]
 		{
-			get => _Dictionary[key];
-			set => _Dictionary[key] = value;
+			get
+			{
+				if (TryGetValue(key, out var value))
+				{
+					return value;
+				}
+
+				throw new KeyNotFoundException($"'{key}' not found in {nameof(ExpirableDictionary<TKey,TValue>)}");
+			}
+			set
+			{
+				_Dictionary[key] = value;
+				RenewKeyExpiration(key);
+			}
 		}
 
 		/// <inheritdoc cref="IExpirableDictionary{TKey,TValue}.ValueExpiration"/>
