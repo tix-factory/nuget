@@ -27,6 +27,7 @@ namespace TixFactory.ApplicationAuthorization
 		private readonly SemaphoreSlim _LoadApplicationAuthorizationsLock;
 		private readonly IHttpClient _HttpClient;
 		private readonly Uri _LoadAuthorizationsUrl;
+		private readonly JsonSerializerOptions _JsonSerializerOptions;
 		private bool _RefreshDebounce = false;
 
 		/// <summary>
@@ -72,6 +73,11 @@ namespace TixFactory.ApplicationAuthorization
 			_ApplicationAuthorizationsByApiKey = new ConcurrentDictionary<Guid, ApplicationAuthorization>();
 			_HttpClient = new HttpClient();
 			_LoadApplicationAuthorizationsLock = new SemaphoreSlim(_MaxParallelRequests, _MaxParallelRequests);
+
+			var jsonSerializerOptions = _JsonSerializerOptions = new JsonSerializerOptions
+			{
+				PropertyNameCaseInsensitive = true
+			};
 
 			var refreshTimer = new Timer(RefreshAuthorizations,
 				state: null,
@@ -133,7 +139,7 @@ namespace TixFactory.ApplicationAuthorization
 					innerException: new Exception("fake exception to satisfy compiler"));
 			}
 
-			var responseModel = JsonSerializer.Deserialize<AuthorizedOperationsResult>(responseBody);
+			var responseModel = JsonSerializer.Deserialize<AuthorizedOperationsResult>(responseBody, _JsonSerializerOptions);
 			return new HashSet<string>(responseModel.Data);
 		}
 
