@@ -82,6 +82,11 @@ namespace TixFactory.ApplicationAuthorization
 		/// <inheritdoc cref="IApplicationAuthorizationsAccessor.GetAuthorizedOperationNames"/>
 		public ISet<string> GetAuthorizedOperationNames(Guid apiKey)
 		{
+			if (apiKey == default)
+			{
+				return new HashSet<string>();
+			}
+
 			var currentTime = DateTime.UtcNow;
 			if (_ApplicationAuthorizationsByApiKey.TryGetValue(apiKey, out var applicationAuthorization))
 			{
