@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <IsPackable>true</IsPackable>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootPath>../../</RootPath>
+    <PackageTags>application authorization</PackageTags>
+  </PropertyGroup>
+  <Import Project="$(RootPath)build/build.targets" />
+  <ItemGroup>
+    <PackageReference Include="TixFactory.Configuration" Version="$(PackageVersion)" />
+    <PackageReference Include="TixFactory.Http.Client" Version="$(PackageVersion)" />
+    <PackageReference Include="TixFactory.Logging" Version="$(PackageVersion)" />
+  </ItemGroup>
+</Project>
