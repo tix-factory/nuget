@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TixFactory.ApplicationContext;
 
@@ -29,6 +30,7 @@ namespace TixFactory.Http.Service
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet("application-metadata")]
+		[AllowAnonymous]
 		public ApplicationMetadataResponse GetApplicationMetadata()
 		{
 			return new ApplicationMetadataResponse
