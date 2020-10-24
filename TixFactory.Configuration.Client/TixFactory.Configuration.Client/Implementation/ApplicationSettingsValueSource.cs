@@ -131,7 +131,7 @@ namespace TixFactory.Configuration.Client
 
 		private IReadOnlyDictionary<string, string> LoadApplicationSettings()
 		{
-			var httpRequest = new HttpRequest(HttpMethod.Get, _GetApplicationSettingsUrl);
+			var httpRequest = new HttpRequest(HttpMethod.Post, _GetApplicationSettingsUrl);
 			httpRequest.Headers.AddOrUpdate(_ApiKeyHeaderName, _ApplicationApiKey.Value.ToString());
 
 			var httpResponse = _HttpClient.Send(httpRequest);
