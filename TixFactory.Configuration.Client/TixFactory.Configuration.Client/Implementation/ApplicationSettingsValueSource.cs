@@ -16,7 +16,7 @@ namespace TixFactory.Configuration.Client
 	{
 		private const string _ApiKeyHeaderName = "Tix-Factory-Api-Key";
 		private readonly ILogger _Logger;
-		private readonly ISetting<string> _ApplicationApiKey;
+		private readonly ISetting<Guid> _ApplicationApiKey;
 		private readonly IApplicationContext _ApplicationContext;
 		private readonly Uri _GetApplicationSettingsUrl;
 		private readonly IHttpClient _HttpClient;
@@ -37,7 +37,7 @@ namespace TixFactory.Configuration.Client
 		/// - <paramref name="logger"/>
 		/// - <paramref name="applicationApiKey"/>
 		/// </exception>
-		public ApplicationSettingsValueSource(Uri configurationServiceUrl, ILogger logger, ISetting<string> applicationApiKey)
+		public ApplicationSettingsValueSource(Uri configurationServiceUrl, ILogger logger, ISetting<Guid> applicationApiKey)
 			: this(configurationServiceUrl, logger, applicationApiKey, ApplicationContext.ApplicationContext.Singleton, new Setting<TimeSpan>(TimeSpan.FromSeconds(30)))
 		{
 		}
@@ -57,7 +57,7 @@ namespace TixFactory.Configuration.Client
 		/// - <paramref name="applicationContext"/>
 		/// - <paramref name="refreshInterval"/>
 		/// </exception>
-		public ApplicationSettingsValueSource(Uri configurationServiceUrl, ILogger logger, ISetting<string> applicationApiKey, IApplicationContext applicationContext, ISetting<TimeSpan> refreshInterval)
+		public ApplicationSettingsValueSource(Uri configurationServiceUrl, ILogger logger, ISetting<Guid> applicationApiKey, IApplicationContext applicationContext, ISetting<TimeSpan> refreshInterval)
 		{
 			if (configurationServiceUrl == null)
 			{
@@ -132,7 +132,7 @@ namespace TixFactory.Configuration.Client
 		private IReadOnlyDictionary<string, string> LoadApplicationSettings()
 		{
 			var httpRequest = new HttpRequest(HttpMethod.Get, _GetApplicationSettingsUrl);
-			httpRequest.Headers.AddOrUpdate(_ApiKeyHeaderName, _ApplicationApiKey.Value);
+			httpRequest.Headers.AddOrUpdate(_ApiKeyHeaderName, _ApplicationApiKey.Value.ToString());
 
 			var httpResponse = _HttpClient.Send(httpRequest);
 			if (!httpResponse.IsSuccessful)
