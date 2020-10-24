@@ -125,7 +125,7 @@ namespace TixFactory.Logging.Client
 			}
 			catch (Exception e)
 			{
-				_FailureLogger.Error(e);
+				_FailureLogger.Error($"{nameof(NetworkLogger)}.{nameof(Write)}({logLevel}) threw unhandled exception\n\nORIGINAL MESSAGE\n{message}\n\nUNHANDLED LOGGER EXCEPTION\n{e}");
 			}
 		}
 	}
