@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <IsPackable>true</IsPackable>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootPath>../../</RootPath>
+    <PackageTags>data mysql</PackageTags>
+  </PropertyGroup>
+  <Import Project="$(RootPath)build/build.targets" />
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="8.0.21" />
+    <PackageReference Include="TixFactory.Configuration" Version="$(PackageVersion)" />
+  </ItemGroup>
+</Project>
