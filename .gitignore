@@ -350,5 +350,5 @@ MigrationBackup/
 .ionide/
 
 # Custom to tix-factory
-#build/build.proj
+build/build.proj
 launchSettings.json
