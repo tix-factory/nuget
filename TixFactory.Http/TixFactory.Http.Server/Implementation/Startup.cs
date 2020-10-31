@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using Newtonsoft.Json.Converters;
 using TixFactory.Logging;
@@ -20,7 +21,7 @@ namespace TixFactory.Http.Server
 		/// <summary>
 		/// The application's <see cref="ILogger"/>.
 		/// </summary>
-		protected ILogger Logger { get; }
+		protected TixFactory.Logging.ILogger Logger { get; }
 
 		/// <summary>
 		/// The application's <see cref="IOperationExecuter"/>.
@@ -34,7 +35,7 @@ namespace TixFactory.Http.Server
 		/// <exception cref="ArgumentNullException">
 		/// - <paramref name="logger"/>
 		/// </exception>
-		protected Startup(ILogger logger)
+		protected Startup(TixFactory.Logging.ILogger logger)
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			OperationExecuter = new OperationExecuter();
@@ -51,6 +52,7 @@ namespace TixFactory.Http.Server
 			services.AddTransient(s => OperationExecuter);
 			services.AddTransient(s => Logger);
 			services.AddMvc(ConfigureMvc).AddJsonOptions(ConfigureJson);
+			services.AddLogging(lb => lb.ClearProviders());
 		}
 
 		/// <summary>
