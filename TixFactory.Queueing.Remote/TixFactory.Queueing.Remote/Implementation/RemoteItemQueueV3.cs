@@ -119,19 +119,20 @@ namespace TixFactory.Queueing.Remote
 				var httpResponse = _HttpClient.Send(httpRequest);
 
 				var serializedQueueItem = ParseResponse<Payload<QueueItemResult>>(httpRequest, httpResponse);
-				if (serializedQueueItem == null)
+				var queueItemResult = serializedQueueItem?.Data;
+				if (queueItemResult == null)
 				{
 					break;
 				}
 
 				try
 				{
-					var queueItemData = JsonConvert.DeserializeObject<RemoteQueueItem<TItem>>(serializedQueueItem.Data.Data);
+					var queueItemData = JsonConvert.DeserializeObject<RemoteQueueItem<TItem>>(queueItemResult.Data);
 					if (queueItemData.Data != null)
 					{
-						queueItem = new QueueItem<TItem>(serializedQueueItem.Data.Id.ToString(), queueItemData.Data)
+						queueItem = new QueueItem<TItem>(queueItemResult.Id.ToString(), queueItemData.Data)
 						{
-							HolderId = serializedQueueItem.Data.LeaseId.ToString(),
+							HolderId = queueItemResult.LeaseId.ToString(),
 							LockExpiration = DateTime.UtcNow + lockExpiration
 						};
 
@@ -146,7 +147,7 @@ namespace TixFactory.Queueing.Remote
 				var invalidItemListener = OnInvalidItem;
 				if (invalidItemListener != null)
 				{
-					ThreadPool.QueueUserWorkItem(state => invalidItemListener.Invoke(serializedQueueItem.Data));
+					ThreadPool.QueueUserWorkItem(state => invalidItemListener.Invoke(queueItemResult));
 				}
 			}
 
@@ -171,20 +172,21 @@ namespace TixFactory.Queueing.Remote
 				var httpResponse = await _HttpClient.SendAsync(httpRequest, cancellationToken).ConfigureAwait(false);
 
 				var serializedQueueItem = ParseResponse<Payload<QueueItemResult>>(httpRequest, httpResponse);
-				if (serializedQueueItem == null)
+				var queueItemResult = serializedQueueItem?.Data;
+				if (queueItemResult == null)
 				{
 					break;
 				}
 
 				try
 				{
-					var queueItemData = JsonConvert.DeserializeObject<RemoteQueueItem<TItem>>(serializedQueueItem.Data.Data);
+					var queueItemData = JsonConvert.DeserializeObject<RemoteQueueItem<TItem>>(queueItemResult.Data);
 					if (queueItemData.Data != null)
 					{
 						success = true;
-						queueItem = new QueueItem<TItem>(serializedQueueItem.Data.Id.ToString(), queueItemData.Data)
+						queueItem = new QueueItem<TItem>(queueItemResult.Id.ToString(), queueItemData.Data)
 						{
-							HolderId = serializedQueueItem.Data.LeaseId.ToString(),
+							HolderId = queueItemResult.LeaseId.ToString(),
 							LockExpiration = DateTime.UtcNow + lockExpiration
 						};
 
@@ -199,7 +201,7 @@ namespace TixFactory.Queueing.Remote
 				var invalidItemListener = OnInvalidItem;
 				if (invalidItemListener != null)
 				{
-					ThreadPool.QueueUserWorkItem(state => invalidItemListener.Invoke(serializedQueueItem.Data));
+					ThreadPool.QueueUserWorkItem(state => invalidItemListener.Invoke(queueItemResult));
 				}
 			}
 
