@@ -86,12 +86,7 @@ namespace TixFactory.Processors.Queueing
 			}
 			catch (Exception e)
 			{
-				var serializedQueueItem = queueItem.Value.ToString();
-				if (serializedQueueItem is object queueItemData)
-				{
-					serializedQueueItem = JsonConvert.SerializeObject(queueItemData);
-				}
-
+				var serializedQueueItem = JsonConvert.SerializeObject(queueItem);
 				_Logger.Error($"Error processing queue item.\n\tQueue Item ID: {queueItem.Id}\n\tItem type: {typeof(TItem).FullName}\n\tItem: {serializedQueueItem}\n{e}");
 			}
 		}
