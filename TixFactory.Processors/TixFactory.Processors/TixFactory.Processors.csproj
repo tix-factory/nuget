@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootPath>../../</RootPath>
+    <PackageTags>application processors</PackageTags>
+  </PropertyGroup>
+  <Import Project="$(RootPath)build/build.targets" />
+  <ItemGroup>
+    <PackageReference Include="TixFactory.ApplicationContext" Version="$(PackageVersion)" />
+    <PackageReference Include="TixFactory.Logging" Version="$(PackageVersion)" />
+  </ItemGroup>
+</Project>
