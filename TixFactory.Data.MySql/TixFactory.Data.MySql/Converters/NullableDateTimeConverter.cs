@@ -14,10 +14,15 @@ namespace TixFactory.Data.MySql
 			switch (reader.TokenType)
 			{
 				case JsonTokenType.String:
-					var dateTime = DateTime.SpecifyKind(DateTime.Parse(reader.GetString()), DateTimeKind.Utc);
-					if (dateTime.Kind != DateTimeKind.Utc)
+					var dateTime = DateTime.Parse(reader.GetString());
+					switch (dateTime.Kind)
 					{
-						dateTime = dateTime.ToUniversalTime();
+						case DateTimeKind.Local:
+							dateTime = dateTime.ToUniversalTime();
+							break;
+						case DateTimeKind.Unspecified:
+							dateTime = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
+							break;
 					}
 
 					return dateTime;
@@ -32,7 +37,18 @@ namespace TixFactory.Data.MySql
 		{
 			if (value.HasValue)
 			{
-				writer.WriteStringValue(value.Value.ToString("o"));
+				var date = value.Value;
+				switch (date.Kind)
+				{
+					case DateTimeKind.Local:
+						date = date.ToUniversalTime();
+						break;
+					case DateTimeKind.Unspecified:
+						date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+						break;
+				}
+
+				writer.WriteStringValue(date.ToString("o"));
 			}
 			else
 			{

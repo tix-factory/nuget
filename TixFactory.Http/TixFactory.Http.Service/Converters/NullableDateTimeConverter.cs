@@ -15,9 +15,14 @@ namespace TixFactory.Http.Service
 			{
 				case JsonTokenType.String:
 					var dateTime = DateTime.Parse(reader.GetString());
-					if (dateTime.Kind != DateTimeKind.Utc)
+					switch (dateTime.Kind)
 					{
-						dateTime = dateTime.ToUniversalTime();
+						case DateTimeKind.Local:
+							dateTime = dateTime.ToUniversalTime();
+							break;
+						case DateTimeKind.Unspecified:
+							dateTime = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
+							break;
 					}
 
 					return dateTime;
@@ -32,7 +37,18 @@ namespace TixFactory.Http.Service
 		{
 			if (value.HasValue)
 			{
-				writer.WriteStringValue(value.Value.ToString("o"));
+				var date = value.Value;
+				switch (date.Kind)
+				{
+					case DateTimeKind.Local:
+						date = date.ToUniversalTime();
+						break;
+					case DateTimeKind.Unspecified:
+						date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+						break;
+				}
+
+				writer.WriteStringValue(date.ToString("o"));
 			}
 			else
 			{
