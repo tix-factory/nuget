@@ -127,10 +127,9 @@ namespace TixFactory.Processors.Queueing
 						runTask = Task.Delay(_QueueProcessorSettings.ThreadSleepTime);
 					}
 
-					_RunningTasks.Add(runTask.ContinueWith(t =>
-					{
-						_RunningTasks.Remove(runTask);
-					}));
+					runTask.ContinueWith(t => _RunningTasks.Remove(runTask));
+
+					_RunningTasks.Add(runTask);
 				}
 			}
 			finally

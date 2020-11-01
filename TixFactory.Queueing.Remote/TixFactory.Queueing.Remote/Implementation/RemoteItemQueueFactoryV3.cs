@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using TixFactory.Configuration;
 using TixFactory.Http.Client;
@@ -13,6 +14,7 @@ namespace TixFactory.Queueing.Remote
 		private readonly IHttpClient _HttpClient;
 		private readonly IReadOnlySetting<Guid> _ApplicationApiKey;
 		private readonly ILogger _Logger;
+		private readonly IList<Timer> _RefreshCountTimers;
 
 		/// <summary>
 		/// The minimum interval to refresh created <see cref="IRemoteItemQueue{IItem}"/> queue sizes.
@@ -38,6 +40,7 @@ namespace TixFactory.Queueing.Remote
 			_HttpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 			_ApplicationApiKey = applicationApiKey ?? throw new ArgumentNullException(nameof(applicationApiKey));
 			_Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+			_RefreshCountTimers = new List<Timer>();
 		}
 
 		/// <inheritdoc cref="IRemoteItemQueueFactory.CreateRemoteItemQueue{TItem}"/>
@@ -58,6 +61,8 @@ namespace TixFactory.Queueing.Remote
 					state: null,
 					dueTime: countRefreshInterval.Value,
 					period: countRefreshInterval.Value);
+
+				_RefreshCountTimers.Add(countRefreshTimer);
 			}
 
 			return remoteItemQueue;
