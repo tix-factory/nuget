@@ -141,7 +141,13 @@ namespace TixFactory.Data.MySql
 					var row = new Dictionary<string, object>();
 					for (var i = 0; i < reader.FieldCount; i++)
 					{
-						row.Add(reader.GetName(i), reader.GetValue(i));
+						var value = reader.GetValue(i);
+						if (value == DBNull.Value)
+						{
+							value = null;
+						}
+
+						row.Add(reader.GetName(i), value);
 					}
 
 					// TODO: Is there a better way to convert reader object -> T?
