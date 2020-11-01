@@ -147,11 +147,12 @@ namespace TixFactory.Processors.Queueing
 				var removalTasks = new List<Task>();
 				foreach (var runningThread in _RunningTasks)
 				{
-					if (runningThread.IsCompleted)
+					if (runningThread == null || runningThread.IsCompleted)
 					{
 						removalTasks.Add(runningThread);
 					}
 				}
+
 				foreach (var removalTask in removalTasks)
 				{
 					_RunningTasks.Remove(removalTask);
@@ -159,7 +160,7 @@ namespace TixFactory.Processors.Queueing
 			}
 			catch (Exception e)
 			{
-				_Logger.Error($"Error clearing out running theads.\n{e}");
+				_Logger.Error($"Error clearing out running theads. (_RunningTask null: {_RunningTasks == null})\n{e}");
 			}
 		}
 	}
