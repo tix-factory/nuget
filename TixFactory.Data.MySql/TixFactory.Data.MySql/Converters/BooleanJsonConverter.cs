@@ -39,7 +39,7 @@ namespace TixFactory.Data.MySql
 
 		public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
 		{
-			writer.WriteStringValue(value.ToString().ToLower());
+			writer.WriteBooleanValue(value);
 		}
 	}
 }

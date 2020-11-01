@@ -95,6 +95,7 @@ namespace TixFactory.Http.Service
 		protected virtual void ConfigureJson(JsonOptions options)
 		{
 			options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+			options.JsonSerializerOptions.Converters.Add(new NullableDateTimeConverter());
 		}
 
 		/// <summary>

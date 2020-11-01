@@ -19,7 +19,7 @@ namespace TixFactory.Http.Server
 	public abstract class Startup
 	{
 		/// <summary>
-		/// The application's <see cref="ILogger"/>.
+		/// The application's <see cref="TixFactory.Logging.ILogger"/>.
 		/// </summary>
 		protected TixFactory.Logging.ILogger Logger { get; }
 
@@ -31,7 +31,7 @@ namespace TixFactory.Http.Server
 		/// <summary>
 		/// Initializes a new <see cref="Startup"/>.
 		/// </summary>
-		/// <param name="logger">An <see cref="ILogger"/>.</param>
+		/// <param name="logger">An <see cref="TixFactory.Logging.ILogger"/>.</param>
 		/// <exception cref="ArgumentNullException">
 		/// - <paramref name="logger"/>
 		/// </exception>
