@@ -22,6 +22,16 @@ namespace TixFactory.Data.MySql
 			ConnectionLock = new SemaphoreSlim(1, 1);
 		}
 
+		public void Close()
+		{
+			if (_ConnectionLazy.IsValueCreated)
+			{
+				var connection = _ConnectionLazy.Value;
+				_ConnectionLazy.Refresh();
+				connection.Close();
+			}
+		}
+
 		private MySqlConnection BuildConnection()
 		{
 			var connectionString = _ConnectionString.Value;

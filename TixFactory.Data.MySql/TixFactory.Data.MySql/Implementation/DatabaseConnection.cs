@@ -12,6 +12,7 @@ namespace TixFactory.Data.MySql
 	/// <inheritdoc cref="IDatabaseConnection"/>
 	public class DatabaseConnection : IDatabaseConnection
 	{
+		private const string _FatalMessage = "Fatal error encountered during command execution.";
 		private readonly JsonSerializerOptions _JsonSerializerOptions;
 		private readonly ISet<DatabaseConnectionWrapper> _ReadConnections;
 		private readonly ISet<DatabaseConnectionWrapper> _WriteConnections;
@@ -102,6 +103,11 @@ namespace TixFactory.Data.MySql
 				command.Parameters.AddRange(mySqlParameters.ToArray());
 				return ExecuteCommand<T>(command);
 			}
+			catch (MySqlException e) when (e.Message.Contains(_FatalMessage))
+			{
+				dataConnectionWrapper.Close();
+				throw;
+			}
 			finally
 			{
 				dataConnectionWrapper.ConnectionLock.Release();
@@ -122,6 +128,11 @@ namespace TixFactory.Data.MySql
 				command.Parameters.AddRange(mySqlParameters.ToArray());
 
 				return command.ExecuteNonQuery();
+			}
+			catch (MySqlException e) when (e.Message.Contains(_FatalMessage))
+			{
+				dataConnectionWrapper.Close();
+				throw;
 			}
 			finally
 			{
