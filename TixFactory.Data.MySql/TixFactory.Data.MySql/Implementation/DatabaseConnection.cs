@@ -145,7 +145,7 @@ namespace TixFactory.Data.MySql
 					}
 
 					// TODO: Is there a better way to convert reader object -> T?
-					var serializedRow = JsonSerializer.Serialize(row);
+					var serializedRow = JsonSerializer.Serialize(row, _JsonSerializerOptions);
 					var deserializedRow = JsonSerializer.Deserialize<T>(serializedRow, _JsonSerializerOptions);
 
 					if (deserializedRow != default(T))

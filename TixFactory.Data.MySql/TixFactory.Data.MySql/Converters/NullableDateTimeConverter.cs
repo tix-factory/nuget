@@ -14,7 +14,7 @@ namespace TixFactory.Data.MySql
 			switch (reader.TokenType)
 			{
 				case JsonTokenType.String:
-					var dateTime = DateTime.Parse(reader.GetString());
+					var dateTime = DateTime.SpecifyKind(DateTime.Parse(reader.GetString()), DateTimeKind.Utc);
 					if (dateTime.Kind != DateTimeKind.Utc)
 					{
 						dateTime = dateTime.ToUniversalTime();
