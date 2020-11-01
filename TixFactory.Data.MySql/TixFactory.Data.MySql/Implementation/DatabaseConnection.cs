@@ -62,6 +62,7 @@ namespace TixFactory.Data.MySql
 			};
 
 			jsonSerializerOptions.Converters.Add(new BooleanJsonConverter());
+			jsonSerializerOptions.Converters.Add(new NullableDateTimeConverter());
 
 			for (var n = 0; n < maxConnections; n++)
 			{
