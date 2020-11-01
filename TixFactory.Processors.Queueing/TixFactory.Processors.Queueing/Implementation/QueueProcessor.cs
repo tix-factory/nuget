@@ -53,6 +53,8 @@ namespace TixFactory.Processors.Queueing
 		public void Start()
 		{
 			_Started = true;
+
+			ProcessQueue();
 		}
 
 		/// <inheritdoc cref="IQueueProcessor.Stop"/>
