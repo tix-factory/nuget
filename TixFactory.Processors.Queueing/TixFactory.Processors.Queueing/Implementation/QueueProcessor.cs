@@ -18,6 +18,7 @@ namespace TixFactory.Processors.Queueing
 		private readonly IQueueProcessorSettings _QueueProcessorSettings;
 		private readonly ILogger _Logger;
 		private readonly SemaphoreSlim _ProcessQueueLock;
+		private readonly SemaphoreSlim _TaskLock;
 		private readonly TrackedList<Task> _RunningTasks;
 		private bool _Started;
 
@@ -43,6 +44,7 @@ namespace TixFactory.Processors.Queueing
 
 			var runningTaks = _RunningTasks = new TrackedList<Task>();
 			_ProcessQueueLock = new SemaphoreSlim(1, 1);
+			_TaskLock = new SemaphoreSlim(1, 1);
 
 			runningTaks.CountSetting.Changed += (newCount, oldCold) => ProcessQueue();
 			itemQueue.QueueSize.Changed += (newQueueSize, oldQueueSize) => ProcessQueue();
@@ -129,9 +131,9 @@ namespace TixFactory.Processors.Queueing
 						runTask = Task.Delay(_QueueProcessorSettings.ThreadSleepTime);
 					}
 
-					runTask.ContinueWith(t => _RunningTasks.Remove(runTask));
+					runTask.ContinueWith(t => RemoveTask(runTask));
 
-					_RunningTasks.Add(runTask);
+					AddTask(runTask);
 				});
 			}
 			finally
@@ -142,6 +144,13 @@ namespace TixFactory.Processors.Queueing
 
 		private void ClearFinishedTasks()
 		{
+			if (!_Started)
+			{
+				return;
+			}
+
+			_TaskLock.Wait();
+
 			try
 			{
 				var removalTasks = new List<Task>();
@@ -161,6 +170,38 @@ namespace TixFactory.Processors.Queueing
 			catch (Exception e)
 			{
 				_Logger.Error($"Error clearing out running theads. (_RunningTask null: {_RunningTasks == null})\n{e}");
+			}
+			finally
+			{
+				_TaskLock.Release();
+			}
+		}
+
+		private void AddTask(Task task)
+		{
+			_TaskLock.Wait();
+
+			try
+			{
+				_RunningTasks.Add(task);
+			}
+			finally
+			{
+				_TaskLock.Release();
+			}
+		}
+
+		private void RemoveTask(Task task)
+		{
+			_TaskLock.Wait();
+
+			try
+			{
+				_RunningTasks.Remove(task);
+			}
+			finally
+			{
+				_TaskLock.Release();
 			}
 		}
 	}
