@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TixFactory.ApplicationContext;
-using TixFactory.Logging;
 
 namespace TixFactory.Http.Service
 {
@@ -19,9 +19,9 @@ namespace TixFactory.Http.Service
 	public abstract class Startup
 	{
 		/// <summary>
-		/// The application's <see cref="ILogger"/>.
+		/// The application's <see cref="TixFactory.Logging.ILogger"/>.
 		/// </summary>
-		protected ILogger Logger { get; }
+		protected TixFactory.Logging.ILogger Logger { get; }
 
 		/// <summary>
 		/// The application's <see cref="IOperationExecuter"/>.
@@ -40,7 +40,7 @@ namespace TixFactory.Http.Service
 		/// <exception cref="ArgumentNullException">
 		/// - <paramref name="logger"/>
 		/// </exception>
-		protected Startup(ILogger logger)
+		protected Startup(TixFactory.Logging.ILogger logger)
 			: this(logger, TixFactory.ApplicationContext.ApplicationContext.Singleton)
 		{
 			TixFactory.ApplicationContext.ApplicationContext.SetEntryClass(GetType());
@@ -55,7 +55,7 @@ namespace TixFactory.Http.Service
 		/// - <paramref name="logger"/>
 		/// - <paramref name="applicationContext"/>
 		/// </exception>
-		protected Startup(ILogger logger, IApplicationContext applicationContext)
+		protected Startup(TixFactory.Logging.ILogger logger, IApplicationContext applicationContext)
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			ApplicationContext = applicationContext ?? throw new ArgumentNullException(nameof(applicationContext));
@@ -73,6 +73,7 @@ namespace TixFactory.Http.Service
 			services.AddTransient(s => ApplicationContext);
 			services.AddTransient(s => OperationExecuter);
 			services.AddTransient(s => Logger);
+			services.AddLogging(lb => lb.ClearProviders());
 			services.AddControllers(ConfigureMvc).AddJsonOptions(ConfigureJson);
 		}
 
