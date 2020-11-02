@@ -116,7 +116,7 @@ namespace TixFactory.Processors.Queueing
 			{
 				ClearFinishedTasks();
 
-				for (var threadNumber = _RunningTasks.Count; threadNumber < _QueueProcessorSettings.NumberOfThreads; threadNumber++)
+				Parallel.For(_RunningTasks.Count, _QueueProcessorSettings.NumberOfThreads, threadNumber =>
 				{
 					Task runTask;
 
@@ -132,7 +132,7 @@ namespace TixFactory.Processors.Queueing
 					runTask.ContinueWith(t => _RunningTasks.Remove(runTask));
 
 					_RunningTasks.Add(runTask);
-				}
+				});
 			}
 			finally
 			{
