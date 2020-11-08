@@ -10,5 +10,6 @@
   <ItemGroup>
     <PackageReference Include="MySql.Data" Version="8.0.21" />
     <PackageReference Include="TixFactory.Configuration" Version="$(PackageVersion)" />
+    <PackageReference Include="TixFactory.Logging" Version="$(PackageVersion)" />
   </ItemGroup>
 </Project>
