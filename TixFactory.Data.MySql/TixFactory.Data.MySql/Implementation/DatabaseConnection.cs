@@ -4,8 +4,10 @@ using System.Data;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using TixFactory.Configuration;
+using TixFactory.Logging;
 
 namespace TixFactory.Data.MySql
 {
@@ -23,11 +25,13 @@ namespace TixFactory.Data.MySql
 		/// Initializes a new <see cref="DatabaseConnection"/>.
 		/// </summary>
 		/// <param name="connectionString">The connection string <see cref="IReadOnlySetting{T}"/>.</param>
+		/// <param name="logger">An <see cref="ILogger"/>.</param>
 		/// <exception cref="ArgumentNullException">
 		/// - <paramref name="connectionString"/>
+		/// - <paramref name="logger"/>
 		/// </exception>
-		public DatabaseConnection(IReadOnlySetting<string> connectionString)
-			: this(connectionString, maxConnections: 5)
+		public DatabaseConnection(IReadOnlySetting<string> connectionString, ILogger logger)
+			: this(connectionString, logger, maxConnections: 5)
 		{
 		}
 
@@ -35,18 +39,25 @@ namespace TixFactory.Data.MySql
 		/// Initializes a new <see cref="DatabaseConnection"/>.
 		/// </summary>
 		/// <param name="connectionString">The connection string <see cref="IReadOnlySetting{T}"/>.</param>
+		/// <param name="logger">An <see cref="ILogger"/>.</param>
 		/// <param name="maxConnections">The max number of connections for per-read/write connection.</param>
 		/// <exception cref="ArgumentNullException">
 		/// - <paramref name="connectionString"/>
+		/// - <paramref name="logger"/>
 		/// </exception>
 		/// <exception cref="ArgumentOutOfRangeException">
 		/// - <paramref name="maxConnections"/> is below 1.
 		/// </exception>
-		public DatabaseConnection(IReadOnlySetting<string> connectionString, int maxConnections)
+		public DatabaseConnection(IReadOnlySetting<string> connectionString, ILogger logger, int maxConnections)
 		{
 			if (connectionString == null)
 			{
 				throw new ArgumentNullException(nameof(connectionString));
+			}
+
+			if (logger == null)
+			{
+				throw new ArgumentNullException(nameof(logger));
 			}
 
 			if (maxConnections < 1)
@@ -67,8 +78,8 @@ namespace TixFactory.Data.MySql
 
 			for (var n = 0; n < maxConnections; n++)
 			{
-				readConnections.Add(new DatabaseConnectionWrapper(connectionString));
-				writeConnections.Add(new DatabaseConnectionWrapper(connectionString));
+				readConnections.Add(new DatabaseConnectionWrapper(connectionString, logger));
+				writeConnections.Add(new DatabaseConnectionWrapper(connectionString, logger));
 			}
 		}
 
@@ -80,10 +91,26 @@ namespace TixFactory.Data.MySql
 			return insertResult.Id;
 		}
 
+		/// <inheritdoc cref="IDatabaseConnection.ExecuteInsertStoredProcedureAsync{T}"/>
+		public async Task<T> ExecuteInsertStoredProcedureAsync<T>(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters, CancellationToken cancellationToken)
+		{
+			var insertResults = await ExecuteReadStoredProcedureAsync<InsertResult<T>>(storedProcedureName, mySqlParameters, cancellationToken).ConfigureAwait(false);
+			var insertResult = insertResults.First();
+			return insertResult.Id;
+		}
+
 		/// <inheritdoc cref="IDatabaseConnection.ExecuteCountStoredProcedure"/>
 		public long ExecuteCountStoredProcedure(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters)
 		{
 			var insertResults = ExecuteReadStoredProcedure<CountResult>(storedProcedureName, mySqlParameters);
+			var insertResult = insertResults.First();
+			return insertResult.Count;
+		}
+
+		/// <inheritdoc cref="IDatabaseConnection.ExecuteCountStoredProcedureAsync"/>
+		public async Task<long> ExecuteCountStoredProcedureAsync(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters, CancellationToken cancellationToken)
+		{
+			var insertResults = await ExecuteReadStoredProcedureAsync<CountResult>(storedProcedureName, mySqlParameters, cancellationToken).ConfigureAwait(false);
 			var insertResult = insertResults.First();
 			return insertResult.Count;
 		}
@@ -98,7 +125,8 @@ namespace TixFactory.Data.MySql
 
 			try
 			{
-				var command = new MySqlCommand(storedProcedureName, dataConnectionWrapper.Connection);
+				var connection = dataConnectionWrapper.GetConnection();
+				var command = new MySqlCommand(storedProcedureName, connection);
 				command.CommandType = CommandType.StoredProcedure;
 				command.Parameters.AddRange(mySqlParameters.ToArray());
 				return ExecuteCommand<T>(command);
@@ -106,6 +134,35 @@ namespace TixFactory.Data.MySql
 			catch (MySqlException e) when (e.Message.Contains(_FatalMessage))
 			{
 				dataConnectionWrapper.Close();
+				throw;
+			}
+			finally
+			{
+				dataConnectionWrapper.ConnectionLock.Release();
+			}
+		}
+
+		/// <inheritdoc cref="IDatabaseConnection.ExecuteReadStoredProcedureAsync{T}"/>
+		public async Task<IReadOnlyCollection<T>> ExecuteReadStoredProcedureAsync<T>(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters, CancellationToken cancellationToken)
+			where T : class
+		{
+			var index = Interlocked.Increment(ref _ReadCount);
+			var dataConnectionWrapper = _ReadConnections.ElementAt(index % _ReadConnections.Count);
+
+			await dataConnectionWrapper.ConnectionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+
+			try
+			{
+				var connection = await dataConnectionWrapper.GetConnectionAsync(cancellationToken).ConfigureAwait(false);
+				var command = new MySqlCommand(storedProcedureName, connection);
+				command.CommandType = CommandType.StoredProcedure;
+				command.Parameters.AddRange(mySqlParameters.ToArray());
+
+				return await ExecuteCommandAsync<T>(command, cancellationToken).ConfigureAwait(false);
+			}
+			catch (MySqlException e) when (e.Message.Contains(_FatalMessage))
+			{
+				await dataConnectionWrapper.CloseAsync(cancellationToken).ConfigureAwait(false);
 				throw;
 			}
 			finally
@@ -123,7 +180,8 @@ namespace TixFactory.Data.MySql
 
 			try
 			{
-				var command = new MySqlCommand(storedProcedureName, dataConnectionWrapper.Connection);
+				var connection = dataConnectionWrapper.GetConnection();
+				var command = new MySqlCommand(storedProcedureName, connection);
 				command.CommandType = CommandType.StoredProcedure;
 				command.Parameters.AddRange(mySqlParameters.ToArray());
 
@@ -132,6 +190,35 @@ namespace TixFactory.Data.MySql
 			catch (MySqlException e) when (e.Message.Contains(_FatalMessage))
 			{
 				dataConnectionWrapper.Close();
+				throw;
+			}
+			finally
+			{
+				dataConnectionWrapper.ConnectionLock.Release();
+			}
+		}
+
+
+		/// <inheritdoc cref="IDatabaseConnection.ExecuteWriteStoredProcedureAsync"/>
+		public async Task<int> ExecuteWriteStoredProcedureAsync(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters, CancellationToken cancellationToken)
+		{
+			var index = Interlocked.Increment(ref _WriteCount);
+			var dataConnectionWrapper = _WriteConnections.ElementAt(index % _WriteConnections.Count);
+
+			await dataConnectionWrapper.ConnectionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+
+			try
+			{
+				var connection = await dataConnectionWrapper.GetConnectionAsync(cancellationToken).ConfigureAwait(false);
+				var command = new MySqlCommand(storedProcedureName, connection);
+				command.CommandType = CommandType.StoredProcedure;
+				command.Parameters.AddRange(mySqlParameters.ToArray());
+
+				return await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+			}
+			catch (MySqlException e) when (e.Message.Contains(_FatalMessage))
+			{
+				await dataConnectionWrapper.CloseAsync(cancellationToken).ConfigureAwait(false);
 				throw;
 			}
 			finally
@@ -149,30 +236,57 @@ namespace TixFactory.Data.MySql
 			{
 				while (reader.Read())
 				{
-					var row = new Dictionary<string, object>();
-					for (var i = 0; i < reader.FieldCount; i++)
+					var parsedRow = ParseRow<T>(reader);
+					if (parsedRow != default(T))
 					{
-						var value = reader.GetValue(i);
-						if (value == DBNull.Value)
-						{
-							value = null;
-						}
-
-						row.Add(reader.GetName(i), value);
-					}
-
-					// TODO: Is there a better way to convert reader object -> T?
-					var serializedRow = JsonSerializer.Serialize(row, _JsonSerializerOptions);
-					var deserializedRow = JsonSerializer.Deserialize<T>(serializedRow, _JsonSerializerOptions);
-
-					if (deserializedRow != default(T))
-					{
-						rows.Add(deserializedRow);
+						rows.Add(parsedRow);
 					}
 				}
 			}
 
 			return rows;
+		}
+
+		private async Task<IReadOnlyCollection<T>> ExecuteCommandAsync<T>(MySqlCommand command, CancellationToken cancellationToken)
+			where T : class
+		{
+			var rows = new List<T>();
+
+			using (var reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false))
+			{
+				while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+				{
+					var parsedRow = ParseRow<T>(reader);
+					if (parsedRow != default(T))
+					{
+						rows.Add(parsedRow);
+					}
+				}
+			}
+
+			return rows;
+		}
+
+		private T ParseRow<T>(IDataRecord reader)
+			where T : class
+		{
+			var row = new Dictionary<string, object>();
+			for (var i = 0; i < reader.FieldCount; i++)
+			{
+				var value = reader.GetValue(i);
+				if (value == DBNull.Value)
+				{
+					value = null;
+				}
+
+				row.Add(reader.GetName(i), value);
+			}
+
+			// TODO: Is there a better way to convert reader object -> T?
+			var serializedRow = JsonSerializer.Serialize(row, _JsonSerializerOptions);
+			var deserializedRow = JsonSerializer.Deserialize<T>(serializedRow, _JsonSerializerOptions);
+
+			return deserializedRow;
 		}
 	}
 }
