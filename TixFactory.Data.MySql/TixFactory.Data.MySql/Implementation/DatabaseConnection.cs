@@ -14,12 +14,9 @@ namespace TixFactory.Data.MySql
 	/// <inheritdoc cref="IDatabaseConnection"/>
 	public class DatabaseConnection : IDatabaseConnection
 	{
-		private const string _FatalMessage = "Fatal error encountered during command execution.";
+		private readonly IReadOnlySetting<string> _ConnectionString;
 		private readonly JsonSerializerOptions _JsonSerializerOptions;
-		private readonly ISet<DatabaseConnectionWrapper> _ReadConnections;
-		private readonly ISet<DatabaseConnectionWrapper> _WriteConnections;
-		private int _ReadCount = 0;
-		private int _WriteCount = 0;
+		private readonly SemaphoreSlim _ConnectionLock;
 
 		/// <summary>
 		/// Initializes a new <see cref="DatabaseConnection"/>.
@@ -31,7 +28,7 @@ namespace TixFactory.Data.MySql
 		/// - <paramref name="logger"/>
 		/// </exception>
 		public DatabaseConnection(IReadOnlySetting<string> connectionString, ILogger logger)
-			: this(connectionString, logger, maxConnections: 5)
+			: this(connectionString, logger, maxConnections: 10)
 		{
 		}
 
@@ -50,11 +47,6 @@ namespace TixFactory.Data.MySql
 		/// </exception>
 		public DatabaseConnection(IReadOnlySetting<string> connectionString, ILogger logger, int maxConnections)
 		{
-			if (connectionString == null)
-			{
-				throw new ArgumentNullException(nameof(connectionString));
-			}
-
 			if (logger == null)
 			{
 				throw new ArgumentNullException(nameof(logger));
@@ -65,8 +57,8 @@ namespace TixFactory.Data.MySql
 				throw new ArgumentOutOfRangeException(nameof(maxConnections));
 			}
 
-			var readConnections = _ReadConnections = new HashSet<DatabaseConnectionWrapper>();
-			var writeConnections = _WriteConnections = new HashSet<DatabaseConnectionWrapper>();
+			_ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
+			_ConnectionLock = new SemaphoreSlim(maxConnections, maxConnections);
 
 			var jsonSerializerOptions = _JsonSerializerOptions = new JsonSerializerOptions
 			{
@@ -75,12 +67,6 @@ namespace TixFactory.Data.MySql
 
 			jsonSerializerOptions.Converters.Add(new BooleanJsonConverter());
 			jsonSerializerOptions.Converters.Add(new NullableDateTimeConverter());
-
-			for (var n = 0; n < maxConnections; n++)
-			{
-				readConnections.Add(new DatabaseConnectionWrapper(connectionString, logger));
-				writeConnections.Add(new DatabaseConnectionWrapper(connectionString, logger));
-			}
 		}
 
 		/// <inheritdoc cref="IDatabaseConnection.ExecuteInsertStoredProcedure{T}"/>
@@ -119,112 +105,111 @@ namespace TixFactory.Data.MySql
 		public IReadOnlyCollection<T> ExecuteReadStoredProcedure<T>(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters)
 			where T : class
 		{
-			var index = Interlocked.Increment(ref _ReadCount);
-			var dataConnectionWrapper = _ReadConnections.ElementAt(index % _ReadConnections.Count);
-			dataConnectionWrapper.ConnectionLock.Wait();
+			IReadOnlyCollection<T> result;
+			_ConnectionLock.Wait();
 
 			try
 			{
-				var connection = dataConnectionWrapper.GetConnection();
-				var command = new MySqlCommand(storedProcedureName, connection);
-				command.CommandType = CommandType.StoredProcedure;
-				command.Parameters.AddRange(mySqlParameters.ToArray());
-				return ExecuteCommand<T>(command);
-			}
-			catch (MySqlException e) when (e.Message.Contains(_FatalMessage))
-			{
-				dataConnectionWrapper.Close();
-				throw;
+				using (var connection = new MySqlConnection(_ConnectionString.Value))
+				{
+					connection.Open();
+
+					var command = new MySqlCommand(storedProcedureName, connection);
+					command.CommandType = CommandType.StoredProcedure;
+					command.Parameters.AddRange(mySqlParameters.ToArray());
+
+					result = ExecuteCommand<T>(command);
+				}
 			}
 			finally
 			{
-				dataConnectionWrapper.ConnectionLock.Release();
+				_ConnectionLock.Release();
 			}
+
+			return result;
 		}
 
 		/// <inheritdoc cref="IDatabaseConnection.ExecuteReadStoredProcedureAsync{T}"/>
 		public async Task<IReadOnlyCollection<T>> ExecuteReadStoredProcedureAsync<T>(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters, CancellationToken cancellationToken)
 			where T : class
 		{
-			var index = Interlocked.Increment(ref _ReadCount);
-			var dataConnectionWrapper = _ReadConnections.ElementAt(index % _ReadConnections.Count);
-
-			await dataConnectionWrapper.ConnectionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+			IReadOnlyCollection<T> result;
+			await _ConnectionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
 
 			try
 			{
-				var connection = await dataConnectionWrapper.GetConnectionAsync(cancellationToken).ConfigureAwait(false);
-				var command = new MySqlCommand(storedProcedureName, connection);
-				command.CommandType = CommandType.StoredProcedure;
-				command.Parameters.AddRange(mySqlParameters.ToArray());
+				using (var connection = new MySqlConnection(_ConnectionString.Value))
+				{
+					await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
 
-				return await ExecuteCommandAsync<T>(command, cancellationToken).ConfigureAwait(false);
-			}
-			catch (MySqlException e) when (e.Message.Contains(_FatalMessage))
-			{
-				await dataConnectionWrapper.CloseAsync(cancellationToken).ConfigureAwait(false);
-				throw;
+					var command = new MySqlCommand(storedProcedureName, connection);
+					command.CommandType = CommandType.StoredProcedure;
+					command.Parameters.AddRange(mySqlParameters.ToArray());
+
+					result = await ExecuteCommandAsync<T>(command, cancellationToken).ConfigureAwait(false);
+				}
 			}
 			finally
 			{
-				dataConnectionWrapper.ConnectionLock.Release();
+				_ConnectionLock.Release();
 			}
+
+			return result;
 		}
 
 		/// <inheritdoc cref="IDatabaseConnection.ExecuteWriteStoredProcedure"/>
 		public int ExecuteWriteStoredProcedure(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters)
 		{
-			var index = Interlocked.Increment(ref _WriteCount);
-			var dataConnectionWrapper = _WriteConnections.ElementAt(index % _WriteConnections.Count);
-			dataConnectionWrapper.ConnectionLock.Wait();
+			int result;
+			_ConnectionLock.Wait();
 
 			try
 			{
-				var connection = dataConnectionWrapper.GetConnection();
-				var command = new MySqlCommand(storedProcedureName, connection);
-				command.CommandType = CommandType.StoredProcedure;
-				command.Parameters.AddRange(mySqlParameters.ToArray());
+				using (var connection = new MySqlConnection(_ConnectionString.Value))
+				{
+					connection.Open();
 
-				return command.ExecuteNonQuery();
-			}
-			catch (MySqlException e) when (e.Message.Contains(_FatalMessage))
-			{
-				dataConnectionWrapper.Close();
-				throw;
+					var command = new MySqlCommand(storedProcedureName, connection);
+					command.CommandType = CommandType.StoredProcedure;
+					command.Parameters.AddRange(mySqlParameters.ToArray());
+
+					result = command.ExecuteNonQuery();
+				}
 			}
 			finally
 			{
-				dataConnectionWrapper.ConnectionLock.Release();
+				_ConnectionLock.Release();
 			}
+
+			return result;
 		}
 
 
 		/// <inheritdoc cref="IDatabaseConnection.ExecuteWriteStoredProcedureAsync"/>
 		public async Task<int> ExecuteWriteStoredProcedureAsync(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters, CancellationToken cancellationToken)
 		{
-			var index = Interlocked.Increment(ref _WriteCount);
-			var dataConnectionWrapper = _WriteConnections.ElementAt(index % _WriteConnections.Count);
-
-			await dataConnectionWrapper.ConnectionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+			int result;
+			await _ConnectionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
 
 			try
 			{
-				var connection = await dataConnectionWrapper.GetConnectionAsync(cancellationToken).ConfigureAwait(false);
-				var command = new MySqlCommand(storedProcedureName, connection);
-				command.CommandType = CommandType.StoredProcedure;
-				command.Parameters.AddRange(mySqlParameters.ToArray());
+				using (var connection = new MySqlConnection(_ConnectionString.Value))
+				{
+					await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
 
-				return await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-			}
-			catch (MySqlException e) when (e.Message.Contains(_FatalMessage))
-			{
-				await dataConnectionWrapper.CloseAsync(cancellationToken).ConfigureAwait(false);
-				throw;
+					var command = new MySqlCommand(storedProcedureName, connection);
+					command.CommandType = CommandType.StoredProcedure;
+					command.Parameters.AddRange(mySqlParameters.ToArray());
+
+					result = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+				}
 			}
 			finally
 			{
-				dataConnectionWrapper.ConnectionLock.Release();
+				_ConnectionLock.Release();
 			}
+
+			return result;
 		}
 
 		private IReadOnlyCollection<T> ExecuteCommand<T>(MySqlCommand command)
