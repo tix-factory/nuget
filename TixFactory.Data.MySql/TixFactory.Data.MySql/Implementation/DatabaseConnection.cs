@@ -159,6 +159,8 @@ namespace TixFactory.Data.MySql
 					command.Parameters.AddRange(mySqlParameters.ToArray());
 
 					result = await ExecuteCommandAsync<T>(command, cancellationToken).ConfigureAwait(false);
+
+					await connection.CloseAsync(cancellationToken).ConfigureAwait(false);
 				}
 			}
 			finally
@@ -218,6 +220,8 @@ namespace TixFactory.Data.MySql
 					command.Parameters.AddRange(mySqlParameters.ToArray());
 
 					result = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+
+					await connection.CloseAsync(cancellationToken).ConfigureAwait(false);
 				}
 			}
 			finally
