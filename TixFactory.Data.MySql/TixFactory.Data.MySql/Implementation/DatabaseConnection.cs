@@ -28,7 +28,7 @@ namespace TixFactory.Data.MySql
 		/// - <paramref name="logger"/>
 		/// </exception>
 		public DatabaseConnection(IReadOnlySetting<string> connectionString, ILogger logger)
-			: this(connectionString, logger, maxConnections: 10)
+			: this(connectionString, logger, maxConnections: 0)
 		{
 		}
 
@@ -52,13 +52,21 @@ namespace TixFactory.Data.MySql
 				throw new ArgumentNullException(nameof(logger));
 			}
 
-			if (maxConnections < 1)
+			if (maxConnections < 0)
 			{
 				throw new ArgumentOutOfRangeException(nameof(maxConnections));
 			}
 
 			_ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
-			_ConnectionLock = new SemaphoreSlim(maxConnections, maxConnections);
+
+			if (maxConnections > 0)
+			{
+				_ConnectionLock = new SemaphoreSlim(maxConnections, maxConnections);
+			}
+			else
+			{
+				_ConnectionLock = null;
+			}
 
 			var jsonSerializerOptions = _JsonSerializerOptions = new JsonSerializerOptions
 			{
@@ -106,7 +114,7 @@ namespace TixFactory.Data.MySql
 			where T : class
 		{
 			IReadOnlyCollection<T> result;
-			_ConnectionLock.Wait();
+			_ConnectionLock?.Wait();
 
 			try
 			{
@@ -123,7 +131,7 @@ namespace TixFactory.Data.MySql
 			}
 			finally
 			{
-				_ConnectionLock.Release();
+				_ConnectionLock?.Release();
 			}
 
 			return result;
@@ -134,7 +142,11 @@ namespace TixFactory.Data.MySql
 			where T : class
 		{
 			IReadOnlyCollection<T> result;
-			await _ConnectionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+
+			if (_ConnectionLock != null)
+			{
+				await _ConnectionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+			}
 
 			try
 			{
@@ -151,7 +163,7 @@ namespace TixFactory.Data.MySql
 			}
 			finally
 			{
-				_ConnectionLock.Release();
+				_ConnectionLock?.Release();
 			}
 
 			return result;
@@ -161,7 +173,7 @@ namespace TixFactory.Data.MySql
 		public int ExecuteWriteStoredProcedure(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters)
 		{
 			int result;
-			_ConnectionLock.Wait();
+			_ConnectionLock?.Wait();
 
 			try
 			{
@@ -178,7 +190,7 @@ namespace TixFactory.Data.MySql
 			}
 			finally
 			{
-				_ConnectionLock.Release();
+				_ConnectionLock?.Release();
 			}
 
 			return result;
@@ -189,7 +201,11 @@ namespace TixFactory.Data.MySql
 		public async Task<int> ExecuteWriteStoredProcedureAsync(string storedProcedureName, IReadOnlyCollection<MySqlParameter> mySqlParameters, CancellationToken cancellationToken)
 		{
 			int result;
-			await _ConnectionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+
+			if (_ConnectionLock != null)
+			{
+				await _ConnectionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+			}
 
 			try
 			{
@@ -206,7 +222,7 @@ namespace TixFactory.Data.MySql
 			}
 			finally
 			{
-				_ConnectionLock.Release();
+				_ConnectionLock?.Release();
 			}
 
 			return result;
