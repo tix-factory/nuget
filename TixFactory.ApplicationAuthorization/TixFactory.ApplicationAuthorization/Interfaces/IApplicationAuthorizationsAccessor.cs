@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace TixFactory.ApplicationAuthorization
 {
@@ -9,7 +11,8 @@ namespace TixFactory.ApplicationAuthorization
 		/// Gets the names of authorized operations for a given ApiKey.
 		/// </summary>
 		/// <param name="apiKey">The ApiKey (<see cref="Guid"/>).</param>
+		/// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
 		/// <returns>The names of the operations the ApiKey is authorized to access.</returns>
-		ISet<string> GetAuthorizedOperationNames(Guid apiKey);
+		Task<ISet<string>> GetAuthorizedOperationNames(Guid apiKey, CancellationToken cancellationToken);
 	}
 }

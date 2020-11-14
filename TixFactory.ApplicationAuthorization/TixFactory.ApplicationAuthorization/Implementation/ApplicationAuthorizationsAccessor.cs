@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Mime;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
 using TixFactory.Configuration;
 using TixFactory.Http;
 using TixFactory.Http.Client;
@@ -79,14 +80,14 @@ namespace TixFactory.ApplicationAuthorization
 				PropertyNameCaseInsensitive = true
 			};
 
-			var refreshTimer = new Timer(RefreshAuthorizations,
+			var refreshTimer = new Timer(async state => await RefreshAuthorizations(state, CancellationToken.None).ConfigureAwait(false),
 				state: null,
 				dueTime: TimeSpan.Zero,
 				period: TimeSpan.FromSeconds(15));
 		}
 
 		/// <inheritdoc cref="IApplicationAuthorizationsAccessor.GetAuthorizedOperationNames"/>
-		public ISet<string> GetAuthorizedOperationNames(Guid apiKey)
+		public async Task<ISet<string>> GetAuthorizedOperationNames(Guid apiKey, CancellationToken cancellationToken)
 		{
 			if (apiKey == default)
 			{
@@ -100,35 +101,45 @@ namespace TixFactory.ApplicationAuthorization
 				return applicationAuthorization.OperationNames;
 			}
 
-			_LoadApplicationAuthorizationsLock.Wait();
+			await _LoadApplicationAuthorizationsLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+
+			ISet<string> operationNames;
 
 			try
 			{
-				var operationNames = LoadAuthorizations(apiKey);
-
-				_ApplicationAuthorizationsByApiKey[apiKey] = new ApplicationAuthorization
+				if (_ApplicationAuthorizationsByApiKey.TryGetValue(apiKey, out applicationAuthorization))
 				{
-					OperationNames = operationNames,
-					LastAccess = currentTime,
-					LastRefresh = currentTime
-				};
-
-				return operationNames;
+					applicationAuthorization.LastAccess = currentTime;
+					operationNames = applicationAuthorization.OperationNames;
+				}
+				else
+				{
+					operationNames = await LoadAuthorizations(apiKey, cancellationToken).ConfigureAwait(false);
+				}
 			}
 			finally
 			{
 				_LoadApplicationAuthorizationsLock.Release();
 			}
+
+			_ApplicationAuthorizationsByApiKey[apiKey] = new ApplicationAuthorization
+			{
+				OperationNames = operationNames,
+				LastAccess = currentTime,
+				LastRefresh = currentTime
+			};
+
+			return operationNames;
 		}
 
-		private ISet<string> LoadAuthorizations(Guid apiKey)
+		private async Task<ISet<string>> LoadAuthorizations(Guid apiKey, CancellationToken cancellationToken)
 		{
 			var httpRequest = new HttpRequest(HttpMethod.Post, _LoadAuthorizationsUrl);
 			httpRequest.Body = new StringContent($"{{\"apiKey\":\"{apiKey}\"}}");
 			httpRequest.Headers.Add(_ApiKeyHeaderName, _ApplicationApiKey.Value.ToString());
 			httpRequest.Headers.AddOrUpdate(HttpRequestHeaderName.ContentType, MediaTypeNames.Application.Json);
 
-			var httpResponse = _HttpClient.Send(httpRequest);
+			var httpResponse = await _HttpClient.SendAsync(httpRequest, cancellationToken).ConfigureAwait(false);
 			var responseBody = httpResponse.GetStringBody();
 			if (!httpResponse.IsSuccessful)
 			{
@@ -143,7 +154,7 @@ namespace TixFactory.ApplicationAuthorization
 			return new HashSet<string>(responseModel.Data);
 		}
 
-		private void RefreshAuthorizations(object state)
+		private async Task RefreshAuthorizations(object state, CancellationToken cancellationToken)
 		{
 			if (_RefreshDebounce)
 			{
@@ -155,6 +166,8 @@ namespace TixFactory.ApplicationAuthorization
 			try
 			{
 				var currentTime = DateTime.UtcNow;
+				var refreshTasks = new Dictionary<ApplicationAuthorization, Task<ISet<string>>>();
+
 				foreach (var apiKey in _ApplicationAuthorizationsByApiKey.Keys)
 				{
 					if (_ApplicationAuthorizationsByApiKey.TryGetValue(apiKey, out var applicationAuthorization))
@@ -168,12 +181,25 @@ namespace TixFactory.ApplicationAuthorization
 						{
 							// Refresh, we've seen them recently.
 							applicationAuthorization.LastRefresh = currentTime;
-							applicationAuthorization.OperationNames = LoadAuthorizations(apiKey);
+							refreshTasks.Add(applicationAuthorization, LoadAuthorizations(apiKey, cancellationToken));
 						}
 						else
 						{
 							_ApplicationAuthorizationsByApiKey.TryRemove(apiKey, out _);
 						}
+					}
+				}
+
+				await Task.WhenAll(refreshTasks.Values).ConfigureAwait(false);
+
+				currentTime = DateTime.UtcNow;
+				foreach (var refreshTask in refreshTasks)
+				{
+					refreshTask.Key.LastRefresh = currentTime;
+
+					if (refreshTask.Value.IsCompletedSuccessfully)
+					{
+						refreshTask.Key.OperationNames = refreshTask.Value.Result;
 					}
 				}
 			}
