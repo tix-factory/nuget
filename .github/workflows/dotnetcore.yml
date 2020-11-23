@@ -16,7 +16,7 @@ jobs:
     - name: Setup NuGet.exe
       uses: NuGet/setup-nuget@v1.0.5
     - name: Build Number Generator
-      uses: einaregilsson/build-number@v2
+      uses: einaregilsson/build-number@v3
       with:
         token: ${{ secrets.github_token }}
     - name: Build with dotnet
