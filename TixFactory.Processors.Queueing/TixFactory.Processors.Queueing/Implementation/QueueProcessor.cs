@@ -136,6 +136,10 @@ namespace TixFactory.Processors.Queueing
 					AddTask(runTask);
 				});
 			}
+			catch (Exception e)
+			{
+				_Logger.Warn($"Unhandled exception leasing queue items.\n{e}");
+			}
 			finally
 			{
 				_ProcessQueueLock.Release();
@@ -169,7 +173,7 @@ namespace TixFactory.Processors.Queueing
 			}
 			catch (Exception e)
 			{
-				_Logger.Error($"Error clearing out running theads. (_RunningTask null: {_RunningTasks == null})\n{e}");
+				_Logger.Error($"Error clearing out running theads.\n{e}");
 			}
 			finally
 			{
