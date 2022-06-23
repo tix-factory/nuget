@@ -8,6 +8,6 @@
   <ItemGroup>
     <PackageReference Include="TixFactory.Logging" Version="$(PackageVersion)" />
     <PackageReference Include="TixFactory.Http.Client" Version="$(PackageVersion)" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 </Project>
