@@ -84,6 +84,8 @@ jobs:
 
     environment: 'release'
 
+    if: ${{ github.event_name == 'push' }}
+
     steps:
       # Setup
       - name: '🟦 Setup .NET'
