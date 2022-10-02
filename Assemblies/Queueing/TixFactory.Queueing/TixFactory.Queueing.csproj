@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<PackageTags>queue</PackageTags>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="TixFactory.Configuration" Version="$(PackageVersion)" />
+		<PackageReference Include="TixFactory.Logging" Version="$(PackageVersion)" />
+	</ItemGroup>
+</Project>

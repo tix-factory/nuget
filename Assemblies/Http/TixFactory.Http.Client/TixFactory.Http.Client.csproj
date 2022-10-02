@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<PackageTags>http</PackageTags>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\TixFactory.Http\TixFactory.Http.csproj" />
+		<PackageReference Include="TixFactory.CookieJar" Version="$(PackageVersion)"/>
+	</ItemGroup>
+
+</Project>

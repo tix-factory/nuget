@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageTags>queueing</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TixFactory.Queueing" Version="$(PackageVersion)" />
+    <PackageReference Include="TixFactory.Serialization.Json" Version="$(PackageVersion)" />
+  </ItemGroup>
+</Project>

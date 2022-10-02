@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<PackageTags>configuration</PackageTags>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+	  <PackageReference Include="FakeItEasy" Version="5.5.0" />
+	</ItemGroup>
+</Project>
