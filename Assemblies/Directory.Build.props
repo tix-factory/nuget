@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup Label="PackageMetadata">
+    <Company>Tix Factory</Company>
+    <RepositoryUrl>https://github.com/tix-factory/nuget</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <VersionPrefix>2.1.0</VersionPrefix>
+  </PropertyGroup>
+
+  <PropertyGroup Label="BuildProperties">
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <GeneratePackageOnBuild Condition="$(AssemblyName.Contains('.Tests')) == 'false'">true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile Condition="'$(GeneratePackageOnBuild)' == 'true'">true</GenerateDocumentationFile>
+  </PropertyGroup>
+</Project>
