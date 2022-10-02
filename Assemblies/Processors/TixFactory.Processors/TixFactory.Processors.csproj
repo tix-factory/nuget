@@ -4,7 +4,7 @@
     <PackageTags>application processors</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="TixFactory.ApplicationContext" Version="$(PackageVersion)" />
-    <PackageReference Include="TixFactory.Logging" Version="$(PackageVersion)" />
+    <ProjectReference Include="..\..\ApplicationContext\TixFactory.ApplicationContext\TixFactory.ApplicationContext.csproj" />
+    <ProjectReference Include="..\..\Logging\TixFactory.Logging\TixFactory.Logging.csproj" />
   </ItemGroup>
 </Project>

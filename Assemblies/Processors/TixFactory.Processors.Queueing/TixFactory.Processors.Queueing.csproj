@@ -4,7 +4,7 @@
     <PackageTags>queueing</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="TixFactory.Queueing" Version="$(PackageVersion)" />
-    <PackageReference Include="TixFactory.Serialization.Json" Version="$(PackageVersion)" />
+    <ProjectReference Include="..\..\Queueing\TixFactory.Queueing\TixFactory.Queueing.csproj" />
+    <ProjectReference Include="..\..\Serialization\TixFactory.Serialization.Json\TixFactory.Serialization.Json.csproj" />
   </ItemGroup>
 </Project>
