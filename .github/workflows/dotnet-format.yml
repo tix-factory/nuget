@@ -1,0 +1,57 @@
+name: 'Format Code'
+
+on:
+  # Run workflow file whenever a pull request is opened, or a commit is pushed to it.
+  pull_request:
+    types: [opened, synchronize]
+
+  # Run workflow file on commits to the main branch.
+  push:
+    branches:
+      - master
+      - main
+
+env:
+  DOTNET_NOLOGO: true
+
+jobs:
+  format:
+    runs-on: 'ubuntu-latest'
+
+    env:
+      SOLUTION_FILE_NAME: './Assemblies.sln'
+
+    steps:
+      # Setup
+      - name: '📥 Clone Repository'
+        uses: actions/checkout@v3
+
+      - name: '🟦 Setup .NET'
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.x'
+
+      - name: '🟩 Setup Node'
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: '🚚 npm install'
+        run: |
+          npm ci
+
+      # Format
+      - name: '🧑‍🎨 Run Prettier'
+        run: >-
+          ./node_modules/.bin/prettier
+          --write .
+
+      - name: '🎨 Format Code'
+        run: |
+          dotnet format ${{ env.SOLUTION_FILE_NAME }}
+
+      # Commit Changes
+      - name: '✏️ Commit Changes'
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: '✏️ Format Code'
