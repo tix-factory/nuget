@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <IsPackable>true</IsPackable>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <PackageTags>application authorization</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Configuration\TixFactory.Configuration\TixFactory.Configuration.csproj" />
+    <ProjectReference Include="..\..\Http\TixFactory.Http.Client\TixFactory.Http.Client.csproj" />
+    <ProjectReference Include="..\..\Logging\TixFactory.Logging\TixFactory.Logging.csproj" />
+  </ItemGroup>
+</Project>

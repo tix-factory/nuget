@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageTags>application processors</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ApplicationContext\TixFactory.ApplicationContext\TixFactory.ApplicationContext.csproj" />
+    <ProjectReference Include="..\..\Logging\TixFactory.Logging\TixFactory.Logging.csproj" />
+  </ItemGroup>
+</Project>

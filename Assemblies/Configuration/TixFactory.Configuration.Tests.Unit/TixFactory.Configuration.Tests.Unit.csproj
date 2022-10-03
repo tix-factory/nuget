@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+	  <PackageReference Include="NUnit" />
+	  <PackageReference Include="NUnit3TestAdapter" />
+	  <PackageReference Include="Microsoft.NET.Test.Sdk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TixFactory.Configuration\TixFactory.Configuration.csproj" />
+  </ItemGroup>
+</Project>
