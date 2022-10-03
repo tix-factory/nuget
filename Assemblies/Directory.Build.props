@@ -6,9 +6,8 @@
     <VersionPrefix>2.1.0</VersionPrefix>
   </PropertyGroup>
 
-  <PropertyGroup Label="TestsProperties" Condition="$(AssemblyName.Contains('.Tests'))">
+  <PropertyGroup Label="TestsProperties" Condition="$(MSBuildProjectName.Contains('.Tests'))">
     <IsTestProject>true</IsTestProject>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Label="PackageProperties" Condition="'$(IsTestProject)' != 'true'">
