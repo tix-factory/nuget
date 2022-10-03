@@ -8,7 +8,8 @@
 
   <PropertyGroup Label="BuildProperties">
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <GeneratePackageOnBuild Condition="'$(AssemblyName.Contains('.Tests'))' == 'false'">true</GeneratePackageOnBuild>
+    <IsTestProject Condition="$(AssemblyName.Contains('.Tests'))">true</IsTestProject>
+    <GeneratePackageOnBuild Condition="'$(IsTestProject)' != 'true'">true</GeneratePackageOnBuild>
     <GenerateDocumentationFile Condition="'$(GeneratePackageOnBuild)' == 'true'">true</GenerateDocumentationFile>
   </PropertyGroup>
 </Project>
