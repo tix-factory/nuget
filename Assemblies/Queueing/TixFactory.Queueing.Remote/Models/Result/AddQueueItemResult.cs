@@ -1,8 +1,8 @@
-﻿namespace TixFactory.Queueing.Remote
+namespace TixFactory.Queueing.Remote
 {
-	internal enum AddQueueItemResult
-	{
-		Unknown = 0,
-		Added = 1,
-	}
+    internal enum AddQueueItemResult
+    {
+        Unknown = 0,
+        Added = 1,
+    }
 }

@@ -1,179 +1,179 @@
-﻿using Castle.Core.Internal;
-using FakeItEasy;
-using FakeItEasy.Sdk;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using Castle.Core.Internal;
+using FakeItEasy;
+using FakeItEasy.Sdk;
 
 namespace TixFactory.Configuration
 {
-	/// <inheritdoc cref="ISettingsInitializer"/>
-	public class SettingsInitializer : ISettingsInitializer
-	{
-		private const string _ValuePropertyName = "Value";
+    /// <inheritdoc cref="ISettingsInitializer"/>
+    public class SettingsInitializer : ISettingsInitializer
+    {
+        private const string _ValuePropertyName = "Value";
 
-		private readonly ISettingValueSource _SettingValueSource;
-		private readonly MethodInfo _TryGetSettingValueMethod;
-		private readonly MethodInfo _WriteSettingValueMethod;
+        private readonly ISettingValueSource _SettingValueSource;
+        private readonly MethodInfo _TryGetSettingValueMethod;
+        private readonly MethodInfo _WriteSettingValueMethod;
 
-		/// <summary>
-		/// Initializes a new <see cref="SettingsInitializer"/>.
-		/// </summary>
-		/// <param name="settingValueSource">An <see cref="ISettingValueSource"/>.</param>
-		/// <exception cref="ArgumentNullException">
-		/// - <paramref name="settingValueSource"/>
-		/// </exception>
-		public SettingsInitializer(ISettingValueSource settingValueSource)
-		{
-			_SettingValueSource = settingValueSource ?? throw new ArgumentNullException(nameof(settingValueSource));
-			
-			var settingValueSourceType = typeof(ISettingValueSource);
-			_TryGetSettingValueMethod = settingValueSourceType.GetMethod(nameof(ISettingValueSource.TryGetSettingValue));
-			_WriteSettingValueMethod = settingValueSourceType.GetMethod(nameof(ISettingValueSource.WriteSettingValue));
-		}
+        /// <summary>
+        /// Initializes a new <see cref="SettingsInitializer"/>.
+        /// </summary>
+        /// <param name="settingValueSource">An <see cref="ISettingValueSource"/>.</param>
+        /// <exception cref="ArgumentNullException">
+        /// - <paramref name="settingValueSource"/>
+        /// </exception>
+        public SettingsInitializer(ISettingValueSource settingValueSource)
+        {
+            _SettingValueSource = settingValueSource ?? throw new ArgumentNullException(nameof(settingValueSource));
 
-		/// <inheritdoc cref="ISettingsInitializer.CreateFromInterface{TSettingsInterface}"/>
-		public TSettingsInterface CreateFromInterface<TSettingsInterface>()
-			where TSettingsInterface : ISettings
-		{
-			var settingsType = typeof(TSettingsInterface);
-			if (!settingsType.IsInterface)
-			{
-				throw new ArgumentException("Interface type must be an interface.", nameof(TSettingsInterface));
-			}
+            var settingValueSourceType = typeof(ISettingValueSource);
+            _TryGetSettingValueMethod = settingValueSourceType.GetMethod(nameof(ISettingValueSource.TryGetSettingValue));
+            _WriteSettingValueMethod = settingValueSourceType.GetMethod(nameof(ISettingValueSource.WriteSettingValue));
+        }
 
-			var groupName = GetSettingsGroup(settingsType);
-			var individualSettings = LoadIndividualSettings(settingsType, groupName);
-			var fakedImplementation = Create.Fake(settingsType);
+        /// <inheritdoc cref="ISettingsInitializer.CreateFromInterface{TSettingsInterface}"/>
+        public TSettingsInterface CreateFromInterface<TSettingsInterface>()
+            where TSettingsInterface : ISettings
+        {
+            var settingsType = typeof(TSettingsInterface);
+            if (!settingsType.IsInterface)
+            {
+                throw new ArgumentException("Interface type must be an interface.", nameof(TSettingsInterface));
+            }
 
-			A.CallTo(fakedImplementation).Where(call => call.Method.Name.StartsWith("get_")).WithNonVoidReturnType().ReturnsLazily(call =>
-			{
-				var property = GetProperty(settingsType, call.Method);
-				var individualSetting = individualSettings[property.Name];
-				var settingValueProperty = GetIndividualSettingValueProperty(property);
-				return settingValueProperty.GetValue(individualSetting);
-			});
+            var groupName = GetSettingsGroup(settingsType);
+            var individualSettings = LoadIndividualSettings(settingsType, groupName);
+            var fakedImplementation = Create.Fake(settingsType);
 
-			A.CallTo(fakedImplementation).Where(call => call.Method.Name.StartsWith("set_")).Invokes(call =>
-			{
-				var property = GetProperty(settingsType, call.Method);
-				var writeSettingValue = _WriteSettingValueMethod.MakeGenericMethod(property.PropertyType);
-				writeSettingValue.Invoke(_SettingValueSource, new[] { groupName, property.Name, call.Arguments[0] });
-			});
+            A.CallTo(fakedImplementation).Where(call => call.Method.Name.StartsWith("get_")).WithNonVoidReturnType().ReturnsLazily(call =>
+            {
+                var property = GetProperty(settingsType, call.Method);
+                var individualSetting = individualSettings[property.Name];
+                var settingValueProperty = GetIndividualSettingValueProperty(property);
+                return settingValueProperty.GetValue(individualSetting);
+            });
 
-			A.CallTo(fakedImplementation).Where(call => call.Method.Name.StartsWith(nameof(ISettings.ExtractSetting))).WithNonVoidReturnType().ReturnsLazily(call =>
-			{
-				var settingName = call.GetArgument<string>(0);
-				var settingProperty = settingsType.GetProperty(settingName);
-				if (settingProperty == null)
-				{
-					throw new ArgumentException($"{settingName} is not valid property on {settingsType.Name}", nameof(settingName));
-				}
+            A.CallTo(fakedImplementation).Where(call => call.Method.Name.StartsWith("set_")).Invokes(call =>
+            {
+                var property = GetProperty(settingsType, call.Method);
+                var writeSettingValue = _WriteSettingValueMethod.MakeGenericMethod(property.PropertyType);
+                writeSettingValue.Invoke(_SettingValueSource, new[] { groupName, property.Name, call.Arguments[0] });
+            });
 
-				var expectedPropertyType = call.Method.GetGenericArguments().FirstOrDefault();
-				if (expectedPropertyType != settingProperty.PropertyType)
-				{
-					throw new ArgumentException("Expected generic argument to match setting property type.", "T");
-				}
+            A.CallTo(fakedImplementation).Where(call => call.Method.Name.StartsWith(nameof(ISettings.ExtractSetting))).WithNonVoidReturnType().ReturnsLazily(call =>
+            {
+                var settingName = call.GetArgument<string>(0);
+                var settingProperty = settingsType.GetProperty(settingName);
+                if (settingProperty == null)
+                {
+                    throw new ArgumentException($"{settingName} is not valid property on {settingsType.Name}", nameof(settingName));
+                }
 
-				return individualSettings[settingName];
-			});
+                var expectedPropertyType = call.Method.GetGenericArguments().FirstOrDefault();
+                if (expectedPropertyType != settingProperty.PropertyType)
+                {
+                    throw new ArgumentException("Expected generic argument to match setting property type.", "T");
+                }
 
-			_SettingValueSource.SettingValueChanged += (changedGroupName, changedSettingName) =>
-			{
-				if (changedGroupName != groupName)
-				{
-					return;
-				}
+                return individualSettings[settingName];
+            });
 
-				var settingProperty = settingsType.GetProperty(changedSettingName);
-				if (settingProperty != null && individualSettings.TryGetValue(changedSettingName, out var individualSetting))
-				{
-					if (TryGetSettingValue(groupName, settingProperty, out var settingValue))
-					{
-						var settingValueProperty = GetIndividualSettingValueProperty(settingProperty);
-						settingValueProperty.SetValue(individualSetting, settingValue);
-					}
-				}
-			};
+            _SettingValueSource.SettingValueChanged += (changedGroupName, changedSettingName) =>
+            {
+                if (changedGroupName != groupName)
+                {
+                    return;
+                }
 
-			return (TSettingsInterface)fakedImplementation;
-		}
+                var settingProperty = settingsType.GetProperty(changedSettingName);
+                if (settingProperty != null && individualSettings.TryGetValue(changedSettingName, out var individualSetting))
+                {
+                    if (TryGetSettingValue(groupName, settingProperty, out var settingValue))
+                    {
+                        var settingValueProperty = GetIndividualSettingValueProperty(settingProperty);
+                        settingValueProperty.SetValue(individualSetting, settingValue);
+                    }
+                }
+            };
 
-		private string GetSettingsGroup(Type settingsType)
-		{
-			var categoryAttribute = settingsType.GetAttribute<CategoryAttribute>();
-			if (!string.IsNullOrWhiteSpace(categoryAttribute?.Category))
-			{
-				return categoryAttribute.Category;
-			}
+            return (TSettingsInterface)fakedImplementation;
+        }
 
-			return settingsType.Namespace;
-		}
+        private string GetSettingsGroup(Type settingsType)
+        {
+            var categoryAttribute = settingsType.GetAttribute<CategoryAttribute>();
+            if (!string.IsNullOrWhiteSpace(categoryAttribute?.Category))
+            {
+                return categoryAttribute.Category;
+            }
 
-		private PropertyInfo GetProperty(Type interfaceType, MethodInfo methodInfo)
-		{
-			return interfaceType.GetProperty(methodInfo.Name.Substring(4));
-		}
+            return settingsType.Namespace;
+        }
 
-		private bool TryGetSettingValue(string groupName, PropertyInfo settingProperty, out object settingValue)
-		{
-			// https://stackoverflow.com/a/569267/1663648
-			var tryGetSettingValue = _TryGetSettingValueMethod.MakeGenericMethod(settingProperty.PropertyType);
-			var parameters = new object[] { groupName, settingProperty.Name, null };
-			if (tryGetSettingValue.Invoke(_SettingValueSource, parameters) is bool success && success)
-			{
-				settingValue = parameters[2];
-				return true;
-			}
+        private PropertyInfo GetProperty(Type interfaceType, MethodInfo methodInfo)
+        {
+            return interfaceType.GetProperty(methodInfo.Name.Substring(4));
+        }
 
-			settingValue = null;
-			return false;
-		}
+        private bool TryGetSettingValue(string groupName, PropertyInfo settingProperty, out object settingValue)
+        {
+            // https://stackoverflow.com/a/569267/1663648
+            var tryGetSettingValue = _TryGetSettingValueMethod.MakeGenericMethod(settingProperty.PropertyType);
+            var parameters = new object[] { groupName, settingProperty.Name, null };
+            if (tryGetSettingValue.Invoke(_SettingValueSource, parameters) is bool success && success)
+            {
+                settingValue = parameters[2];
+                return true;
+            }
 
-		private object GetDefaultValue(PropertyInfo settingProperty, string groupName)
-		{
-			if (TryGetSettingValue(groupName, settingProperty, out var settingValue))
-			{
-				return settingValue;
-			}
+            settingValue = null;
+            return false;
+        }
 
-			var defaultValueAttribute = settingProperty.GetAttribute<DefaultValueAttribute>();
-			if (defaultValueAttribute != null)
-			{
-				return Convert.ChangeType(defaultValueAttribute.Value, settingProperty.PropertyType);
-			}
+        private object GetDefaultValue(PropertyInfo settingProperty, string groupName)
+        {
+            if (TryGetSettingValue(groupName, settingProperty, out var settingValue))
+            {
+                return settingValue;
+            }
 
-			if (settingProperty.PropertyType.GetTypeInfo().IsValueType)
-			{
-				return Activator.CreateInstance(settingProperty.PropertyType);
-			}
+            var defaultValueAttribute = settingProperty.GetAttribute<DefaultValueAttribute>();
+            if (defaultValueAttribute != null)
+            {
+                return Convert.ChangeType(defaultValueAttribute.Value, settingProperty.PropertyType);
+            }
 
-			return null;
-		}
+            if (settingProperty.PropertyType.GetTypeInfo().IsValueType)
+            {
+                return Activator.CreateInstance(settingProperty.PropertyType);
+            }
 
-		private IReadOnlyDictionary<string, object> LoadIndividualSettings(Type settingsType, string groupName)
-		{
-			var individualSettings = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            return null;
+        }
 
-			foreach (var settingProperty in settingsType.GetProperties())
-			{
-				var individualSettingType = typeof(Setting<>).MakeGenericType(settingProperty.PropertyType);
-				var individualSettingConstructor = individualSettingType.GetConstructors().First(c => c.GetParameters().Length == 1);
-				var individualSetting = individualSettingConstructor.Invoke(new[] { GetDefaultValue(settingProperty, groupName) });
+        private IReadOnlyDictionary<string, object> LoadIndividualSettings(Type settingsType, string groupName)
+        {
+            var individualSettings = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
-				individualSettings[settingProperty.Name] = individualSetting;
-			}
+            foreach (var settingProperty in settingsType.GetProperties())
+            {
+                var individualSettingType = typeof(Setting<>).MakeGenericType(settingProperty.PropertyType);
+                var individualSettingConstructor = individualSettingType.GetConstructors().First(c => c.GetParameters().Length == 1);
+                var individualSetting = individualSettingConstructor.Invoke(new[] { GetDefaultValue(settingProperty, groupName) });
 
-			return individualSettings;
-		}
+                individualSettings[settingProperty.Name] = individualSetting;
+            }
 
-		private PropertyInfo GetIndividualSettingValueProperty(PropertyInfo settingProperty)
-		{
-			var individualSettingInterfaceType = typeof(ISetting<>).MakeGenericType(settingProperty.PropertyType);
-			return individualSettingInterfaceType.GetProperty(_ValuePropertyName);
-		}
-	}
+            return individualSettings;
+        }
+
+        private PropertyInfo GetIndividualSettingValueProperty(PropertyInfo settingProperty)
+        {
+            var individualSettingInterfaceType = typeof(ISetting<>).MakeGenericType(settingProperty.PropertyType);
+            return individualSettingInterfaceType.GetProperty(_ValuePropertyName);
+        }
+    }
 }
