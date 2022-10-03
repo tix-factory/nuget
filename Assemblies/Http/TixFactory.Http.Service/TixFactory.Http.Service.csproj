@@ -1,13 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-	<PropertyGroup>
-		<OutputType>Library</OutputType>
-		<IsPackable>true</IsPackable>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
-		<PackageTags>http service</PackageTags>
-	</PropertyGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\..\ApplicationContext\TixFactory.ApplicationContext\TixFactory.ApplicationContext.csproj" />
-	  <ProjectReference Include="..\..\Logging\TixFactory.Logging\TixFactory.Logging.csproj" />
-	  <ProjectReference Include="..\..\Operations\TixFactory.Operations\TixFactory.Operations.csproj" />
-	</ItemGroup>
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <PackageTags>http service</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ApplicationContext\TixFactory.ApplicationContext\TixFactory.ApplicationContext.csproj" />
+    <ProjectReference Include="..\..\Logging\TixFactory.Logging\TixFactory.Logging.csproj" />
+    <ProjectReference Include="..\..\Operations\TixFactory.Operations\TixFactory.Operations.csproj" />
+  </ItemGroup>
 </Project>

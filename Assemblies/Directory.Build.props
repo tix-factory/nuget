@@ -6,9 +6,14 @@
     <VersionPrefix>2.1.0</VersionPrefix>
   </PropertyGroup>
 
-  <PropertyGroup Label="BuildProperties">
+  <PropertyGroup Label="TestsProperties" Condition="$(MSBuildProjectName.Contains('.Tests'))">
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <PropertyGroup Label="PackageProperties" Condition="'$(IsTestProject)' != 'true'">
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <GeneratePackageOnBuild Condition="$(AssemblyName.Contains('.Tests')) == 'false'">true</GeneratePackageOnBuild>
-    <GenerateDocumentationFile Condition="'$(GeneratePackageOnBuild)' == 'true'">true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 </Project>

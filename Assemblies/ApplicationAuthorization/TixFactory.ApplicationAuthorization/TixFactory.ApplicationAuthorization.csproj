@@ -1,7 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <IsPackable>true</IsPackable>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <PackageTags>application authorization</PackageTags>
   </PropertyGroup>
