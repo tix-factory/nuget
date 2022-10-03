@@ -19,6 +19,8 @@ jobs:
       # Setup
       - name: '📥 Clone Repository'
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
 
       - name: '🟦 Setup .NET'
         uses: actions/setup-dotnet@v3
