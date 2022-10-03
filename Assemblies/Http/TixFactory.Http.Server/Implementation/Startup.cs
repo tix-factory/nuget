@@ -51,7 +51,7 @@ namespace TixFactory.Http.Server
 		{
 			services.AddTransient(s => OperationExecuter);
 			services.AddTransient(s => Logger);
-			services.AddMvc(ConfigureMvc).AddJsonOptions(ConfigureJson);
+			services.AddMvc(ConfigureMvc).AddNewtonsoftJson(ConfigureJson);
 			services.AddLogging(lb => lb.ClearProviders());
 		}
 
@@ -70,7 +70,7 @@ namespace TixFactory.Http.Server
 		/// Configures <see cref="MvcJsonOptions"/> for the application.
 		/// </summary>
 		/// <param name="options">The <see cref="MvcJsonOptions"/>.</param>
-		protected virtual void ConfigureJson(MvcJsonOptions options)
+		protected virtual void ConfigureJson(MvcNewtonsoftJsonOptions options)
 		{
 			options.SerializerSettings.Converters.Add(new KindAwareDateTimeConverter());
 			options.SerializerSettings.Converters.Add(new StringEnumConverter());
