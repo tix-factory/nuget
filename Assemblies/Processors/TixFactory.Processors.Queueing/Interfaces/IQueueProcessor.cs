@@ -1,9 +1,9 @@
-﻿namespace TixFactory.Processors.Queueing
+namespace TixFactory.Processors.Queueing
 {
-	public interface IQueueProcessor
-	{
-		void Start();
+    public interface IQueueProcessor
+    {
+        void Start();
 
-		void Stop();
-	}
+        void Stop();
+    }
 }

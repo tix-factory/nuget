@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 
 namespace TixFactory.ApplicationAuthorization
 {
-	public interface IKeyHasher
-	{
-		string HashKey(Guid key);
-	}
+    public interface IKeyHasher
+    {
+        string HashKey(Guid key);
+    }
 }

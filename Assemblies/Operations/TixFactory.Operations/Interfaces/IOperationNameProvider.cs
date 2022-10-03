@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 
 namespace TixFactory.Operations
 {
-	public interface IOperationNameProvider
-	{
-		string GetOperationName(Type operationType);
-	}
+    public interface IOperationNameProvider
+    {
+        string GetOperationName(Type operationType);
+    }
 }

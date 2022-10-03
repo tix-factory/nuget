@@ -1,0 +1,6 @@
+{
+  "name": "nuget",
+  "devDependencies": {
+    "prettier": "^2.7.1"
+  }
+}

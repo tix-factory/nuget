@@ -1,12 +1,12 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace TixFactory.Configuration.Tests.Unit
 {
-	public interface ISettings : Configuration.ISettings
-	{
-		[DefaultValue(SettingsInitializerTests.DefaultStrValue)]
-		string Str { get; set; }
+    public interface ISettings : Configuration.ISettings
+    {
+        [DefaultValue(SettingsInitializerTests.DefaultStrValue)]
+        string Str { get; set; }
 
-		string StrWithoutDefaultValue { get; set; }
-	}
+        string StrWithoutDefaultValue { get; set; }
+    }
 }
