@@ -31,8 +31,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Logging.Client",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Logging.Windows", "Assemblies\Logging\TixFactory.Logging.Windows\TixFactory.Logging.Windows.csproj", "{A5DE4B96-F637-403F-B4E7-BE4F0A824C1E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Data.MySql", "Assemblies\MySql\TixFactory.Data.MySql\TixFactory.Data.MySql.csproj", "{E9DF6E52-2457-4667-BDCA-24DEB920BCD6}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Processors", "Assemblies\Processors\TixFactory.Processors\TixFactory.Processors.csproj", "{F899C53B-C82A-41C2-BC78-C42080029A00}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Processors.Queueing", "Assemblies\Processors\TixFactory.Processors.Queueing\TixFactory.Processors.Queueing.csproj", "{2FB0CF50-6937-4F91-89C4-133DC2A0E3DA}"
@@ -105,10 +103,6 @@ Global
 		{A5DE4B96-F637-403F-B4E7-BE4F0A824C1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5DE4B96-F637-403F-B4E7-BE4F0A824C1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5DE4B96-F637-403F-B4E7-BE4F0A824C1E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E9DF6E52-2457-4667-BDCA-24DEB920BCD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E9DF6E52-2457-4667-BDCA-24DEB920BCD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E9DF6E52-2457-4667-BDCA-24DEB920BCD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E9DF6E52-2457-4667-BDCA-24DEB920BCD6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F899C53B-C82A-41C2-BC78-C42080029A00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F899C53B-C82A-41C2-BC78-C42080029A00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F899C53B-C82A-41C2-BC78-C42080029A00}.Release|Any CPU.ActiveCfg = Release|Any CPU
