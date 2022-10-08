@@ -3,40 +3,39 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TixFactory.ApplicationContext;
 
-namespace TixFactory.Http.Service
+namespace TixFactory.Http.Service;
+
+/// <summary>
+/// A controller to verify the application is running.
+/// </summary>
+[ApiController]
+public class ApplicationMetdataController : Controller
 {
+    private readonly IApplicationContext _ApplicationContext;
+
     /// <summary>
-    /// A controller to verify the application is running.
+    /// Initializes a new <see cref="ApplicationMetdataController"/>.
     /// </summary>
-    [ApiController]
-    public class ApplicationMetdataController : Controller
+    /// <param name="applicationContext">An <see cref="IApplicationContext"/>.</param>
+    /// <exception cref="ArgumentNullException">
+    /// - <paramref name="applicationContext"/>
+    /// </exception>
+    public ApplicationMetdataController(IApplicationContext applicationContext)
     {
-        private readonly IApplicationContext _ApplicationContext;
+        _ApplicationContext = applicationContext ?? throw new ArgumentNullException(nameof(applicationContext));
+    }
 
-        /// <summary>
-        /// Initializes a new <see cref="ApplicationMetdataController"/>.
-        /// </summary>
-        /// <param name="applicationContext">An <see cref="IApplicationContext"/>.</param>
-        /// <exception cref="ArgumentNullException">
-        /// - <paramref name="applicationContext"/>
-        /// </exception>
-        public ApplicationMetdataController(IApplicationContext applicationContext)
+    /// <summary>
+    /// Gets the metadata for the running application.
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("application-metadata")]
+    [AllowAnonymous]
+    public ApplicationMetadataResponse GetApplicationMetadata()
+    {
+        return new ApplicationMetadataResponse
         {
-            _ApplicationContext = applicationContext ?? throw new ArgumentNullException(nameof(applicationContext));
-        }
-
-        /// <summary>
-        /// Gets the metadata for the running application.
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("application-metadata")]
-        [AllowAnonymous]
-        public ApplicationMetadataResponse GetApplicationMetadata()
-        {
-            return new ApplicationMetadataResponse
-            {
-                Name = _ApplicationContext.Name
-            };
-        }
+            Name = _ApplicationContext.Name
+        };
     }
 }
