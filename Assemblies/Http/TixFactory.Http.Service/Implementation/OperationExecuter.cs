@@ -126,7 +126,7 @@ public class OperationExecuter : IOperationExecuter
         return BuildPayloadResult(data, operationError);
     }
 
-    private IActionResult BuildPayloadResult<TData>(TData data, OperationError operationError)
+    private static IActionResult BuildPayloadResult<TData>(TData data, OperationError operationError)
     {
         if (operationError != null)
         {
