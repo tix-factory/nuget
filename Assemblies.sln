@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.ApplicationConte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Configuration.Tests.Unit", "Assemblies\Configuration\TixFactory.Configuration.Tests.Unit\TixFactory.Configuration.Tests.Unit.csproj", "{F57CC687-94EE-421F-B5B2-490046DC5497}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Assembly.Documentation", "Assemblies\Assembly\TixFactory.Assembly.Documentation\TixFactory.Assembly.Documentation.csproj", "{6588945C-C5C0-4DE3-8759-0AC4DF704933}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Configuration", "Assemblies\Configuration\TixFactory.Configuration\TixFactory.Configuration.csproj", "{E2DBAF5F-ECBF-4E25-A7FC-3E4A9A153CAF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Configuration.Client", "Assemblies\Configuration\TixFactory.Configuration.Client\TixFactory.Configuration.Client.csproj", "{3FF2F8E5-1AE4-4E6E-A88F-EDF062087EA4}"
@@ -67,10 +65,6 @@ Global
 		{F57CC687-94EE-421F-B5B2-490046DC5497}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F57CC687-94EE-421F-B5B2-490046DC5497}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F57CC687-94EE-421F-B5B2-490046DC5497}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6588945C-C5C0-4DE3-8759-0AC4DF704933}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6588945C-C5C0-4DE3-8759-0AC4DF704933}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6588945C-C5C0-4DE3-8759-0AC4DF704933}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6588945C-C5C0-4DE3-8759-0AC4DF704933}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E2DBAF5F-ECBF-4E25-A7FC-3E4A9A153CAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E2DBAF5F-ECBF-4E25-A7FC-3E4A9A153CAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2DBAF5F-ECBF-4E25-A7FC-3E4A9A153CAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
