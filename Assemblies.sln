@@ -7,47 +7,45 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Operations", "As
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.CookieJar", "Assemblies\CookieJar\TixFactory.CookieJar\TixFactory.CookieJar.csproj", "{953DBEE2-75A1-4228-B894-2E5264E6A8E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.ApplicationContext", "Assemblies\ApplicationContext\TixFactory.ApplicationContext\TixFactory.ApplicationContext.csproj", "{F4BFF98A-73C2-4FBE-8FB2-CE1831A027BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.ApplicationContext", "Assemblies\ApplicationContext\TixFactory.ApplicationContext\TixFactory.ApplicationContext.csproj", "{F4BFF98A-73C2-4FBE-8FB2-CE1831A027BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Configuration.Tests.Unit", "Assemblies\Configuration\TixFactory.Configuration.Tests.Unit\TixFactory.Configuration.Tests.Unit.csproj", "{F57CC687-94EE-421F-B5B2-490046DC5497}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Configuration.Tests.Unit", "Assemblies\Configuration\TixFactory.Configuration.Tests.Unit\TixFactory.Configuration.Tests.Unit.csproj", "{F57CC687-94EE-421F-B5B2-490046DC5497}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.ApplicationAuthorization", "Assemblies\ApplicationAuthorization\TixFactory.ApplicationAuthorization\TixFactory.ApplicationAuthorization.csproj", "{9E7C1685-859C-4DFB-A9AC-FB6221B25CFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.ApplicationAuthorization", "Assemblies\ApplicationAuthorization\TixFactory.ApplicationAuthorization\TixFactory.ApplicationAuthorization.csproj", "{9E7C1685-859C-4DFB-A9AC-FB6221B25CFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Assembly.Documentation", "Assemblies\Assembly\TixFactory.Assembly.Documentation\TixFactory.Assembly.Documentation.csproj", "{6588945C-C5C0-4DE3-8759-0AC4DF704933}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Assembly.Documentation", "Assemblies\Assembly\TixFactory.Assembly.Documentation\TixFactory.Assembly.Documentation.csproj", "{6588945C-C5C0-4DE3-8759-0AC4DF704933}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Configuration", "Assemblies\Configuration\TixFactory.Configuration\TixFactory.Configuration.csproj", "{E2DBAF5F-ECBF-4E25-A7FC-3E4A9A153CAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Configuration", "Assemblies\Configuration\TixFactory.Configuration\TixFactory.Configuration.csproj", "{E2DBAF5F-ECBF-4E25-A7FC-3E4A9A153CAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Configuration.Client", "Assemblies\Configuration\TixFactory.Configuration.Client\TixFactory.Configuration.Client.csproj", "{3FF2F8E5-1AE4-4E6E-A88F-EDF062087EA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Configuration.Client", "Assemblies\Configuration\TixFactory.Configuration.Client\TixFactory.Configuration.Client.csproj", "{3FF2F8E5-1AE4-4E6E-A88F-EDF062087EA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Discord", "Assemblies\Discord\TixFactory.Discord\TixFactory.Discord.csproj", "{07C1F7CB-C5BA-4574-8147-A1551A06387E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Discord", "Assemblies\Discord\TixFactory.Discord\TixFactory.Discord.csproj", "{07C1F7CB-C5BA-4574-8147-A1551A06387E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Firebase", "Assemblies\Firebase\TixFactory.Firebase\TixFactory.Firebase.csproj", "{A89679EF-CD23-4679-8D2C-F373D05D1AB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Firebase", "Assemblies\Firebase\TixFactory.Firebase\TixFactory.Firebase.csproj", "{A89679EF-CD23-4679-8D2C-F373D05D1AB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Http", "Assemblies\Http\TixFactory.Http\TixFactory.Http.csproj", "{A02DC034-352B-48A0-88F5-F391A8ECCD89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Http", "Assemblies\Http\TixFactory.Http\TixFactory.Http.csproj", "{A02DC034-352B-48A0-88F5-F391A8ECCD89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Http.Client", "Assemblies\Http\TixFactory.Http.Client\TixFactory.Http.Client.csproj", "{D076B06E-9938-449F-9028-FD6E4A2DEAD3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Http.Client", "Assemblies\Http\TixFactory.Http.Client\TixFactory.Http.Client.csproj", "{D076B06E-9938-449F-9028-FD6E4A2DEAD3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Http.Server", "Assemblies\Http\TixFactory.Http.Server\TixFactory.Http.Server.csproj", "{99605003-D757-4F50-AE44-B4FB730B525A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Http.Service", "Assemblies\Http\TixFactory.Http.Service\TixFactory.Http.Service.csproj", "{7360D6B7-50D3-4884-B20F-54B9A277C527}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Http.Service", "Assemblies\Http\TixFactory.Http.Service\TixFactory.Http.Service.csproj", "{7360D6B7-50D3-4884-B20F-54B9A277C527}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Logging", "Assemblies\Logging\TixFactory.Logging\TixFactory.Logging.csproj", "{426ADD4E-850E-4B0B-A814-328F26B19209}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Logging", "Assemblies\Logging\TixFactory.Logging\TixFactory.Logging.csproj", "{426ADD4E-850E-4B0B-A814-328F26B19209}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Logging.Client", "Assemblies\Logging\TixFactory.Logging.Client\TixFactory.Logging.Client.csproj", "{D367DE62-D688-4541-86BA-E1410E549ACA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Logging.Client", "Assemblies\Logging\TixFactory.Logging.Client\TixFactory.Logging.Client.csproj", "{D367DE62-D688-4541-86BA-E1410E549ACA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Logging.Windows", "Assemblies\Logging\TixFactory.Logging.Windows\TixFactory.Logging.Windows.csproj", "{A5DE4B96-F637-403F-B4E7-BE4F0A824C1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Logging.Windows", "Assemblies\Logging\TixFactory.Logging.Windows\TixFactory.Logging.Windows.csproj", "{A5DE4B96-F637-403F-B4E7-BE4F0A824C1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Data.MySql", "Assemblies\MySql\TixFactory.Data.MySql\TixFactory.Data.MySql.csproj", "{E9DF6E52-2457-4667-BDCA-24DEB920BCD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Data.MySql", "Assemblies\MySql\TixFactory.Data.MySql\TixFactory.Data.MySql.csproj", "{E9DF6E52-2457-4667-BDCA-24DEB920BCD6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Processors", "Assemblies\Processors\TixFactory.Processors\TixFactory.Processors.csproj", "{F899C53B-C82A-41C2-BC78-C42080029A00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Processors", "Assemblies\Processors\TixFactory.Processors\TixFactory.Processors.csproj", "{F899C53B-C82A-41C2-BC78-C42080029A00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Processors.Queueing", "Assemblies\Processors\TixFactory.Processors.Queueing\TixFactory.Processors.Queueing.csproj", "{2FB0CF50-6937-4F91-89C4-133DC2A0E3DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Processors.Queueing", "Assemblies\Processors\TixFactory.Processors.Queueing\TixFactory.Processors.Queueing.csproj", "{2FB0CF50-6937-4F91-89C4-133DC2A0E3DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Queueing", "Assemblies\Queueing\TixFactory.Queueing\TixFactory.Queueing.csproj", "{ADCC3821-BDE9-41A2-9325-EFD729ECC0D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Queueing", "Assemblies\Queueing\TixFactory.Queueing\TixFactory.Queueing.csproj", "{ADCC3821-BDE9-41A2-9325-EFD729ECC0D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Queueing.Remote", "Assemblies\Queueing\TixFactory.Queueing.Remote\TixFactory.Queueing.Remote.csproj", "{A3464CF7-B16D-4323-A235-85EBA8C58F9C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Queueing.Remote", "Assemblies\Queueing\TixFactory.Queueing.Remote\TixFactory.Queueing.Remote.csproj", "{A3464CF7-B16D-4323-A235-85EBA8C58F9C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TixFactory.Serialization.Json", "Assemblies\Serialization\TixFactory.Serialization.Json\TixFactory.Serialization.Json.csproj", "{9AF6737B-0378-438B-9D9C-F216D41A61AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Serialization.Json", "Assemblies\Serialization\TixFactory.Serialization.Json\TixFactory.Serialization.Json.csproj", "{9AF6737B-0378-438B-9D9C-F216D41A61AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -103,10 +101,6 @@ Global
 		{D076B06E-9938-449F-9028-FD6E4A2DEAD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D076B06E-9938-449F-9028-FD6E4A2DEAD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D076B06E-9938-449F-9028-FD6E4A2DEAD3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{99605003-D757-4F50-AE44-B4FB730B525A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{99605003-D757-4F50-AE44-B4FB730B525A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{99605003-D757-4F50-AE44-B4FB730B525A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{99605003-D757-4F50-AE44-B4FB730B525A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7360D6B7-50D3-4884-B20F-54B9A277C527}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7360D6B7-50D3-4884-B20F-54B9A277C527}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7360D6B7-50D3-4884-B20F-54B9A277C527}.Release|Any CPU.ActiveCfg = Release|Any CPU
