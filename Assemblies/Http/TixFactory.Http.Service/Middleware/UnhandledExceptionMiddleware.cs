@@ -1,24 +1,23 @@
 using System;
 using System.Net;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using TixFactory.Logging;
-using TixFactory.Operations;
+using Microsoft.Extensions.Logging;
 
 namespace TixFactory.Http.Service
 {
     /// <summary>
     /// Middleware for logging unhandled exceptions and responding with <see cref="HttpStatusCode.InternalServerError"/>.
     /// </summary>
-    public class UnhandledExceptionHandler
+    public class UnhandledExceptionMiddleware
     {
         private readonly RequestDelegate _NextHandler;
-        private readonly ILogger _Logger;
+        private readonly ILogger<UnhandledExceptionMiddleware> _Logger;
+        private static readonly byte[] _ResponseBytes = Encoding.UTF8.GetBytes($@"{{""error"":""UnhandledException""}}");
 
         /// <summary>
-        /// Initializes a new <see cref="UnhandledExceptionHandler"/>.
+        /// Initializes a new <see cref="UnhandledExceptionMiddleware"/>.
         /// </summary>
         /// <param name="nextHandler">A delegate for triggering the next handler.</param>
         /// <param name="logger">An <see cref="ILogger"/>.</param>
@@ -26,7 +25,7 @@ namespace TixFactory.Http.Service
         /// - <paramref name="nextHandler"/>
         /// - <paramref name="logger"/>
         /// </exception>
-        public UnhandledExceptionHandler(RequestDelegate nextHandler, ILogger logger)
+        public UnhandledExceptionMiddleware(RequestDelegate nextHandler, ILogger<UnhandledExceptionMiddleware> logger)
         {
             _NextHandler = nextHandler ?? throw new ArgumentNullException(nameof(nextHandler));
             _Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -40,19 +39,15 @@ namespace TixFactory.Http.Service
         {
             try
             {
-                await _NextHandler(context).ConfigureAwait(false);
+                await _NextHandler(context);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _Logger.Error(e);
-
-                var responsePayload = new Payload<object>(null, new OperationError("UnhandledException"));
-                var json = JsonSerializer.Serialize(responsePayload);
-                var jsonBytes = Encoding.UTF8.GetBytes(json);
+                _Logger.LogError(ex, "Unhandled exception caught by middleware.");
 
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 context.Response.ContentType = "application/json";
-                await context.Response.Body.WriteAsync(jsonBytes, 0, jsonBytes.Length).ConfigureAwait(false);
+                await context.Response.Body.WriteAsync(_ResponseBytes);
             }
         }
     }
