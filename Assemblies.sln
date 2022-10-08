@@ -25,8 +25,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Http.Service", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Logging", "Assemblies\Logging\TixFactory.Logging\TixFactory.Logging.csproj", "{426ADD4E-850E-4B0B-A814-328F26B19209}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Logging.Client", "Assemblies\Logging\TixFactory.Logging.Client\TixFactory.Logging.Client.csproj", "{D367DE62-D688-4541-86BA-E1410E549ACA}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Logging.Windows", "Assemblies\Logging\TixFactory.Logging.Windows\TixFactory.Logging.Windows.csproj", "{A5DE4B96-F637-403F-B4E7-BE4F0A824C1E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Processors", "Assemblies\Processors\TixFactory.Processors\TixFactory.Processors.csproj", "{F899C53B-C82A-41C2-BC78-C42080029A00}"
@@ -89,10 +87,6 @@ Global
 		{426ADD4E-850E-4B0B-A814-328F26B19209}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{426ADD4E-850E-4B0B-A814-328F26B19209}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{426ADD4E-850E-4B0B-A814-328F26B19209}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D367DE62-D688-4541-86BA-E1410E549ACA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D367DE62-D688-4541-86BA-E1410E549ACA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D367DE62-D688-4541-86BA-E1410E549ACA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D367DE62-D688-4541-86BA-E1410E549ACA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A5DE4B96-F637-403F-B4E7-BE4F0A824C1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A5DE4B96-F637-403F-B4E7-BE4F0A824C1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5DE4B96-F637-403F-B4E7-BE4F0A824C1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
