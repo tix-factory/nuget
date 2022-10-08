@@ -16,4 +16,19 @@ namespace TixFactory.Operations
         /// <returns>The <see cref="OperationError"/> (if the action failed, or <c>null</c>.)</returns>
         OperationError Execute(TInput input);
     }
+
+    /// <summary>
+    /// A synchronous action interface.
+    /// </summary>
+    /// <remarks>
+    /// Similar to <see cref="IAction{TInput}"/> but does not have an input.
+    /// </remarks>
+    public interface IAction
+    {
+        /// <summary>
+        /// Executes the action.
+        /// </summary>
+        /// <returns>The <see cref="OperationError"/> (if the action failed, or <c>null</c>.)</returns>
+        OperationError Execute();
+    }
 }

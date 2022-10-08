@@ -14,6 +14,16 @@ namespace TixFactory.Http.Service
         /// <summary>
         /// Executes an <see cref="IAction{TInput}"/> and converts the result to an <see cref="IActionResult"/>.
         /// </summary>
+        /// <param name="action">The <see cref="IAction{TInput}"/>.</param>
+        /// <returns>The <see cref="IActionResult"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// - <paramref name="action"/>
+        /// </exception>
+        IActionResult Execute(IAction action);
+
+        /// <summary>
+        /// Executes an <see cref="IAction{TInput}"/> and converts the result to an <see cref="IActionResult"/>.
+        /// </summary>
         /// <typeparam name="TInput">The action input data type.</typeparam>
         /// <param name="action">The <see cref="IAction{TInput}"/>.</param>
         /// <param name="input">The action input.</param>
@@ -45,6 +55,17 @@ namespace TixFactory.Http.Service
         /// - <paramref name="operation"/>
         /// </exception>
         IActionResult Execute<TInput, TOutput>(IOperation<TInput, TOutput> operation, TInput input);
+
+        /// <summary>
+        /// Executes an <see cref="IAsyncAction{TInput}"/> and converts the result to an <see cref="IActionResult"/>.
+        /// </summary>
+        /// <param name="action">The <see cref="IAsyncAction{TInput}"/>.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+        /// <returns>The <see cref="IActionResult"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// - <paramref name="action"/>
+        /// </exception>
+        Task<IActionResult> ExecuteAsync(IAsyncAction action, CancellationToken cancellationToken);
 
         /// <summary>
         /// Executes an <see cref="IAsyncAction{TInput}"/> and converts the result to an <see cref="IActionResult"/>.

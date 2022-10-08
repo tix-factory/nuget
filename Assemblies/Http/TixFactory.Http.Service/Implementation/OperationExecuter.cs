@@ -10,6 +10,23 @@ namespace TixFactory.Http.Service
     /// <inheritdoc cref="IOperationExecuter"/>
     public class OperationExecuter : IOperationExecuter
     {
+        /// <inheritdoc cref="IOperationExecuter.Execute(IAction)"/>
+        public IActionResult Execute(IAction action)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var error = action.Execute();
+            if (error != null)
+            {
+                return BuildErrorResult(error);
+            }
+
+            return new NoContentResult();
+        }
+
         /// <inheritdoc cref="IOperationExecuter.Execute{TInput}(IAction{TInput}, TInput)"/>
         public IActionResult Execute<TInput>(IAction<TInput> action, TInput input)
         {
@@ -51,6 +68,23 @@ namespace TixFactory.Http.Service
             return BuildPayloadResult(data, operationError);
         }
 
+        /// <inheritdoc cref="IOperationExecuter.ExecuteAsync(IAsyncAction, CancellationToken)"/>
+        public async Task<IActionResult> ExecuteAsync(IAsyncAction action, CancellationToken cancellationToken)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            var error = await action.ExecuteAsync(cancellationToken).ConfigureAwait(false);
+            if (error != null)
+            {
+                return BuildErrorResult(error);
+            }
+
+            return new NoContentResult();
+        }
+
         /// <inheritdoc cref="IOperationExecuter.ExecuteAsync{TInput}(IAsyncAction{TInput}, TInput, CancellationToken)"/>
         public async Task<IActionResult> ExecuteAsync<TInput>(IAsyncAction<TInput> action, TInput input, CancellationToken cancellationToken)
         {
@@ -59,7 +93,7 @@ namespace TixFactory.Http.Service
                 throw new ArgumentNullException(nameof(action));
             }
 
-            var error = await action.Execute(input, cancellationToken).ConfigureAwait(false);
+            var error = await action.ExecuteAsync(input, cancellationToken).ConfigureAwait(false);
             if (error != null)
             {
                 return BuildErrorResult(error);
@@ -76,7 +110,7 @@ namespace TixFactory.Http.Service
                 throw new ArgumentNullException(nameof(operation));
             }
 
-            var (data, operationError) = await operation.Execute(cancellationToken).ConfigureAwait(false);
+            var (data, operationError) = await operation.ExecuteAsync(cancellationToken).ConfigureAwait(false);
             return BuildPayloadResult(data, operationError);
         }
 
@@ -88,7 +122,7 @@ namespace TixFactory.Http.Service
                 throw new ArgumentNullException(nameof(operation));
             }
 
-            var (data, operationError) = await operation.Execute(input, cancellationToken).ConfigureAwait(false);
+            var (data, operationError) = await operation.ExecuteAsync(input, cancellationToken).ConfigureAwait(false);
             return BuildPayloadResult(data, operationError);
         }
 
