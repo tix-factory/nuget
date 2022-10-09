@@ -76,9 +76,9 @@ namespace TixFactory.Http.Client
             {
                 throw new HttpException(_UnexpectedErrorMessage, ex);
             }
-#endif
-
+#else
             return InvokeAsync(request, CancellationToken.None).GetAwaiter().GetResult();
+#endif
         }
 
         /// <inheritdoc cref="IHttpClientHandler.InvokeAsync"/>
