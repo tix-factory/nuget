@@ -12,6 +12,9 @@ jobs:
   format:
     runs-on: 'ubuntu-latest'
 
+    # Disabled because it broke my .NET Standard assembly.
+    if: ${{ false }}
+
     env:
       SOLUTION_FILE_NAME: './Assemblies.sln'
 
