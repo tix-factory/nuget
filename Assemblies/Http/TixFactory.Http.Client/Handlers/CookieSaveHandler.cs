@@ -4,49 +4,50 @@ using System.Threading;
 using System.Threading.Tasks;
 using TixFactory.CookieJar;
 
-namespace TixFactory.Http.Client;
-
-/// <summary>
-/// An <see cref="IHttpClientHandler"/> to save cookies after the request.
-/// </summary>
-/// <seealso cref="IHttpClientHandler"/>
-public class CookieSaveHandler : HttpClientHandlerBase
+namespace TixFactory.Http.Client
 {
-    private readonly ICookieJar _CookieJar;
-
     /// <summary>
-    /// Initializes a new <see cref="CookieSaveHandler"/>.
+    /// An <see cref="IHttpClientHandler"/> to save cookies after the request.
     /// </summary>
-    /// <param name="cookieJar">The <see cref="ICookieJar"/>.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="cookieJar"/></exception>
-    public CookieSaveHandler(ICookieJar cookieJar)
+    /// <seealso cref="IHttpClientHandler"/>
+    public class CookieSaveHandler : HttpClientHandlerBase
     {
-        _CookieJar = cookieJar ?? throw new ArgumentNullException(nameof(cookieJar));
-    }
+        private readonly ICookieJar _CookieJar;
 
-    /// <inheritdoc cref="HttpClientHandlerBase.Invoke"/>
-    public override IHttpResponse Invoke(IHttpRequest request)
-    {
-        var response = base.Invoke(request);
-
-        if (response.Headers.Keys.Contains(HttpResponseHeaderName.SetCookie))
+        /// <summary>
+        /// Initializes a new <see cref="CookieSaveHandler"/>.
+        /// </summary>
+        /// <param name="cookieJar">The <see cref="ICookieJar"/>.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="cookieJar"/></exception>
+        public CookieSaveHandler(ICookieJar cookieJar)
         {
-            _CookieJar.Save();
+            _CookieJar = cookieJar ?? throw new ArgumentNullException(nameof(cookieJar));
         }
 
-        return response;
-    }
-
-    /// <inheritdoc cref="HttpClientHandlerBase.InvokeAsync"/>
-    public override async Task<IHttpResponse> InvokeAsync(IHttpRequest request, CancellationToken cancellationToken)
-    {
-        var response = await base.InvokeAsync(request, cancellationToken).ConfigureAwait(false);
-
-        if (response.Headers.Keys.Contains(HttpResponseHeaderName.SetCookie))
+        /// <inheritdoc cref="HttpClientHandlerBase.Invoke"/>
+        public override IHttpResponse Invoke(IHttpRequest request)
         {
-            _CookieJar.Save();
+            var response = base.Invoke(request);
+
+            if (response.Headers.Keys.Contains(HttpResponseHeaderName.SetCookie))
+            {
+                _CookieJar.Save();
+            }
+
+            return response;
         }
 
-        return response;
+        /// <inheritdoc cref="HttpClientHandlerBase.InvokeAsync"/>
+        public override async Task<IHttpResponse> InvokeAsync(IHttpRequest request, CancellationToken cancellationToken)
+        {
+            var response = await base.InvokeAsync(request, cancellationToken).ConfigureAwait(false);
+
+            if (response.Headers.Keys.Contains(HttpResponseHeaderName.SetCookie))
+            {
+                _CookieJar.Save();
+            }
+
+            return response;
+        }
     }
 }

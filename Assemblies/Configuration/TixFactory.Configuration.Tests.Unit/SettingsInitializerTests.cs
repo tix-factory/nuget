@@ -1,35 +1,36 @@
 using System.Linq;
 using NUnit.Framework;
 
-namespace TixFactory.Configuration.Tests.Unit;
-
-[TestFixture]
-public class SettingsInitializerTests
+namespace TixFactory.Configuration.Tests.Unit
 {
-    internal const string DefaultStrValue = "Hello, world!";
-
-    private SettingsInitializer _SettingsInitializer;
-
-    [SetUp]
-    public void Setup()
+    [TestFixture]
+    public class SettingsInitializerTests
     {
-        var baselessSettingValueSource = new BaselessSettingValueSource();
-        _SettingsInitializer = new SettingsInitializer(baselessSettingValueSource);
-    }
+        internal const string DefaultStrValue = "Hello, world!";
 
-    [Test]
-    public void Test()
-    {
-        var settings = _SettingsInitializer.CreateFromInterface<ISettings>();
-        Assert.That(settings.Str, Is.EqualTo(DefaultStrValue));
+        private SettingsInitializer _SettingsInitializer;
 
-        var newStrValue = new string(settings.Str.Reverse().ToArray());
-        settings.Str = newStrValue;
-        Assert.That(settings.Str, Is.EqualTo(newStrValue));
+        [SetUp]
+        public void Setup()
+        {
+            var baselessSettingValueSource = new BaselessSettingValueSource();
+            _SettingsInitializer = new SettingsInitializer(baselessSettingValueSource);
+        }
 
-        Assert.That(settings.StrWithoutDefaultValue, Is.EqualTo(default(string)));
+        [Test]
+        public void Test()
+        {
+            var settings = _SettingsInitializer.CreateFromInterface<ISettings>();
+            Assert.That(settings.Str, Is.EqualTo(DefaultStrValue));
 
-        settings.StrWithoutDefaultValue = newStrValue;
-        Assert.That(settings.StrWithoutDefaultValue, Is.EqualTo(newStrValue));
+            var newStrValue = new string(settings.Str.Reverse().ToArray());
+            settings.Str = newStrValue;
+            Assert.That(settings.Str, Is.EqualTo(newStrValue));
+
+            Assert.That(settings.StrWithoutDefaultValue, Is.EqualTo(default(string)));
+
+            settings.StrWithoutDefaultValue = newStrValue;
+            Assert.That(settings.StrWithoutDefaultValue, Is.EqualTo(newStrValue));
+        }
     }
 }
