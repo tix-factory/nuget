@@ -12,7 +12,7 @@ namespace TixFactory.Operations
         /// </summary>
         /// <param name="input">The <typeparamref name="TInput"/>.</param>
         /// <returns>The <typeparamref name="TOutput"/>/<see cref="OperationError"/> tuple.</returns>
-        (TOutput output, OperationError error) Execute(TInput input);
+        (TOutput Output, OperationError Error) Execute(TInput input);
     }
 
     /// <summary>
@@ -25,6 +25,6 @@ namespace TixFactory.Operations
         /// Executes the operation.
         /// </summary>
         /// <returns>The <typeparamref name="TOutput"/>/<see cref="OperationError"/> tuple.</returns>
-        (TOutput output, OperationError error) Execute();
+        (TOutput Output, OperationError Error) Execute();
     }
 }

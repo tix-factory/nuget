@@ -17,7 +17,7 @@ namespace TixFactory.Operations
         /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
         /// <returns>A task returning the <typeparamref name="TOutput"/>/<see cref="OperationError"/> tuple.</returns>
         /// <exception cref="TaskCanceledException"><paramref name="cancellationToken"/> is cancelled.</exception>
-        Task<(TOutput output, OperationError error)> ExecuteAsync(TInput input, CancellationToken cancellationToken);
+        Task<(TOutput Output, OperationError Error)> ExecuteAsync(TInput input, CancellationToken cancellationToken);
     }
 
     /// <summary>
@@ -32,6 +32,6 @@ namespace TixFactory.Operations
         /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
         /// <returns>A task returning the <typeparamref name="TOutput"/>/<see cref="OperationError"/> tuple.</returns>
         /// <exception cref="TaskCanceledException"><paramref name="cancellationToken"/> is cancelled.</exception>
-        Task<(TOutput output, OperationError error)> ExecuteAsync(CancellationToken cancellationToken);
+        Task<(TOutput Output, OperationError Error)> ExecuteAsync(CancellationToken cancellationToken);
     }
 }
