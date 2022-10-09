@@ -82,19 +82,19 @@ namespace TixFactory.Http.Client
         }
 
         /// <inheritdoc cref="IHttpClientHandler.InvokeAsync"/>
-        public async Task<IHttpResponse> InvokeAsync(IHttpRequest request, CancellationToken originalCancellationToken)
+        public async Task<IHttpResponse> InvokeAsync(IHttpRequest request, CancellationToken cancellationToken)
         {
-            var cancellationToken = GetRequestCancellationToken(originalCancellationToken);
+            var requestCancellationToken = GetRequestCancellationToken(cancellationToken);
 
             try
             {
                 var requestMessage = BuildHttpRequestMessage(request);
-                var responseMessage = await SendAsync(_HttpClient, requestMessage, cancellationToken);
+                var responseMessage = await SendAsync(_HttpClient, requestMessage, requestCancellationToken);
                 return await BuildHttpResponseAsync(request, responseMessage, cancellationToken);
             }
             catch (TaskCanceledException ex)
             {
-                if (!cancellationToken.IsCancellationRequested)
+                if (!requestCancellationToken.IsCancellationRequested)
                 {
                     throw new HttpTimeoutException("The request timed out.", ex);
                 }
