@@ -35,6 +35,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Queueing", "Asse
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Serialization.Json", "Assemblies\Serialization\TixFactory.Serialization.Json\TixFactory.Serialization.Json.csproj", "{9AF6737B-0378-438B-9D9C-F216D41A61AB}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.MongoDB", "Assemblies\MongoDB\TixFactory.MongoDB\TixFactory.MongoDB.csproj", "{B281922F-94DF-4113-89AE-6F872F155A44}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,10 @@ Global
 		{9AF6737B-0378-438B-9D9C-F216D41A61AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AF6737B-0378-438B-9D9C-F216D41A61AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AF6737B-0378-438B-9D9C-F216D41A61AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B281922F-94DF-4113-89AE-6F872F155A44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B281922F-94DF-4113-89AE-6F872F155A44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B281922F-94DF-4113-89AE-6F872F155A44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B281922F-94DF-4113-89AE-6F872F155A44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
