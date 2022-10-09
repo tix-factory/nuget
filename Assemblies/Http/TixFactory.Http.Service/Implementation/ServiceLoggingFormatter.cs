@@ -58,14 +58,25 @@ public class ServiceLoggingFormatter : ConsoleFormatter, IDisposable
 
         if (string.IsNullOrWhiteSpace(serializableLog.Message))
         {
-            if (logEntry.Exception != null)
+            serializableLog.Message = "[ Empty ]";
+
+            if (logEntry.Exception == null)
             {
-                serializableLog.Message = logEntry.Exception.ToString();
-            }
-            else
-            {
+                // No message, no exception.
+                // Nothing to log.
                 return;
             }
+        }
+
+        if (logEntry.Exception != null)
+        {
+            if (!string.IsNullOrWhiteSpace(logEntry.Exception.Message))
+            {
+                serializableLog.ExceptionMessage = logEntry.Exception.Message;
+            }
+
+            serializableLog.SerializedException = logEntry.Exception.ToString();
+            serializableLog.ExceptionType = logEntry.Exception.GetType().FullName;
         }
 
         if (!string.IsNullOrWhiteSpace(logEntry.Category))
