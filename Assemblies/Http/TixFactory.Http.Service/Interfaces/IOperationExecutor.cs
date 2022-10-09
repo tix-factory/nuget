@@ -9,7 +9,7 @@ namespace TixFactory.Http.Service;
 /// <summary>
 /// Executes operation interfaces and translates them to <see cref="IActionResult"/>s.
 /// </summary>
-public interface IOperationExecuter
+public interface IOperationExecutor
 {
     /// <summary>
     /// Executes an <see cref="IAction{TInput}"/> and converts the result to an <see cref="IActionResult"/>.

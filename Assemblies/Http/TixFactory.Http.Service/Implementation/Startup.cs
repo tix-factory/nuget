@@ -23,7 +23,7 @@ public abstract class Startup
     public virtual void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<IApplicationContext>(ApplicationContext.ApplicationContext.Singleton);
-        services.AddSingleton<IOperationExecuter, OperationExecuter>();
+        services.AddSingleton<IOperationExecutor, OperationExecutor>();
         services.AddControllers(ConfigureMvc)
             .AddNewtonsoftJson(ConfigureJson);
     }
