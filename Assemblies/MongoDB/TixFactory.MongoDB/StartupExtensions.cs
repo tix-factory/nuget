@@ -1,7 +1,9 @@
 using System;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -22,16 +24,22 @@ public static class StartupExtensions
     /// <param name="services">The <see cref="IServiceCollection"/>.</param>
     /// <exception cref="ArgumentNullException">
     /// - <paramref name="services"/>
+    /// - <paramref name="configuration"/>
     /// </exception>
     /// <exception cref="ArgumentException">
     /// - <typeparamref name="TDocument"/> is missing <see cref="DataContractAttribute"/>, or <see cref="DataContractAttribute"/> does not have required properties set.
     /// </exception>
-    public static void AddMongoCollection<TDocument>(this IServiceCollection services)
+    public static void AddMongoCollection<TDocument>(this IServiceCollection services, IConfiguration configuration)
         where TDocument : class
     {
         if (services == null)
         {
             throw new ArgumentNullException(nameof(services));
+        }
+
+        if (configuration == null)
+        {
+            throw new ArgumentNullException(nameof(configuration));
         }
 
         var dataContract = typeof(TDocument).GetCustomAttribute(typeof(DataContractAttribute)) as DataContractAttribute;
@@ -40,7 +48,9 @@ public static class StartupExtensions
             throw new ArgumentException($"[DataContract] attribute expected with {nameof(DataContractAttribute.Name)} set to the collection name, and {nameof(DataContractAttribute.Namespace)} set to the database name.", nameof(TDocument));
         }
 
-        services.AddSingleton(sp =>
+        services.TryAddSingleton<IMongoClient>(_ => new MongoClient(configuration.GetValue<string>("MONGODB_CONNECTION_STRING")));
+
+        services.TryAddSingleton(sp =>
         {
             var mongoClient = sp.GetRequiredService<IMongoClient>();
             var database = mongoClient.GetDatabase(dataContract.Namespace);
