@@ -7,11 +7,18 @@ namespace TixFactory.ApplicationContext
     /// <inheritdoc cref="IApplicationContext"/>
     public class ApplicationContext : IApplicationContext
     {
+        private static readonly string _AppName = Environment.GetEnvironmentVariable("APP_NAME");
+
         /// <inheritdoc cref="IApplicationContext.Name"/>
         public string Name
         {
             get
             {
+                if (!string.IsNullOrWhiteSpace(_AppName))
+                {
+                    return _AppName;
+                }
+
                 var path = Assembly?.Location;
                 if (string.IsNullOrWhiteSpace(path))
                 {

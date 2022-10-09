@@ -18,6 +18,22 @@ namespace TixFactory.Operations
         /// <param name="input">The <typeparamref name="TInput"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
         /// <returns>A task returning the <see cref="OperationError"/> (if the action failed, or <c>null</c>.)</returns>
-        Task<OperationError> Execute(TInput input, CancellationToken cancellationToken);
+        Task<OperationError> ExecuteAsync(TInput input, CancellationToken cancellationToken);
+    }
+
+    /// <summary>
+    /// An asynchronous action interface.
+    /// </summary>
+    /// <remarks>
+    /// Similar to <see cref="IAsyncAction{TInput}"/> but does not have an input either.
+    /// </remarks>
+    public interface IAsyncAction
+    {
+        /// <summary>
+        /// Executes the action.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+        /// <returns>A task returning the <see cref="OperationError"/> (if the action failed, or <c>null</c>.)</returns>
+        Task<OperationError> ExecuteAsync(CancellationToken cancellationToken);
     }
 }
