@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Converters;
 using TixFactory.ApplicationContext;
 
@@ -17,18 +18,6 @@ namespace TixFactory.Http.Service;
 public abstract class Startup
 {
     /// <summary>
-    /// Configures the <see cref="IServiceCollection"/> for the application.
-    /// </summary>
-    /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-    public virtual void ConfigureServices(IServiceCollection services)
-    {
-        services.AddSingleton<IApplicationContext>(ApplicationContext.ApplicationContext.Singleton);
-        services.AddSingleton<IOperationExecutor, OperationExecutor>();
-        services.AddControllers(ConfigureMvc)
-            .AddNewtonsoftJson(ConfigureJson);
-    }
-
-    /// <summary>
     /// Configures the <see cref="IApplicationBuilder"/> for the application.
     /// </summary>
     /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
@@ -38,6 +27,21 @@ public abstract class Startup
         app.UseMiddleware<UnhandledExceptionMiddleware>();
         app.UseRouting();
         app.UseEndpoints(ConfigureEndpoints);
+    }
+
+    /// <summary>
+    /// Configures the <see cref="IServiceCollection"/> for the application.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+    public virtual void ConfigureServices(IServiceCollection services)
+    {
+        services.AddSingleton<IApplicationContext>(ApplicationContext.ApplicationContext.Singleton);
+        services.AddSingleton<IOperationExecutor, OperationExecutor>();
+
+        services.AddLogging(ConfigureLogging);
+
+        services.AddControllers(ConfigureMvc)
+            .AddNewtonsoftJson(ConfigureJson);
     }
 
     /// <summary>
@@ -65,5 +69,14 @@ public abstract class Startup
     protected virtual void ConfigureEndpoints(IEndpointRouteBuilder endpointRouteBuilder)
     {
         endpointRouteBuilder.MapControllers();
+    }
+
+    /// <summary>
+    /// Configures how things are logged.
+    /// </summary>
+    /// <param name="loggingBuilder">The <see cref="ILoggingBuilder"/>.</param>
+    protected virtual void ConfigureLogging(ILoggingBuilder loggingBuilder)
+    {
+        loggingBuilder.AddConsoleFormatter<ServiceLoggingFormatter, ServiceLoggingFormatterOptions>();
     }
 }
