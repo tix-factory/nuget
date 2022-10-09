@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Converters;
+using Prometheus;
+using Prometheus.HttpMetrics;
 using TixFactory.ApplicationContext;
 
 namespace TixFactory.Http.Service;
@@ -26,6 +28,7 @@ public abstract class Startup
     {
         app.UseMiddleware<UnhandledExceptionMiddleware>();
         app.UseRouting();
+        app.UseHttpMetrics(ConfigureMetrics);
         app.UseEndpoints(ConfigureEndpoints);
     }
 
@@ -68,6 +71,7 @@ public abstract class Startup
     /// <param name="endpointRouteBuilder">The <see cref="IEndpointRouteBuilder"/>.</param>
     protected virtual void ConfigureEndpoints(IEndpointRouteBuilder endpointRouteBuilder)
     {
+        endpointRouteBuilder.MapMetrics();
         endpointRouteBuilder.MapControllers();
     }
 
@@ -78,5 +82,13 @@ public abstract class Startup
     protected virtual void ConfigureLogging(ILoggingBuilder loggingBuilder)
     {
         loggingBuilder.AddConsoleFormatter<ServiceLoggingFormatter, ServiceLoggingFormatterOptions>();
+    }
+
+    /// <summary>
+    /// Configure HTTP metrics exported to prometheus.
+    /// </summary>
+    /// <param name="options">The <see cref="HttpMiddlewareExporterOptions"/>.</param>
+    protected virtual void ConfigureMetrics(HttpMiddlewareExporterOptions options)
+    {
     }
 }
