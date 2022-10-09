@@ -143,17 +143,23 @@ namespace TixFactory.Http.Client
             return requestMessage;
         }
 
+#if NET6_0_OR_GREATER
         internal static IHttpResponse BuildHttpResponse(IHttpRequest httpRequest, HttpResponseMessage responseMessage)
         {
             var httpResponse = CreateHttpResponse(httpRequest, responseMessage);
             httpResponse.Body = responseMessage.Content.ReadAsStream();
             return httpResponse;
         }
+#endif
 
         internal static async Task<IHttpResponse> BuildHttpResponseAsync(IHttpRequest httpRequest, HttpResponseMessage responseMessage, CancellationToken cancellationToken)
         {
             var httpResponse = CreateHttpResponse(httpRequest, responseMessage);
+#if NET6_0_OR_GREATER
             httpResponse.Body = await responseMessage.Content.ReadAsStreamAsync(cancellationToken);
+#else
+            httpResponse.Body = await responseMessage.Content.ReadAsStreamAsync();
+#endif
             return httpResponse;
         }
 
@@ -168,12 +174,14 @@ namespace TixFactory.Http.Client
             };
         }
 
+#if NET6_0_OR_GREATER
         [ExcludeFromCodeCoverage]
         internal virtual HttpResponseMessage Send(System.Net.Http.HttpClient httpClient, HttpRequestMessage requestMessage, CancellationToken cancellationToken)
         {
             VerifyHttpClientSettings();
             return httpClient.Send(requestMessage, cancellationToken);
         }
+#endif
 
         [ExcludeFromCodeCoverage]
         internal virtual async Task<HttpResponseMessage> SendAsync(System.Net.Http.HttpClient httpClient, HttpRequestMessage requestMessage, CancellationToken cancellationToken)
