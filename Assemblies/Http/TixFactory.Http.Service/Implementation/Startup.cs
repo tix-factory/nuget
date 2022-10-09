@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Converters;
+using Prometheus;
 using TixFactory.ApplicationContext;
 
 namespace TixFactory.Http.Service;
@@ -68,6 +69,7 @@ public abstract class Startup
     /// <param name="endpointRouteBuilder">The <see cref="IEndpointRouteBuilder"/>.</param>
     protected virtual void ConfigureEndpoints(IEndpointRouteBuilder endpointRouteBuilder)
     {
+        endpointRouteBuilder.MapMetrics();
         endpointRouteBuilder.MapControllers();
     }
 
