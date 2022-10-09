@@ -8,7 +8,6 @@ namespace TixFactory.Http.Client
         private string _UserAgent = "TixFactory.Http.Client";
         private TimeSpan _RequestTimeout = TimeSpan.FromMinutes(2);
         private int _MaxRedirects = 20;
-        private bool _SslCertificateValidationEnabled = true;
 
 #pragma warning disable CS0067
         /// <inheritdoc cref="IHttpClientSettings.SettingChanged"/>
@@ -60,22 +59,6 @@ namespace TixFactory.Http.Client
 
                 _MaxRedirects = value;
                 SettingChanged?.Invoke(nameof(MaxRedirects));
-            }
-        }
-
-        /// <inheritdoc cref="IHttpClientSettings.SslCertificateValidationEnabled"/>
-        public bool SslCertificateValidationEnabled
-        {
-            get => _SslCertificateValidationEnabled;
-            set
-            {
-                if (_SslCertificateValidationEnabled == value)
-                {
-                    return;
-                }
-
-                _SslCertificateValidationEnabled = value;
-                SettingChanged?.Invoke(nameof(SslCertificateValidationEnabled));
             }
         }
     }

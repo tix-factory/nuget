@@ -26,10 +26,5 @@ namespace TixFactory.Http.Client
         /// The max amount of times the request can be redirected before it is terminated.
         /// </summary>
         int MaxRedirects { get; }
-
-        /// <summary>
-        /// Whether or not to validate SSL certificates.
-        /// </summary>
-        bool SslCertificateValidationEnabled { get; }
     }
 }
