@@ -8,11 +8,6 @@ namespace TixFactory.Http.Client
     public interface IHttpClientSettings
     {
         /// <summary>
-        /// An event that should be fired any time a property getter will begin returning a new value.
-        /// </summary>
-        event Action<string> SettingChanged;
-
-        /// <summary>
         /// The default User-Agent request header for all requests.
         /// </summary>
         string UserAgent { get; }

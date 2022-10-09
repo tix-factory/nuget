@@ -5,61 +5,13 @@ namespace TixFactory.Http.Client
     /// <inheritdoc cref="IHttpClientSettings"/>
     public class HttpClientSettings : IHttpClientSettings
     {
-        private string _UserAgent = "TixFactory.Http.Client";
-        private TimeSpan _RequestTimeout = TimeSpan.FromMinutes(2);
-        private int _MaxRedirects = 20;
-
-#pragma warning disable CS0067
-        /// <inheritdoc cref="IHttpClientSettings.SettingChanged"/>
-        public event Action<string> SettingChanged;
-#pragma warning restore CS0067
-
         /// <inheritdoc cref="IHttpClientSettings.UserAgent"/>
-        public string UserAgent
-        {
-            get => _UserAgent;
-            set
-            {
-                if (_UserAgent == value)
-                {
-                    return;
-                }
-
-                _UserAgent = value;
-                SettingChanged?.Invoke(nameof(UserAgent));
-            }
-        }
+        public string UserAgent { get; set; } = "TixFactory.Http.Client";
 
         /// <inheritdoc cref="IHttpClientSettings.RequestTimeout"/>
-        public TimeSpan RequestTimeout
-        {
-            get => _RequestTimeout;
-            set
-            {
-                if (_RequestTimeout == value)
-                {
-                    return;
-                }
-
-                _RequestTimeout = value;
-                SettingChanged?.Invoke(nameof(RequestTimeout));
-            }
-        }
+        public TimeSpan RequestTimeout { get; set; } = TimeSpan.FromMinutes(2);
 
         /// <inheritdoc cref="IHttpClientSettings.MaxRedirects"/>
-        public int MaxRedirects
-        {
-            get => _MaxRedirects;
-            set
-            {
-                if (_MaxRedirects == value)
-                {
-                    return;
-                }
-
-                _MaxRedirects = value;
-                SettingChanged?.Invoke(nameof(MaxRedirects));
-            }
-        }
+        public int MaxRedirects { get; set; } = 20;
     }
 }
