@@ -52,7 +52,7 @@ namespace TixFactory.Http.Client
             try
             {
                 var requestMessage = BuildHttpRequestMessage(request);
-                var responseMessage = Send(_HttpClient, requestMessage, cancellationToken);
+                var responseMessage = Send(requestMessage, cancellationToken);
                 return BuildHttpResponse(request, responseMessage);
             }
             catch (TaskCanceledException ex)
@@ -81,7 +81,7 @@ namespace TixFactory.Http.Client
             try
             {
                 var requestMessage = BuildHttpRequestMessage(request);
-                var responseMessage = await SendAsync(_HttpClient, requestMessage, requestCancellationToken);
+                var responseMessage = await SendAsync(requestMessage, requestCancellationToken);
                 return await BuildHttpResponseAsync(request, responseMessage, cancellationToken);
             }
             catch (TaskCanceledException ex)
@@ -168,18 +168,18 @@ namespace TixFactory.Http.Client
 
 #if NET6_0_OR_GREATER
         [ExcludeFromCodeCoverage]
-        internal virtual HttpResponseMessage Send(System.Net.Http.HttpClient httpClient, HttpRequestMessage requestMessage, CancellationToken cancellationToken)
+        internal virtual HttpResponseMessage Send(HttpRequestMessage requestMessage, CancellationToken cancellationToken)
         {
             VerifyHttpClientSettings();
-            return httpClient.Send(requestMessage, cancellationToken);
+            return _HttpClient.Send(requestMessage, cancellationToken);
         }
 #endif
 
         [ExcludeFromCodeCoverage]
-        internal virtual async Task<HttpResponseMessage> SendAsync(System.Net.Http.HttpClient httpClient, HttpRequestMessage requestMessage, CancellationToken cancellationToken)
+        internal virtual async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage, CancellationToken cancellationToken)
         {
             VerifyHttpClientSettings();
-            return await httpClient.SendAsync(requestMessage, cancellationToken);
+            return await _HttpClient.SendAsync(requestMessage, cancellationToken);
         }
 
         private CancellationToken GetRequestCancellationToken(CancellationToken originalCancellationToken)
