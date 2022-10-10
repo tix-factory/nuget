@@ -1,8 +1,10 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Converters;
 using Prometheus;
@@ -45,6 +47,22 @@ public abstract class Startup
 
         services.AddControllers(ConfigureMvc)
             .AddNewtonsoftJson(ConfigureJson);
+    }
+
+    /// <summary>
+    /// Intended to be called by the entry point for the service.
+    /// </summary>
+    /// <typeparam name="TStartup">The startup class.</typeparam>
+    /// <param name="args">The command line arguments used to start the service.</param>
+    public static Task Main<TStartup>(string[] args)
+        where TStartup : class
+    {
+        var webHost = Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webHostBuilder =>
+        {
+            webHostBuilder.UseStartup<TStartup>();
+        }).Build();
+
+        return webHost.RunAsync();
     }
 
     /// <summary>
