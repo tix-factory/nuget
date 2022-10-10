@@ -197,8 +197,11 @@ namespace TixFactory.Http.Client
 
         private (System.Net.Http.HttpClient HttpClient, HttpClientHandler Handler) CreateHttpClient()
         {
-            var httpClientHandler = new HttpClientHandler();
-            httpClientHandler.AllowAutoRedirect = _HttpClientSettings.MaxRedirects > 0;
+            var httpClientHandler = new HttpClientHandler
+            {
+                CookieContainer = _CookieContainer,
+                AllowAutoRedirect = _HttpClientSettings.MaxRedirects > 0
+            };
 
             if (httpClientHandler.AllowAutoRedirect)
             {
