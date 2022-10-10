@@ -82,7 +82,7 @@ public static class CollectionExtensions
                 Comment = WriteComment
             }, cancellationToken);
 
-            if (result != null)
+            if (result.ModifiedCount != 1)
             {
                 throw new MongoException($"Expected exactly one document to be updated, but got {result.ModifiedCount}");
             }

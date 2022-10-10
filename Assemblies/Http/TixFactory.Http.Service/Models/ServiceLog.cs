@@ -64,7 +64,7 @@ internal class ServiceLog
     /// https://www.elastic.co/guide/en/ecs/current/ecs-error.html#field-error-stack-trace
     /// </remarks>
     [DataMember(Name = "error.stack_trace", EmitDefaultValue = false)]
-    public string SerializedException { get; set; }
+    public string ExceptionStackTrace { get; set; }
 
     /// <summary>
     /// When the log was logged.

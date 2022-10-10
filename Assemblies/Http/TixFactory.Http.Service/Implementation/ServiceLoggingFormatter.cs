@@ -75,8 +75,12 @@ public class ServiceLoggingFormatter : ConsoleFormatter, IDisposable
                 serializableLog.ExceptionMessage = logEntry.Exception.Message;
             }
 
-            serializableLog.SerializedException = logEntry.Exception.ToString();
-            serializableLog.ExceptionType = logEntry.Exception.GetType().FullName;
+            var exceptionType = logEntry.Exception.GetType().FullName ?? string.Empty;
+            serializableLog.ExceptionType = exceptionType;
+
+            var serializedException = logEntry.Exception.ToString();
+            var stackTraceStartIndex = exceptionType.Length + logEntry.Exception.Message.Length + 2;
+            serializableLog.ExceptionStackTrace = serializedException.Length > stackTraceStartIndex ? serializedException[stackTraceStartIndex..].Trim() : serializedException;
         }
 
         if (!string.IsNullOrWhiteSpace(logEntry.Category))
