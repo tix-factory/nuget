@@ -77,7 +77,7 @@ public static class CollectionExtensions
 
         if (updateDocument(document))
         {
-            var result = await collection.UpdateOneAsync(filter, new ObjectUpdateDefinition<TDocument>(document), new UpdateOptions
+            var result = await collection.ReplaceOneAsync(filter, document, new ReplaceOptions
             {
                 Comment = WriteComment
             }, cancellationToken);
