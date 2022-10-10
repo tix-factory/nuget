@@ -28,9 +28,9 @@ public abstract class Startup
     /// <param name="env">The <see cref="IHostingEnvironment"/>.</param>
     public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        app.UseMiddleware<UnhandledExceptionMiddleware>();
         app.UseRouting();
         app.UseHttpMetrics(ConfigureMetrics);
+        app.UseMiddleware<UnhandledExceptionMiddleware>();
         app.UseEndpoints(ConfigureEndpoints);
     }
 
