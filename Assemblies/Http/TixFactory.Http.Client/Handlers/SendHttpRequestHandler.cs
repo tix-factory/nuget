@@ -20,8 +20,9 @@ namespace TixFactory.Http.Client
         private const string _UnexpectedErrorMessage = "An unexpected error occurred while processing the Http request. Check inner exception.";
 
         private readonly IHttpClientSettings _HttpClientSettings;
-        private readonly HttpClientHandler _HttpClientHandler;
-        private readonly System.Net.Http.HttpClient _HttpClient;
+        private readonly CookieContainer _CookieContainer;
+        private HttpClientHandler _HttpClientHandler;
+        private System.Net.Http.HttpClient _HttpClient;
 
         /// <summary>
         /// Initializes a new <see cref="SendHttpRequestHandler"/>.
@@ -39,16 +40,7 @@ namespace TixFactory.Http.Client
             }
 
             _HttpClientSettings = httpClientSettings ?? throw new ArgumentNullException(nameof(httpClientSettings));
-
-            _HttpClientHandler = new HttpClientHandler
-            {
-                CookieContainer = cookieContainer
-            };
-
-            _HttpClient = new System.Net.Http.HttpClient(_HttpClientHandler)
-            {
-                Timeout = GetHttpClientMaxTimeout()
-            };
+            _CookieContainer = cookieContainer;
         }
 
         /// <inheritdoc cref="IHttpClientHandler.Invoke"/>
@@ -203,6 +195,24 @@ namespace TixFactory.Http.Client
             return cancellationTokenSource.Token;
         }
 
+        private (System.Net.Http.HttpClient HttpClient, HttpClientHandler Handler) CreateHttpClient()
+        {
+            var httpClientHandler = new HttpClientHandler();
+            httpClientHandler.AllowAutoRedirect = _HttpClientSettings.MaxRedirects > 0;
+
+            if (httpClientHandler.AllowAutoRedirect)
+            {
+                httpClientHandler.MaxAutomaticRedirections = _HttpClientSettings.MaxRedirects;
+            }
+
+            var httpClient = new System.Net.Http.HttpClient(httpClientHandler)
+            {
+                Timeout = GetHttpClientMaxTimeout()
+            };
+
+            return (httpClient, httpClientHandler);
+        }
+
         private static TimeSpan GetHttpClientMaxTimeout()
         {
             if (TimeSpan.TryParse(Environment.GetEnvironmentVariable("TIXFACTORY_HTTP_CLIENT_MAX_TIMEOUT"), out var maxTimeout))
@@ -215,12 +225,19 @@ namespace TixFactory.Http.Client
 
         private void VerifyHttpClientSettings()
         {
-            _HttpClientHandler.AllowAutoRedirect = _HttpClientSettings.MaxRedirects > 0;
-
-            if (_HttpClientHandler.AllowAutoRedirect)
+            if (_HttpClientHandler != null
+                && _HttpClientHandler.MaxAutomaticRedirections == _HttpClientSettings.MaxRedirects)
             {
-                _HttpClientHandler.MaxAutomaticRedirections = _HttpClientSettings.MaxRedirects;
+                return;
             }
+
+            // Will this kill any requests currently in flight? Probably..
+            _HttpClientHandler?.Dispose();
+            _HttpClient?.Dispose();
+
+            var (httpClient, httpClientHandler) = CreateHttpClient();
+            _HttpClientHandler = httpClientHandler;
+            _HttpClient = httpClient;
         }
     }
 }
