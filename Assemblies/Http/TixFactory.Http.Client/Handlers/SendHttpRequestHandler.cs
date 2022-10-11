@@ -19,28 +19,23 @@ namespace TixFactory.Http.Client
     {
         private const string _UnexpectedErrorMessage = "An unexpected error occurred while processing the Http request. Check inner exception.";
 
+        private readonly Func<HttpClientHandler> _HttpClientHandlerFactory;
         private readonly IHttpClientSettings _HttpClientSettings;
-        private readonly CookieContainer _CookieContainer;
         private HttpClientHandler _HttpClientHandler;
         private System.Net.Http.HttpClient _HttpClient;
 
         /// <summary>
         /// Initializes a new <see cref="SendHttpRequestHandler"/>.
         /// </summary>
-        /// <param name="cookieContainer">The <see cref="CookieContainer"/> to use in the requests (initializes a new one when <c>null</c>.)</param>
+        /// <param name="httpClientHandlerFactory">Produces the <see cref="HttpClientHandler"/> to use for the requests.</param>
         /// <param name="httpClientSettings">An <see cref="IHttpClientSettings"/>.</param>
         /// <exception cref="ArgumentNullException">
         /// - <paramref name="httpClientSettings"/>
         /// </exception>
-        public SendHttpRequestHandler(CookieContainer cookieContainer, IHttpClientSettings httpClientSettings)
+        public SendHttpRequestHandler(Func<HttpClientHandler> httpClientHandlerFactory, IHttpClientSettings httpClientSettings)
         {
-            if (cookieContainer == null)
-            {
-                cookieContainer = new CookieContainer();
-            }
-
+            _HttpClientHandlerFactory = httpClientHandlerFactory ?? throw new ArgumentNullException(nameof(httpClientHandlerFactory));
             _HttpClientSettings = httpClientSettings ?? throw new ArgumentNullException(nameof(httpClientSettings));
-            _CookieContainer = cookieContainer;
         }
 
         /// <inheritdoc cref="IHttpClientHandler.Invoke"/>
@@ -197,11 +192,8 @@ namespace TixFactory.Http.Client
 
         private (System.Net.Http.HttpClient HttpClient, HttpClientHandler Handler) CreateHttpClient()
         {
-            var httpClientHandler = new HttpClientHandler
-            {
-                CookieContainer = _CookieContainer,
-                AllowAutoRedirect = _HttpClientSettings.MaxRedirects > 0
-            };
+            var httpClientHandler = _HttpClientHandlerFactory();
+            httpClientHandler.AllowAutoRedirect = _HttpClientSettings.MaxRedirects > 0;
 
             if (httpClientHandler.AllowAutoRedirect)
             {

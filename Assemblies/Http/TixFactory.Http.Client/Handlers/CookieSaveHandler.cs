@@ -10,6 +10,7 @@ namespace TixFactory.Http.Client
     /// An <see cref="IHttpClientHandler"/> to save cookies after the request.
     /// </summary>
     /// <seealso cref="IHttpClientHandler"/>
+    [Obsolete("Use " + nameof(CookieJarHandler) + " instead.")]
     public class CookieSaveHandler : HttpClientHandlerBase
     {
         private readonly ICookieJar _CookieJar;
