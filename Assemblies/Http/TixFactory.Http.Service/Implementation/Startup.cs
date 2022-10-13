@@ -24,9 +24,11 @@ public abstract class Startup
     /// <summary>
     /// Configures the <see cref="IApplicationBuilder"/> for the application.
     /// </summary>
+    /// <remarks>
+    /// You must call this from the Configure method on startup.
+    /// </remarks>
     /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-    /// <param name="env">The <see cref="IHostingEnvironment"/>.</param>
-    public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    public void UseConfiguration(IApplicationBuilder app)
     {
         app.UseRouting();
         app.UseHttpMetrics(ConfigureMetrics);
