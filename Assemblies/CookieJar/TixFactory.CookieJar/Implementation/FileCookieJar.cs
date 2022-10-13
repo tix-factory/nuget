@@ -1,8 +1,9 @@
 using System;
 using System.IO;
 using System.Net;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace TixFactory.CookieJar
 {
@@ -13,8 +14,7 @@ namespace TixFactory.CookieJar
     public class FileCookieJar : ICookieJar
     {
         private readonly string _FileName;
-        private readonly BinaryFormatter _BinaryFormatter;
-        private readonly SemaphoreSlim _SaveLock = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _SaveLock = new(1, 1);
 
         /// <inheritdoc cref="ICookieJar.CookieContainer"/>
         public CookieContainer CookieContainer { get; }
@@ -22,14 +22,32 @@ namespace TixFactory.CookieJar
         /// <summary>
         /// Initializes a new <see cref="FileCookieJar"/>.
         /// </summary>
+        /// <remarks>
+        /// If <paramref name="cookieContainer"/> is set, any cookies in the file are ignored, and replaced.
+        /// </remarks>
         /// <param name="fileName">The file name to save/load the cookies to/from.</param>
-        /// <param name="cookieContainer"></param>
+        /// <param name="cookieContainer">An initial <see cref="CookieContainer"/>.</param>
+        /// <exception cref="ArgumentException">
+        /// - <paramref name="fileName"/> is <c>null</c> or white space.
+        /// </exception>
         public FileCookieJar(string fileName, CookieContainer cookieContainer = null)
-            : this(new BinaryFormatter(), fileName, cookieContainer)
+            : this(fileName, null, cookieContainer)
         {
         }
 
-        private FileCookieJar(BinaryFormatter binaryFormatter, string fileName, CookieContainer cookieContainer = null)
+        /// <summary>
+        /// Initializes a new <see cref="FileCookieJar"/>.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="cookieContainer"/> is set, any cookies in the file are ignored, and replaced.
+        /// </remarks>
+        /// <param name="fileName">The file name to save/load the cookies to/from.</param>
+        /// <param name="logger">An <see cref="ILogger{TCategoryName}"/>.</param>
+        /// <param name="cookieContainer">An initial <see cref="CookieContainer"/>.</param>
+        /// <exception cref="ArgumentException">
+        /// - <paramref name="fileName"/> is <c>null</c> or white space.
+        /// </exception>
+        public FileCookieJar(string fileName, ILogger<FileCookieJar> logger, CookieContainer cookieContainer = null)
         {
             if (string.IsNullOrWhiteSpace(fileName))
             {
@@ -37,9 +55,10 @@ namespace TixFactory.CookieJar
             }
 
             _FileName = fileName;
-            _BinaryFormatter = binaryFormatter ?? throw new ArgumentNullException(nameof(binaryFormatter));
-            CookieContainer = cookieContainer ?? CreateCookieContainer(fileName, binaryFormatter);
+            CookieContainer = cookieContainer ?? CreateCookieContainer(fileName, logger);
         }
+
+
 
         /// <inheritdoc cref="ICookieJar.Save"/>
         public void Save()
@@ -53,11 +72,8 @@ namespace TixFactory.CookieJar
 
             try
             {
-                using (var memoryStream = new MemoryStream())
-                {
-                    _BinaryFormatter.Serialize(memoryStream, CookieContainer);
-                    File.WriteAllBytes(_FileName, memoryStream.ToArray());
-                }
+                var cookies = JsonConvert.SerializeObject(CookieContainer.GetAllCookies());
+                File.WriteAllText(_FileName, cookies);
             }
             finally
             {
@@ -65,18 +81,22 @@ namespace TixFactory.CookieJar
             }
         }
 
-        private static CookieContainer CreateCookieContainer(string fileName, BinaryFormatter binaryFormatter)
+        private static CookieContainer CreateCookieContainer(string fileName, ILogger<FileCookieJar> logger)
         {
-            if (File.Exists(fileName))
+            var cookieContainer = new CookieContainer();
+
+            try
             {
-                var cookieBytes = File.ReadAllBytes(fileName);
-                using (var memoryStream = new MemoryStream(cookieBytes))
-                {
-                    return (CookieContainer)binaryFormatter.Deserialize(memoryStream);
-                }
+                var cookies = File.ReadAllText(fileName);
+                var cookieCollection = JsonConvert.DeserializeObject<CookieCollection>(cookies);
+                cookieContainer.Add(cookieCollection);
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Failed to read cookies from file.");
             }
 
-            return new CookieContainer();
+            return cookieContainer;
         }
     }
 }
