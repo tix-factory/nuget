@@ -3,7 +3,7 @@
     <Company>Tix Factory</Company>
     <RepositoryUrl>https://github.com/tix-factory/nuget</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <VersionPrefix>3.9.0</VersionPrefix>
+    <VersionPrefix>3.10.0</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup Label="TestsProperties" Condition="$(MSBuildProjectName.Contains('.Tests'))">
