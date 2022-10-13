@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using TixFactory.CookieJar;
@@ -20,17 +21,33 @@ namespace TixFactory.Http.Client
         /// Initializes a new <see cref="HttpClient"/>.
         /// </summary>
         /// <remarks>
-        /// Adds the <see cref="CookieSaveHandler"/> to <see cref="Handlers"/> if <paramref name="cookieJar"/> is not <c>null</c>.
+        /// This constructor will save cookies, when the Set-Cookie header is returned, to the provided <see cref="ICookieJar"/>.
         /// </remarks>
         /// <param name="cookieJar">The <see cref="ICookieJar"/> to use for the requests.</param>
         /// <param name="httpClientSettings">The <see cref="IHttpClientSettings"/> (uses <see cref="HttpClientSettings"/> if <c>null</c>.)</param>
         public HttpClient(ICookieJar cookieJar = null, IHttpClientSettings httpClientSettings = null)
-            : this(cookieJar?.CookieContainer, httpClientSettings ?? new HttpClientSettings())
         {
-            if (cookieJar != null)
+            if (httpClientSettings == null)
             {
-                Handlers.Insert(0, new CookieSaveHandler(cookieJar));
+                httpClientSettings = new HttpClientSettings();
             }
+
+            // Backup cookie container.
+            var cookieContainer = cookieJar == null ? new CookieContainer() : null;
+
+            Handlers = new List<IHttpClientHandler>();
+            Handlers.Add(new SendHttpRequestHandler(() =>
+            {
+                if (cookieJar != null)
+                {
+                    return new CookieJarHandler(cookieJar);
+                }
+
+                return new HttpClientHandler
+                {
+                    CookieContainer = cookieContainer
+                };
+            }, httpClientSettings));
         }
 
         /// <summary>
@@ -47,7 +64,10 @@ namespace TixFactory.Http.Client
             }
 
             Handlers = new List<IHttpClientHandler>();
-            Handlers.Add(new SendHttpRequestHandler(cookieContainer, httpClientSettings));
+            Handlers.Add(new SendHttpRequestHandler(() => new HttpClientHandler
+            {
+                CookieContainer = cookieContainer
+            }, httpClientSettings));
         }
 
         /// <inheritdoc cref="IHttpClient.Send"/>
