@@ -28,7 +28,7 @@ public abstract class Startup
     /// You must call this from the Configure method on startup.
     /// </remarks>
     /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-    public void UseConfiguration(IApplicationBuilder app)
+    protected void UseConfiguration(IApplicationBuilder app)
     {
         app.UseRouting();
         app.UseHttpMetrics(ConfigureMetrics);
