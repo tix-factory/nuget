@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace TixFactory.CookieJar
@@ -26,7 +27,27 @@ namespace TixFactory.CookieJar
         /// </remarks>
         /// <param name="fileName">The file name to save/load the cookies to/from.</param>
         /// <param name="cookieContainer">An initial <see cref="CookieContainer"/>.</param>
+        /// <exception cref="ArgumentException">
+        /// - <paramref name="fileName"/> is <c>null</c> or white space.
+        /// </exception>
         public FileCookieJar(string fileName, CookieContainer cookieContainer = null)
+            : this(fileName, null, cookieContainer)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new <see cref="FileCookieJar"/>.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="cookieContainer"/> is set, any cookies in the file are ignored, and replaced.
+        /// </remarks>
+        /// <param name="fileName">The file name to save/load the cookies to/from.</param>
+        /// <param name="logger">An <see cref="ILogger{TCategoryName}"/>.</param>
+        /// <param name="cookieContainer">An initial <see cref="CookieContainer"/>.</param>
+        /// <exception cref="ArgumentException">
+        /// - <paramref name="fileName"/> is <c>null</c> or white space.
+        /// </exception>
+        public FileCookieJar(string fileName, ILogger<FileCookieJar> logger, CookieContainer cookieContainer = null)
         {
             if (string.IsNullOrWhiteSpace(fileName))
             {
@@ -34,8 +55,10 @@ namespace TixFactory.CookieJar
             }
 
             _FileName = fileName;
-            CookieContainer = cookieContainer ?? CreateCookieContainer(fileName);
+            CookieContainer = cookieContainer ?? CreateCookieContainer(fileName, logger);
         }
+
+
 
         /// <inheritdoc cref="ICookieJar.Save"/>
         public void Save()
@@ -58,7 +81,7 @@ namespace TixFactory.CookieJar
             }
         }
 
-        private static CookieContainer CreateCookieContainer(string fileName)
+        private static CookieContainer CreateCookieContainer(string fileName, ILogger<FileCookieJar> logger)
         {
             var cookieContainer = new CookieContainer();
 
@@ -68,9 +91,9 @@ namespace TixFactory.CookieJar
                 var cookieCollection = JsonConvert.DeserializeObject<CookieCollection>(cookies);
                 cookieContainer.Add(cookieCollection);
             }
-            catch
+            catch (Exception ex)
             {
-                // Probably shouldn't swallow this. ¯\_(ツ)_/¯
+                logger?.LogError(ex, "Failed to read cookies from file.");
             }
 
             return cookieContainer;
