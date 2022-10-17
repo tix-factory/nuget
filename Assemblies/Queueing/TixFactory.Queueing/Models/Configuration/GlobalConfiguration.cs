@@ -17,5 +17,5 @@ public class GlobalConfiguration
     /// Whether or not Rabbit should process received messages asynchronously.
     /// </summary>
     /// <seealso cref="ConnectionFactory.DispatchConsumersAsync"/>
-    public bool AsyncEnabled { get; set; }
+    public bool AsyncEnabled { get; set; } = true;
 }
