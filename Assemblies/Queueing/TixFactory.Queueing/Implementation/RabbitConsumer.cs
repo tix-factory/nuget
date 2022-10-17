@@ -23,7 +23,7 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
 {
     private readonly IModel _RabbitConnection;
     private readonly IApplicationContext _ApplicationContext;
-    private readonly AsyncEventingBasicConsumer _QueueConsumer;
+    private readonly EventingBasicConsumer _QueueConsumer;
     private readonly IndividualQueueConfiguration _Configuration;
     private readonly Gauge.Child _InProgressGauge;
     private readonly Counter _ResultCounter;
@@ -63,7 +63,7 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
         _RabbitConnection = rabbitConnection ?? throw new ArgumentNullException(nameof(rabbitConnection));
         _ApplicationContext = applicationContext ?? throw new ArgumentNullException(nameof(applicationContext));
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _QueueConsumer = new AsyncEventingBasicConsumer(rabbitConnection);
+        _QueueConsumer = new EventingBasicConsumer(rabbitConnection);
         _Configuration = LoadConfiguration(configuration, queueName);
 
         _InProgressGauge = Metrics.CreateGauge(
@@ -81,7 +81,7 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
     /// <inheritdoc cref="IHostedService.StartAsync"/>
     public virtual Task StartAsync(CancellationToken cancellationToken)
     {
-        _QueueConsumer.Received += HandleQueueItemAsync;
+        _QueueConsumer.Received += HandleQueueItem;
 
         _RabbitConnection.BasicQos(prefetchSize: 0, prefetchCount: _Configuration.NumberOfThreads, global: false);
 
@@ -97,7 +97,7 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
             consumer: _QueueConsumer,
             consumerTag: _ApplicationContext.Name);
 
-        Logger.LogInformation($"Listening to queue... {QueueName}");
+        Logger.LogInformation($"Listening to queue... {QueueName}\n\tNumber of Threads: {_Configuration.NumberOfThreads} (process thread count: {ThreadPool.ThreadCount})");
 
         return Task.CompletedTask;
     }
@@ -105,7 +105,7 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
     /// <inheritdoc cref="IHostedService.StopAsync"/>
     public virtual Task StopAsync(CancellationToken cancellationToken)
     {
-        _QueueConsumer.Received -= HandleQueueItemAsync;
+        _QueueConsumer.Received -= HandleQueueItem;
 
         // TODO: Is there some way to undo BasicConsume?
 
@@ -119,6 +119,15 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     /// <returns>The result of what happened while processing the message.</returns>
     protected abstract Task<MessageProcessingResult> ProcessMessageAsync(TMessage message, CancellationToken cancellationToken);
+
+    private void HandleQueueItem(object sender, BasicDeliverEventArgs message)
+    {
+        ThreadPool.QueueUserWorkItem(async (_) =>
+        {
+            // Need to process the message in a background thread, to ensure the 
+            await HandleQueueItemAsync(sender, message);
+        });
+    }
 
     private async Task HandleQueueItemAsync(object sender, BasicDeliverEventArgs message)
     {
@@ -137,8 +146,6 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
                     {
                         Logger.LogError(exception, $"An unhandled exception happened while processing message. The message will be retried.\n\tMessage: {Encoding.UTF8.GetString(message.Body.ToArray())}");
                     }
-
-                    await Task.Delay(_Configuration.RetryDealy);
 
                     _RabbitConnection.BasicNack(message.DeliveryTag, multiple: false, requeue: true);
 
