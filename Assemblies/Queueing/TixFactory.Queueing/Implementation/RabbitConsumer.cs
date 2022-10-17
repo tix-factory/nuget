@@ -59,7 +59,7 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
             throw new ArgumentNullException(nameof(configuration));
         }
 
-        var queueName = QueueName = GetQueueName();
+        var queueName = QueueName = RabbitExtensions.GetQueueName<TMessage>();
 
         _RabbitConnection = rabbitConnection ?? throw new ArgumentNullException(nameof(rabbitConnection));
         _ApplicationContext = applicationContext ?? throw new ArgumentNullException(nameof(applicationContext));
@@ -204,17 +204,6 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
         {
             return (MessageProcessingResult.Retry, e);
         }
-    }
-
-    private string GetQueueName()
-    {
-        var dataContract = typeof(TMessage).GetCustomAttribute<DataContractAttribute>();
-        if (string.IsNullOrWhiteSpace(dataContract?.Name))
-        {
-            throw new ArgumentException($"{nameof(DataContractAttribute)} with {nameof(DataContractAttribute.Name)} set, to identify queue the message is for.", nameof(TMessage));
-        }
-
-        return dataContract.Name;
     }
 
     private IndividualQueueConfiguration LoadConfiguration(IConfiguration configuration, string queueName)
