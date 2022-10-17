@@ -26,6 +26,7 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
     private readonly EventingBasicConsumer _QueueConsumer;
     private readonly IndividualQueueConfiguration _Configuration;
     private readonly Gauge.Child _InProgressGauge;
+    private readonly Histogram.Child _ProcessingHistogram;
     private readonly Counter _ResultCounter;
 
     /// <summary>
@@ -76,6 +77,12 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
             name: "rabbit_consumer_messages_processed",
             help: "Number of messages processed, and their result.",
             labelNames: new[] { "queue_name", "result" });
+
+        _ProcessingHistogram = Metrics.CreateHistogram(
+            name: "rabbit_consumer_messages_processing",
+            help: "Messages being processed, and their processing times.",
+            labelNames: new[] { "queue_name" })
+            .WithLabels(QueueName);
     }
 
     /// <inheritdoc cref="IHostedService.StartAsync"/>
@@ -131,6 +138,7 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
 
     private async Task HandleQueueItemAsync(object sender, BasicDeliverEventArgs message)
     {
+        using var timer = _ProcessingHistogram.NewTimer();
         _InProgressGauge.Inc();
 
         try
