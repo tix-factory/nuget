@@ -216,7 +216,7 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
         }
         catch (Exception e)
         {
-            return (MessageProcessingResult.Retry, e);
+            return (MessageProcessingResult.UnhandledException, e);
         }
     }
 
