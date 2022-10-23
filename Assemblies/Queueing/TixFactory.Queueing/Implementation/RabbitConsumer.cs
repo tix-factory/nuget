@@ -143,21 +143,21 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
 
     private void HandleQueueItem(object sender, BasicDeliverEventArgs message)
     {
+        var messageBody = Encoding.UTF8.GetString(message.Body.ToArray());
         ThreadPool.QueueUserWorkItem(async (_) =>
         {
             // Need to process the message in a background thread, to ensure the 
-            await HandleQueueItemAsync(sender, message);
+            await HandleQueueItemAsync(sender, message, messageBody);
         });
     }
 
-    private async Task HandleQueueItemAsync(object sender, BasicDeliverEventArgs message)
+    private async Task HandleQueueItemAsync(object sender, BasicDeliverEventArgs message, string messageBody)
     {
         using var timer = _ProcessingHistogram.NewTimer();
         _InProgressGauge.Inc();
 
         try
         {
-            var messageBody = Encoding.UTF8.GetString(message.Body.ToArray());
             var (processingResult, exception) = await HandleQueueItemAsync(sender, messageBody, CancellationToken.None);
             _ResultCounter.WithLabels(QueueName, processingResult.ToString()).Inc();
 
