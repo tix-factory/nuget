@@ -139,7 +139,7 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
     /// <param name="message">The message itself.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     /// <returns>The result of what happened while processing the message.</returns>
-    protected abstract Task<MessageProcessingResult> ProcessMessageAsync(TMessage message, CancellationToken cancellationToken);
+    public abstract Task<MessageProcessingResult> ProcessMessageAsync(TMessage message, CancellationToken cancellationToken);
 
     private void HandleQueueItem(object sender, BasicDeliverEventArgs message)
     {
