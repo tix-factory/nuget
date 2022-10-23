@@ -143,16 +143,19 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
 
     private void HandleQueueItem(object sender, BasicDeliverEventArgs message)
     {
+        var exchange = message.Exchange;
         var deliveryTag = message.DeliveryTag;
         var messageBody = Encoding.UTF8.GetString(message.Body.ToArray());
+        var messageProperties = message.BasicProperties;
+
         ThreadPool.QueueUserWorkItem(async (_) =>
         {
             // Need to process the message in a background thread, to ensure the 
-            await HandleQueueItemAsync(messageBody, deliveryTag);
+            await HandleQueueItemAsync(messageBody, deliveryTag, exchange, messageProperties);
         });
     }
 
-    private async Task HandleQueueItemAsync(string messageBody, ulong deliveryTag)
+    private async Task HandleQueueItemAsync(string messageBody, ulong deliveryTag, string exchange, IBasicProperties messageProperties)
     {
         using var timer = _ProcessingHistogram.NewTimer();
         _InProgressGauge.Inc();
@@ -176,6 +179,16 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
                     return;
                 case MessageProcessingResult.Success:
                     _RabbitConnection.BasicAck(deliveryTag, multiple: false);
+                    return;
+                case MessageProcessingResult.Requeue:
+                    _RabbitConnection.BasicPublish(
+                            exchange: exchange,
+                            routingKey: QueueName,
+                            body: Encoding.UTF8.GetBytes(messageBody),
+                            basicProperties: messageProperties);
+
+                    _RabbitConnection.BasicAck(deliveryTag, multiple: false);
+
                     return;
                 case MessageProcessingResult.BadMessage:
                     if (_Configuration.DisposeBadMessages)

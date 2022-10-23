@@ -35,4 +35,9 @@ public enum MessageProcessingResult
     /// Acts as a retry, but should not be returned directly.
     /// </remarks>
     UnhandledException = 4,
+
+    /// <summary>
+    /// Attempts to add the message back to the queue, and remove the original message.
+    /// </summary>
+    Requeue = 5,
 }
