@@ -143,21 +143,23 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
 
     private void HandleQueueItem(object sender, BasicDeliverEventArgs message)
     {
+        var deliveryTag = message.DeliveryTag;
+        var messageBody = Encoding.UTF8.GetString(message.Body.ToArray());
         ThreadPool.QueueUserWorkItem(async (_) =>
         {
             // Need to process the message in a background thread, to ensure the 
-            await HandleQueueItemAsync(sender, message);
+            await HandleQueueItemAsync(messageBody, deliveryTag);
         });
     }
 
-    private async Task HandleQueueItemAsync(object sender, BasicDeliverEventArgs message)
+    private async Task HandleQueueItemAsync(string messageBody, ulong deliveryTag)
     {
         using var timer = _ProcessingHistogram.NewTimer();
         _InProgressGauge.Inc();
 
         try
         {
-            var (processingResult, exception) = await HandleQueueItemAsync(sender, message, CancellationToken.None);
+            var (processingResult, exception) = await HandleQueueItemAsync(messageBody, CancellationToken.None);
             _ResultCounter.WithLabels(QueueName, processingResult.ToString()).Inc();
 
             switch (processingResult)
@@ -166,33 +168,33 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
                 case MessageProcessingResult.UnhandledException:
                     if (exception != null)
                     {
-                        Logger.LogError(exception, $"An unhandled exception happened while processing message. The message will be retried.\n\tMessage: {Encoding.UTF8.GetString(message.Body.ToArray())}");
+                        Logger.LogError(exception, $"An unhandled exception happened while processing message. The message will be retried.\n\tMessage: {messageBody}");
                     }
 
-                    _RabbitConnection.BasicNack(message.DeliveryTag, multiple: false, requeue: true);
+                    _RabbitConnection.BasicNack(deliveryTag, multiple: false, requeue: true);
 
                     return;
                 case MessageProcessingResult.Success:
-                    _RabbitConnection.BasicAck(message.DeliveryTag, multiple: false);
+                    _RabbitConnection.BasicAck(deliveryTag, multiple: false);
                     return;
                 case MessageProcessingResult.BadMessage:
                     if (_Configuration.DisposeBadMessages)
                     {
                         if (_Configuration.LogBadMessages)
                         {
-                            Logger.LogWarning(exception, $"Failed to parse message from queue: {QueueName} (the message will be removed)\n\tMessage: {Convert.ToBase64String(message.Body.ToArray())}");
+                            Logger.LogWarning(exception, $"Failed to parse message from queue: {QueueName} (the message will be removed)\n\tMessage: {messageBody}");
                         }
 
-                        _RabbitConnection.BasicAck(message.DeliveryTag, multiple: false);
+                        _RabbitConnection.BasicAck(deliveryTag, multiple: false);
                     }
                     else
                     {
                         if (_Configuration.LogBadMessages)
                         {
-                            Logger.LogWarning(exception, $"Failed to parse message from queue: {QueueName} (message will remain in queue)\n\tMessage: {Convert.ToBase64String(message.Body.ToArray())}");
+                            Logger.LogWarning(exception, $"Failed to parse message from queue: {QueueName} (message will remain in queue)\n\tMessage: {messageBody}");
                         }
 
-                        _RabbitConnection.BasicNack(message.DeliveryTag, multiple: false, requeue: true);
+                        _RabbitConnection.BasicNack(deliveryTag, multiple: false, requeue: true);
                     }
 
                     return;
@@ -213,13 +215,13 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
         }
     }
 
-    private async Task<(MessageProcessingResult, Exception)> HandleQueueItemAsync(object _, BasicDeliverEventArgs message, CancellationToken cancellationToken)
+    private async Task<(MessageProcessingResult, Exception)> HandleQueueItemAsync(string message, CancellationToken cancellationToken)
     {
         TMessage parsedMessage;
 
         try
         {
-            parsedMessage = JsonConvert.DeserializeObject<TMessage>(Encoding.UTF8.GetString(message.Body.ToArray()));
+            parsedMessage = JsonConvert.DeserializeObject<TMessage>(message);
         }
         catch (Exception e)
         {
