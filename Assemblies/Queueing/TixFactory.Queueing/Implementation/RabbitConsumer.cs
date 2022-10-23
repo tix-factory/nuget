@@ -213,7 +213,7 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
         }
     }
 
-    private async Task<(MessageProcessingResult, Exception)> HandleQueueItemAsync(object sender, BasicDeliverEventArgs message, CancellationToken cancellationToken)
+    private async Task<(MessageProcessingResult, Exception)> HandleQueueItemAsync(object _, BasicDeliverEventArgs message, CancellationToken cancellationToken)
     {
         TMessage parsedMessage;
 
@@ -237,7 +237,7 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
         }
     }
 
-    private IndividualQueueConfiguration LoadConfiguration(IConfiguration configuration, string queueName)
+    private static IndividualQueueConfiguration LoadConfiguration(IConfiguration configuration, string queueName)
     {
         var settings = new IndividualQueueConfiguration();
         var rabbitSection = configuration.GetSection("Rabbit");
