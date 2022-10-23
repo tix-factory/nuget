@@ -1,6 +1,4 @@
 using System;
-using System.Reflection;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,6 +36,22 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
     /// The <see cref="ILogger"/>.
     /// </summary>
     protected ILogger Logger { get; }
+
+    /// <summary>
+    /// Initializes a new <see cref="RabbitConsumer{TMessage}"/>.
+    /// </summary>
+    /// <param name="rabbitConnection">The Rabbit connection.</param>
+    /// <param name="logger">The <see cref="Logger"/>.</param>
+    /// <param name="configuration">The <see cref="IConfiguration"/>.</param>
+    /// <exception cref="ArgumentNullException">
+    /// - <paramref name="rabbitConnection"/>
+    /// - <paramref name="logger"/>
+    /// - <paramref name="configuration"/>
+    /// </exception>
+    protected RabbitConsumer(IModel rabbitConnection, ILogger logger, IConfiguration configuration)
+        : this(rabbitConnection, ApplicationContext.ApplicationContext.Singleton, logger, configuration)
+    {
+    }
 
     /// <summary>
     /// Initializes a new <see cref="RabbitConsumer{TMessage}"/>.
