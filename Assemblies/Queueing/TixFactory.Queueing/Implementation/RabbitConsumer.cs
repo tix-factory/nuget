@@ -176,8 +176,25 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
                     _RabbitConnection.BasicAck(message.DeliveryTag, multiple: false);
                     return;
                 case MessageProcessingResult.BadMessage:
-                    Logger.LogWarning(exception, $"Failed to parse message from queue: {QueueName} (the message will be removed)\n\tMessage: {Convert.ToBase64String(message.Body.ToArray())}");
-                    _RabbitConnection.BasicAck(message.DeliveryTag, multiple: false);
+                    if (_Configuration.DisposeBadMessages)
+                    {
+                        if (_Configuration.LogBadMessages)
+                        {
+                            Logger.LogWarning(exception, $"Failed to parse message from queue: {QueueName} (the message will be removed)\n\tMessage: {Convert.ToBase64String(message.Body.ToArray())}");
+                        }
+
+                        _RabbitConnection.BasicAck(message.DeliveryTag, multiple: false);
+                    }
+                    else
+                    {
+                        if (_Configuration.LogBadMessages)
+                        {
+                            Logger.LogWarning(exception, $"Failed to parse message from queue: {QueueName} (message will remain in queue)\n\tMessage: {Convert.ToBase64String(message.Body.ToArray())}");
+                        }
+
+                        _RabbitConnection.BasicNack(message.DeliveryTag, multiple: false, requeue: true);
+                    }
+
                     return;
                 default:
                     Logger.LogError($"The processing result is invalid ({processingResult}). This message will be back after the timeout.");
