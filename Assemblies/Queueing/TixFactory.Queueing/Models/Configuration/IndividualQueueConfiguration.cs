@@ -19,10 +19,10 @@ internal class IndividualQueueConfiguration
     ///
     /// When <c>false</c> the message will remain in the queue.
     /// </remarks>
-    public bool DisposeBadMessages { get; set; } = false;
+    public bool DisposeBadMessages { get; set; } = true;
 
     /// <summary>
     /// Whether or not to log a warning whenever a bad message is detected in the queue.
     /// </summary>
-    public bool LogBadMessages { get; set; } = false;
+    public bool LogBadMessages { get; set; } = true;
 }
