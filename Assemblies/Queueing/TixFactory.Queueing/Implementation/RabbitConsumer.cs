@@ -1,6 +1,4 @@
 using System;
-using System.Reflection;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,6 +36,22 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
     /// The <see cref="ILogger"/>.
     /// </summary>
     protected ILogger Logger { get; }
+
+    /// <summary>
+    /// Initializes a new <see cref="RabbitConsumer{TMessage}"/>.
+    /// </summary>
+    /// <param name="rabbitConnection">The Rabbit connection.</param>
+    /// <param name="logger">The <see cref="Logger"/>.</param>
+    /// <param name="configuration">The <see cref="IConfiguration"/>.</param>
+    /// <exception cref="ArgumentNullException">
+    /// - <paramref name="rabbitConnection"/>
+    /// - <paramref name="logger"/>
+    /// - <paramref name="configuration"/>
+    /// </exception>
+    protected RabbitConsumer(IModel rabbitConnection, ILogger logger, IConfiguration configuration)
+        : this(rabbitConnection, ApplicationContext.ApplicationContext.Singleton, logger, configuration)
+    {
+    }
 
     /// <summary>
     /// Initializes a new <see cref="RabbitConsumer{TMessage}"/>.
@@ -125,7 +139,7 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
     /// <param name="message">The message itself.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     /// <returns>The result of what happened while processing the message.</returns>
-    protected abstract Task<MessageProcessingResult> ProcessMessageAsync(TMessage message, CancellationToken cancellationToken);
+    public abstract Task<MessageProcessingResult> ProcessMessageAsync(TMessage message, CancellationToken cancellationToken);
 
     private void HandleQueueItem(object sender, BasicDeliverEventArgs message)
     {
@@ -162,8 +176,25 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
                     _RabbitConnection.BasicAck(message.DeliveryTag, multiple: false);
                     return;
                 case MessageProcessingResult.BadMessage:
-                    Logger.LogWarning(exception, $"Failed to parse message from queue: {QueueName} (the message will be removed)\n\tMessage: {Convert.ToBase64String(message.Body.ToArray())}");
-                    _RabbitConnection.BasicAck(message.DeliveryTag, multiple: false);
+                    if (_Configuration.DisposeBadMessages)
+                    {
+                        if (_Configuration.LogBadMessages)
+                        {
+                            Logger.LogWarning(exception, $"Failed to parse message from queue: {QueueName} (the message will be removed)\n\tMessage: {Convert.ToBase64String(message.Body.ToArray())}");
+                        }
+
+                        _RabbitConnection.BasicAck(message.DeliveryTag, multiple: false);
+                    }
+                    else
+                    {
+                        if (_Configuration.LogBadMessages)
+                        {
+                            Logger.LogWarning(exception, $"Failed to parse message from queue: {QueueName} (message will remain in queue)\n\tMessage: {Convert.ToBase64String(message.Body.ToArray())}");
+                        }
+
+                        _RabbitConnection.BasicNack(message.DeliveryTag, multiple: false, requeue: true);
+                    }
+
                     return;
                 default:
                     Logger.LogError($"The processing result is invalid ({processingResult}). This message will be back after the timeout.");
@@ -182,7 +213,7 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
         }
     }
 
-    private async Task<(MessageProcessingResult, Exception)> HandleQueueItemAsync(object sender, BasicDeliverEventArgs message, CancellationToken cancellationToken)
+    private async Task<(MessageProcessingResult, Exception)> HandleQueueItemAsync(object _, BasicDeliverEventArgs message, CancellationToken cancellationToken)
     {
         TMessage parsedMessage;
 
@@ -202,11 +233,11 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
         }
         catch (Exception e)
         {
-            return (MessageProcessingResult.Retry, e);
+            return (MessageProcessingResult.UnhandledException, e);
         }
     }
 
-    private IndividualQueueConfiguration LoadConfiguration(IConfiguration configuration, string queueName)
+    private static IndividualQueueConfiguration LoadConfiguration(IConfiguration configuration, string queueName)
     {
         var settings = new IndividualQueueConfiguration();
         var rabbitSection = configuration.GetSection("Rabbit");
