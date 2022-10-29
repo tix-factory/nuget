@@ -24,6 +24,7 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
     private readonly EventingBasicConsumer _QueueConsumer;
     private readonly IndividualQueueConfiguration _Configuration;
     private readonly Gauge.Child _InProgressGauge;
+    private readonly Gauge.Child _QueueSize;
     private readonly Histogram.Child _ProcessingHistogram;
     private readonly Counter _ResultCounter;
 
@@ -84,6 +85,12 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
         _InProgressGauge = Metrics.CreateGauge(
             name: "rabbit_consumer_in_progress",
             help: "How many messages are actively being processed.",
+            labelNames: new[] { "queue_name" })
+            .WithLabels(QueueName);
+
+        _QueueSize = Metrics.CreateGauge(
+            name: "rabbit_queue_size",
+            help: "Number of messages in the queue waiting for a consumer to pick them up.",
             labelNames: new[] { "queue_name" })
             .WithLabels(QueueName);
 
@@ -150,9 +157,13 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
 
         ThreadPool.QueueUserWorkItem(async (_) =>
         {
-            // Need to process the message in a background thread, to ensure the 
+            // Need to process the message in a background thread, to ensure the event handling concludes.
+            // The next event won't fire until the previous one finishes.
             await HandleQueueItemAsync(messageBody, deliveryTag, exchange, messageProperties);
+            RecordQueueSize();
         });
+
+        RecordQueueSize();
     }
 
     private async Task HandleQueueItemAsync(string messageBody, ulong deliveryTag, string exchange, IBasicProperties messageProperties)
@@ -249,6 +260,24 @@ public abstract class RabbitConsumer<TMessage> : IHostedService
         catch (Exception e)
         {
             return (MessageProcessingResult.UnhandledException, e);
+        }
+    }
+
+    private void RecordQueueSize()
+    {
+        if (!_Configuration.RecordQueueSize)
+        {
+            return;
+        }
+
+        try
+        {
+            var count = _RabbitConnection.MessageCount(QueueName);
+            _QueueSize.Set(count);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "Failed to record queue size");
         }
     }
 
