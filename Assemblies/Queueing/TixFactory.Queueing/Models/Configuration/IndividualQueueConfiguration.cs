@@ -25,4 +25,9 @@ internal class IndividualQueueConfiguration
     /// Whether or not to log a warning whenever a bad message is detected in the queue.
     /// </summary>
     public bool LogBadMessages { get; set; } = true;
+
+    /// <summary>
+    /// Whether or not to check the queue size every time a message is processed.
+    /// </summary>
+    public bool RecordQueueSize { get; set; } = true;
 }
