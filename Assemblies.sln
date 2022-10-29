@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Configuration.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Configuration", "Assemblies\Configuration\TixFactory.Configuration\TixFactory.Configuration.csproj", "{E2DBAF5F-ECBF-4E25-A7FC-3E4A9A153CAF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Discord", "Assemblies\Discord\TixFactory.Discord\TixFactory.Discord.csproj", "{07C1F7CB-C5BA-4574-8147-A1551A06387E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Http", "Assemblies\Http\TixFactory.Http\TixFactory.Http.csproj", "{A02DC034-352B-48A0-88F5-F391A8ECCD89}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TixFactory.Http.Client", "Assemblies\Http\TixFactory.Http.Client\TixFactory.Http.Client.csproj", "{D076B06E-9938-449F-9028-FD6E4A2DEAD3}"
@@ -59,10 +57,6 @@ Global
 		{E2DBAF5F-ECBF-4E25-A7FC-3E4A9A153CAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2DBAF5F-ECBF-4E25-A7FC-3E4A9A153CAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2DBAF5F-ECBF-4E25-A7FC-3E4A9A153CAF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{07C1F7CB-C5BA-4574-8147-A1551A06387E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{07C1F7CB-C5BA-4574-8147-A1551A06387E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{07C1F7CB-C5BA-4574-8147-A1551A06387E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{07C1F7CB-C5BA-4574-8147-A1551A06387E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A02DC034-352B-48A0-88F5-F391A8ECCD89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A02DC034-352B-48A0-88F5-F391A8ECCD89}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A02DC034-352B-48A0-88F5-F391A8ECCD89}.Release|Any CPU.ActiveCfg = Release|Any CPU
