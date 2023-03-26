@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Converters;
 using Prometheus;
 using Prometheus.HttpMetrics;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using TixFactory.ApplicationContext;
 
 namespace TixFactory.Http.Service;
@@ -34,6 +35,8 @@ public abstract class Startup
         app.UseHttpMetrics(ConfigureMetrics);
         app.UseMiddleware<UnhandledExceptionMiddleware>();
         app.UseEndpoints(ConfigureEndpoints);
+        app.UseSwagger();
+        app.UseSwaggerUI();
     }
 
     /// <summary>
@@ -46,6 +49,9 @@ public abstract class Startup
         services.AddSingleton<IOperationExecutor, OperationExecutor>();
 
         services.AddLogging(ConfigureLogging);
+
+        services.AddSwaggerGen(ConfigureSwagger)
+            .AddSwaggerGenNewtonsoftSupport();
 
         services.AddControllers(ConfigureMvc)
             .AddNewtonsoftJson(ConfigureJson);
@@ -109,6 +115,14 @@ public abstract class Startup
     /// </summary>
     /// <param name="options">The <see cref="HttpMiddlewareExporterOptions"/>.</param>
     protected virtual void ConfigureMetrics(HttpMiddlewareExporterOptions options)
+    {
+    }
+
+    /// <summary>
+    /// Configures Swagger.
+    /// </summary>
+    /// <param name="options">The <see cref="SwaggerGenOptions"/>.</param>
+    protected virtual void ConfigureSwagger(SwaggerGenOptions options)
     {
     }
 }
