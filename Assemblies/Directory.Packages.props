@@ -17,5 +17,8 @@
     <PackageVersion Include="prometheus-net" Version="6.0.0" />
     <PackageVersion Include="prometheus-net.AspNetCore" Version="6.0.0" />
     <PackageVersion Include="RabbitMQ.Client" Version="6.4.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.5.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.5.0" />
   </ItemGroup>
 </Project>
